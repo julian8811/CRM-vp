@@ -4,12 +4,13 @@ import {
   signUpWithEmail, 
   signInWithGoogle, 
   signOut as signOutAuth,
-  getCurrentUser,
   getSession,
   onAuthStateChange,
   getProfile,
-  isSupabaseConfigured
+  isSupabaseConfigured,
+  supabase
 } from '../lib/auth'
+import { formatAuthError } from '../lib/authErrors'
 
 const AuthContext = createContext(null)
 
@@ -94,16 +95,20 @@ export function AuthProvider({ children }) {
     const { data, error: authError } = await signInWithEmail(email, password)
     
     if (authError) {
-      setError(authError.message)
+      setError(formatAuthError(authError))
       setLoading(false)
       return { error: authError }
     }
 
-    // Cargar perfil después del login
-    if (data?.user) {
-      setUser(data.user)
-      const { data: profileData } = await getProfile(data.user.id)
-      setProfile(profileData)
+    const { data: { session } } = await supabase.auth.getSession()
+    const authedUser = session?.user ?? data?.user
+    if (authedUser) {
+      setUser(authedUser)
+      const { data: profileData, error: profileError } = await getProfile(authedUser.id)
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.warn('Perfil:', profileError.message)
+      }
+      setProfile(profileData ?? null)
     }
     
     setLoading(false)
@@ -130,7 +135,7 @@ export function AuthProvider({ children }) {
     })
     
     if (authError) {
-      setError(authError.message)
+      setError(formatAuthError(authError))
       setLoading(false)
       return { error: authError }
     }
@@ -153,7 +158,7 @@ export function AuthProvider({ children }) {
     const { data, error: authError } = await signInWithGoogle()
     
     if (authError) {
-      setError(authError.message)
+      setError(formatAuthError(authError))
       return { error: authError }
     }
 
