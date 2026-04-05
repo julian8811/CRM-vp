@@ -16,19 +16,19 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useAuth } from './contexts/AuthContext';
+import { useCrmModal } from './contexts/CrmModalContext';
+import { CrmModalsHost } from './components/CrmModalsHost';
 import { Layout } from './components/layout/Layout';
 import { Button } from './components/ui/Button';
 import { Card, CardContent } from './components/ui/Card';
 import { Badge } from './components/ui/Badge';
 import { Avatar } from './components/ui/Avatar';
 import { DataTable } from './components/ui/DataTable';
-import { Modal } from './components/ui/Modal';
 import { Input } from './components/ui/Input';
 import { Label } from './components/ui/Label';
 import { Loader2, Plus, TrendingUp, DollarSign, Users, Target, ShoppingCart, GripVertical, MapPin, Building2, Mail, Phone, Edit2, Trash2, ArrowRightCircle, Package, AlertTriangle, FileText, Clock, CheckCircle, XCircle, Send, BarChart3, PieChart, Activity, Zap, Settings, UserPlus, Wrench, Headphones, Download, Filter, Eye, FileDown, Calendar, RefreshCw, Copy, Check, X, ChevronRight, Sparkles, Bot, Lightbulb, TrendingDown, UsersRound, Receipt, CreditCard, FileCheck, Workflow, Play, Pause, Clock3, Bell } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useStore } from './store/useStore';
-import { exportCurrentPage } from './lib/exportExcel';
 
 const PAGE_TITLES = {
   dashboard: { title: 'Dashboard', subtitle: 'Resumen de tu gestión comercial' },
@@ -56,6 +56,7 @@ const STAGE_COLORS = {
 };
 
 function DashboardContent() {
+  const { openModal } = useCrmModal();
   const pipeline = useStore(state => state.pipeline) || {};
   const customers = useStore(state => state.customers);
   const leads = useStore(state => state.leads);
@@ -92,9 +93,15 @@ function DashboardContent() {
   const quickActions = [
     { id: 'customer', icon: Users, label: 'Nuevo cliente', color: 'bg-blue-500' },
     { id: 'lead', icon: Target, label: 'Nuevo lead', color: 'bg-emerald-500' },
-    { id: 'quote', icon: DollarSign, label: 'Nueva cotización', color: 'bg-violet-500' },
+    { id: 'quotation', icon: DollarSign, label: 'Nueva cotización', color: 'bg-violet-500' },
     { id: 'order', icon: ShoppingCart, label: 'Nuevo pedido', color: 'bg-amber-500' },
   ];
+
+  const openQuick = (id) => {
+    const map = { customer: 'customer', lead: 'lead', quotation: 'quotation', order: 'order' };
+    const name = map[id];
+    if (name) openModal(name);
+  };
 
   return (
     <div className="space-y-6">
@@ -214,6 +221,8 @@ function DashboardContent() {
               {quickActions.map(action => (
                 <button
                   key={action.id}
+                  type="button"
+                  onClick={() => openQuick(action.id)}
                   className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group"
                 >
                   <div className={`p-2 rounded-lg ${action.color}`}>
@@ -526,21 +535,25 @@ export default function App() {
   };
 
   return (
-    <Layout
-      currentPage={currentPage}
-      onNavigate={setCurrentPage}
-      user={{ first_name: profile.first_name || user.email?.split('@')[0], last_name: profile.last_name || '', role: profile.role || 'sales' }}
-      onLogout={logout}
-      title={pageInfo.title}
-      subtitle={pageInfo.subtitle}
-    >
-      {renderPage()}
-    </Layout>
+    <>
+      <Layout
+        currentPage={currentPage}
+        onNavigate={setCurrentPage}
+        user={{ first_name: profile.first_name || user.email?.split('@')[0], last_name: profile.last_name || '', role: profile.role || 'sales' }}
+        onLogout={logout}
+        title={pageInfo.title}
+        subtitle={pageInfo.subtitle}
+      >
+        {renderPage()}
+      </Layout>
+      <CrmModalsHost />
+    </>
   );
 }
 
 // Customers Page
 function CustomersContent() {
+  const { openModal } = useCrmModal();
   const customers = useStore(state => state.customers);
   const deleteCustomer = useStore(state => state.deleteCustomer);
   
@@ -584,10 +597,10 @@ function CustomersContent() {
     )},
     { key: 'actions', header: '', render: (val, row) => (
       <div className="flex items-center gap-2 justify-end">
-        <button className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-blue-500 transition-colors">
+        <button type="button" onClick={() => openModal('customer', { customer: row })} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-blue-500 transition-colors">
           <Edit2 className="w-4 h-4" />
         </button>
-        <button onClick={() => deleteCustomer(row.id)} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-red-500 transition-colors">
+        <button type="button" onClick={() => deleteCustomer(row.id)} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-red-500 transition-colors">
           <Trash2 className="w-4 h-4" />
         </button>
       </div>
@@ -601,7 +614,7 @@ function CustomersContent() {
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Clientes</h2>
           <p className="text-sm text-slate-500">{customers.length} clientes registrados</p>
         </div>
-        <Button>
+        <Button type="button" onClick={() => openModal('customer')}>
           <Plus className="w-4 h-4" />
           Nuevo Cliente
         </Button>
@@ -613,6 +626,7 @@ function CustomersContent() {
 
 // Leads Page
 function LeadsContent() {
+  const { openModal } = useCrmModal();
   const leads = useStore(state => state.leads);
   const convertLead = useStore(state => state.convertLead);
   
@@ -644,7 +658,7 @@ function LeadsContent() {
     { key: 'actions', header: '', render: (val, row) => (
       <div className="flex justify-center">
         {row.status !== 'converted' ? (
-          <Button size="sm" variant="outline" onClick={() => convertLead(row.id)}>
+          <Button size="sm" variant="outline" type="button" onClick={() => convertLead(row.id)}>
             <ArrowRightCircle className="w-3 h-3" />
             Convertir
           </Button>
@@ -660,7 +674,7 @@ function LeadsContent() {
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Leads</h2>
           <p className="text-sm text-slate-500">{leads.length} leads registrados</p>
         </div>
-        <Button>
+        <Button type="button" onClick={() => openModal('lead')}>
           <Plus className="w-4 h-4" />
           Nuevo Lead
         </Button>
@@ -672,6 +686,7 @@ function LeadsContent() {
 
 // Products Page
 function ProductsContent() {
+  const { openModal } = useCrmModal();
   const products = useStore(state => state.products);
 
   return (
@@ -681,7 +696,7 @@ function ProductsContent() {
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Productos</h2>
           <p className="text-sm text-slate-500">{products.length} productos en catálogo</p>
         </div>
-        <Button>
+        <Button type="button" onClick={() => openModal('product')}>
           <Plus className="w-4 h-4" />
           Nuevo Producto
         </Button>
@@ -826,6 +841,7 @@ function PipelineColumn({ stage, opps }) {
 }
 
 function PipelineContent() {
+  const { openModal } = useCrmModal();
   const pipeline = useStore(state => state.pipeline) || {};
   const movePipelineOpportunity = useStore(state => state.movePipelineOpportunity);
   const stages = ['lead', 'contact', 'qualification', 'proposal', 'negotiation', 'closed_won'];
@@ -915,7 +931,7 @@ function PipelineContent() {
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Embudo de Ventas</h2>
           <p className="text-sm text-slate-500">Arrastrá las oportunidades entre etapas</p>
         </div>
-        <Button>
+        <Button type="button" onClick={() => openModal('opportunity')}>
           <Plus className="w-4 h-4" />
           Nueva Oportunidad
         </Button>
@@ -950,6 +966,7 @@ function PipelineContent() {
 
 // Quotations Page
 function QuotationsContent() {
+  const { openModal } = useCrmModal();
   const quotations = useStore(state => state.quotations);
   
   const columns = [
@@ -962,8 +979,8 @@ function QuotationsContent() {
     )},
     { key: 'total', header: 'Total', sortable: true, render: (val) => <span className="font-semibold text-slate-900 dark:text-white">${Math.round(val).toLocaleString()}</span> },
     { key: 'status', header: 'Estado', render: (val) => {
-      const variants = { draft: 'gray', sent: 'blue', viewed: 'amber', accepted: 'green', rejected: 'red', expired: 'gray' };
-      const labels = { draft: 'Borrador', sent: 'Enviada', viewed: 'Vista', accepted: 'Aceptada', rejected: 'Rechazada', expired: 'Expirada' };
+      const variants = { draft: 'gray', sent: 'blue', approved: 'green', reviewed: 'amber', rejected: 'red' };
+      const labels = { draft: 'Borrador', sent: 'Enviada', approved: 'Aprobada', reviewed: 'Revisada', rejected: 'Rechazada' };
       return <Badge variant={variants[val] || 'gray'}>{labels[val] || val}</Badge>;
     }},
     { key: 'valid_until', header: 'Válida hasta', render: (val) => val ? new Date(val).toLocaleDateString('es-CO') : '—' },
@@ -990,7 +1007,7 @@ function QuotationsContent() {
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Cotizaciones</h2>
           <p className="text-sm text-slate-500">{quotations.length} cotizaciones</p>
         </div>
-        <Button>
+        <Button type="button" onClick={() => openModal('quotation')}>
           <Plus className="w-4 h-4" />
           Nueva Cotización
         </Button>
@@ -1002,6 +1019,7 @@ function QuotationsContent() {
 
 // Orders Page
 function OrdersContent() {
+  const { openModal } = useCrmModal();
   const orders = useStore(state => state.orders);
   
   const columns = [
@@ -1014,14 +1032,11 @@ function OrdersContent() {
     )},
     { key: 'total', header: 'Total', sortable: true, render: (val) => <span className="font-semibold text-slate-900 dark:text-white">${Math.round(val).toLocaleString()}</span> },
     { key: 'status', header: 'Estado', render: (val) => {
-      const variants = { pending: 'amber', processing: 'blue', shipped: 'purple', delivered: 'green', cancelled: 'red' };
-      const labels = { pending: 'Pendiente', processing: 'Procesando', shipped: 'Enviado', delivered: 'Entregado', cancelled: 'Cancelado' };
+      const variants = { confirmed: 'amber', preparing: 'blue', shipped: 'purple', delivered: 'green', returned: 'red' };
+      const labels = { confirmed: 'Confirmado', preparing: 'Preparando', shipped: 'Enviado', delivered: 'Entregado', returned: 'Devuelto' };
       return <Badge variant={variants[val] || 'gray'}>{labels[val] || val}</Badge>;
     }},
-    { key: 'payment_status', header: 'Pago', render: (val) => {
-      const variants = { pending: 'amber', paid: 'green', failed: 'red', refunded: 'gray' };
-      return <Badge variant={variants[val] || 'gray'}>{val}</Badge>;
-    }},
+    { key: 'carrier', header: 'Transporte', render: (val) => val || '—' },
     { key: 'created_at', header: 'Fecha', render: (val) => new Date(val).toLocaleDateString('es-CO') },
     { key: 'actions', header: '', render: () => (
       <div className="flex items-center gap-2 justify-end">
@@ -1042,16 +1057,10 @@ function OrdersContent() {
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Pedidos</h2>
           <p className="text-sm text-slate-500">{orders.length} pedidos</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline">
-            <Download className="w-4 h-4" />
-            Exportar
-          </Button>
-          <Button>
+        <Button type="button" onClick={() => openModal('order')}>
             <Plus className="w-4 h-4" />
             Nuevo Pedido
           </Button>
-        </div>
       </div>
       <DataTable columns={columns} data={orders} searchPlaceholder="Buscar pedidos..." pageName="orders" />
     </div>

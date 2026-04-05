@@ -2,7 +2,14 @@ import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
 import { CUSTOMERS, LEADS, PRODUCTS, PIPELINE_DATA, QUOTATIONS, ORDERS } from '../data/mockData';
 import api from '../lib/api';
-import { isSupabaseConfigured } from '../lib/supabase';
+import { isSupabaseConfigured, supabase } from '../lib/supabase';
+
+async function getAuthUserId() {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user?.id ?? null;
+}
 
 /**
  * useStore - Zustand store con soporte para API de Supabase
@@ -71,10 +78,25 @@ export const useStore = create((set, get) => ({
     const { isApiReady, customers } = get();
     
     if (isApiReady()) {
+      const uid = await getAuthUserId();
+      if (!uid) {
+        console.error('No hay sesión para crear cliente');
+        return null;
+      }
       set((state) => ({ loading: { ...state.loading, customers: true } }));
       try {
-        // Agregar user_id del usuario actual (del contexto de auth)
-        const customerWithUser = { ...customer, user_id: customer.user_id || null };
+        const customerWithUser = {
+          name: customer.name,
+          company: customer.company,
+          email: customer.email,
+          phone: customer.phone ?? null,
+          city: customer.city ?? 'Medellín',
+          customer_type: customer.customer_type ?? 'corporate',
+          score: customer.score ?? 50,
+          lifetime_value: customer.lifetime_value ?? 0,
+          purchase_count: customer.purchase_count ?? 0,
+          user_id: uid,
+        };
         const result = await api.customers.create(customerWithUser);
         if (result.success) {
           set({ customers: [result.data, ...customers] });
@@ -167,9 +189,23 @@ export const useStore = create((set, get) => ({
     const { isApiReady, leads } = get();
     
     if (isApiReady()) {
+      const uid = await getAuthUserId();
+      if (!uid) return null;
       set((state) => ({ loading: { ...state.loading, leads: true } }));
       try {
-        const result = await api.leads.create({ ...lead, user_id: lead.user_id || null });
+        const payload = {
+          first_name: lead.first_name,
+          last_name: lead.last_name,
+          email: lead.email,
+          company: lead.company || '',
+          source: lead.source || 'web',
+          interest: lead.interest || 'warm',
+          score: lead.score ?? 50,
+          budget: lead.budget ?? 0,
+          status: lead.status || 'new',
+          user_id: uid,
+        };
+        const result = await api.leads.create(payload);
         if (result.success) {
           set({ leads: [result.data, ...leads] });
           return result.data;
@@ -231,7 +267,16 @@ export const useStore = create((set, get) => ({
     if (isApiReady()) {
       set((state) => ({ loading: { ...state.loading, products: true } }));
       try {
-        const result = await api.products.create(product);
+        const result = await api.products.create({
+          sku: product.sku,
+          name: product.name,
+          category: product.category || 'Software',
+          price: product.price,
+          discount_price: product.discount_price ?? null,
+          stock: product.stock ?? 0,
+          margin: product.margin ?? 0,
+          status: product.status || 'active',
+        });
         if (result.success) {
           set({ products: [result.data, ...products] });
           return result.data;
@@ -330,15 +375,19 @@ export const useStore = create((set, get) => ({
     const { isApiReady, pipeline } = get();
     
     if (isApiReady()) {
+      const uid = await getAuthUserId();
+      if (!uid) return null;
       try {
-        const result = await api.opportunities.create({ ...opp, stage });
+        const result = await api.opportunities.create({
+          name: opp.name,
+          value: opp.value ?? 0,
+          probability: opp.probability ?? 50,
+          customer_id: opp.customer_id || null,
+          stage,
+          user_id: uid,
+        });
         if (result.success) {
-          set({
-            pipeline: {
-              ...pipeline,
-              [stage]: [result.data, ...pipeline[stage]]
-            }
-          });
+          await get().fetchOpportunities();
           return result.data;
         }
         return null;
@@ -382,11 +431,22 @@ export const useStore = create((set, get) => ({
     const { isApiReady, quotations } = get();
     
     if (isApiReady()) {
+      const uid = await getAuthUserId();
+      if (!uid) return null;
       set((state) => ({ loading: { ...state.loading, quotations: true } }));
       try {
-        const result = await api.quotations.create(quote);
+        const result = await api.quotations.create({
+          number: quote.number,
+          customer_id: quote.customer_id,
+          user_id: uid,
+          status: quote.status || 'draft',
+          subtotal: quote.subtotal ?? 0,
+          tax: quote.tax ?? 0,
+          total: quote.total ?? 0,
+          validity: quote.validity || null,
+        });
         if (result.success) {
-          set({ quotations: [result.data, ...quotations] });
+          await get().fetchQuotations();
           return result.data;
         }
         return null;
@@ -427,11 +487,21 @@ export const useStore = create((set, get) => ({
     const { isApiReady, orders } = get();
     
     if (isApiReady()) {
+      const uid = await getAuthUserId();
+      if (!uid) return null;
       set((state) => ({ loading: { ...state.loading, orders: true } }));
       try {
-        const result = await api.orders.create(order);
+        const result = await api.orders.create({
+          number: order.number,
+          customer_id: order.customer_id,
+          user_id: uid,
+          status: order.status || 'confirmed',
+          total: order.total ?? 0,
+          carrier: order.carrier || null,
+          delivery_date: order.delivery_date || null,
+        });
         if (result.success) {
-          set({ orders: [result.data, ...orders] });
+          await get().fetchOrders();
           return result.data;
         }
         return null;

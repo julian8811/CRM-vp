@@ -144,10 +144,18 @@ export const api = {
     getAll: async () => {
       const { data, error } = await supabase
         .from('opportunities')
-        .select('*')
+        .select('*, customers(name, company)')
         .order('created_at', { ascending: false })
       if (error) return handleError(error)
-      return handleSuccess(data)
+      const rows = (data || []).map((row) => ({
+        ...row,
+        customer:
+          row.customers?.name ||
+          row.customers?.company ||
+          row.customer ||
+          null,
+      }))
+      return handleSuccess(rows)
     },
 
     create: async (opportunity) => {
@@ -249,10 +257,17 @@ export const api = {
     getAll: async () => {
       const { data, error } = await supabase
         .from('quotations')
-        .select('*')
+        .select('*, customers(name, company)')
         .order('created_at', { ascending: false })
       if (error) return handleError(error)
-      return handleSuccess(data)
+      const rows = (data || []).map((row) => ({
+        ...row,
+        quote_number: row.number,
+        customer_name:
+          row.customers?.name || row.customers?.company || '—',
+        valid_until: row.validity,
+      }))
+      return handleSuccess(rows)
     },
 
     create: async (quotation) => {
@@ -282,10 +297,16 @@ export const api = {
     getAll: async () => {
       const { data, error } = await supabase
         .from('orders')
-        .select('*')
+        .select('*, customers(name, company)')
         .order('created_at', { ascending: false })
       if (error) return handleError(error)
-      return handleSuccess(data)
+      const rows = (data || []).map((row) => ({
+        ...row,
+        order_number: row.number,
+        customer_name:
+          row.customers?.name || row.customers?.company || '—',
+      }))
+      return handleSuccess(rows)
     },
 
     create: async (order) => {

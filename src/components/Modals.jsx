@@ -89,7 +89,7 @@ export function LeadModal({ onClose }) {
     const addLead = useStore(state => state.addLead);
     const [form, setForm] = useState({
         first_name: "", last_name: "", email: "", company: "", source: "web",
-        interest: "warm", score: 50, budget: 0, status: "new", assigned: "Sin asignar"
+        interest: "warm", score: 50, budget: 0, status: "new"
     });
 
     const handleSubmit = (e) => {
@@ -160,12 +160,20 @@ export function ProductModal({ onClose, product }) {
 
 export function QuotationModal({ onClose }) {
     const addQuotation = useStore(state => state.addQuotation);
+    const customers = useStore(state => state.customers);
     const [form, setForm] = useState({
-        number: `COT-000${Math.floor(Math.random() * 1000)}`, customer: "", status: "draft", subtotal: 0, tax: 0, total: 0, validity: new Date().toISOString().split('T')[0]
+        number: `COT-${Date.now().toString().slice(-6)}`,
+        customer_id: "",
+        status: "draft",
+        subtotal: 0,
+        tax: 0,
+        total: 0,
+        validity: new Date().toISOString().split('T')[0]
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (!form.customer_id) return;
         addQuotation(form);
         onClose();
     };
@@ -175,9 +183,15 @@ export function QuotationModal({ onClose }) {
             <h2 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 20px" }}>Nueva Cotización</h2>
             <form onSubmit={handleSubmit}>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 12px" }}>
-                    <div style={{ marginBottom: 16 }}>
+                    <div style={{ marginBottom: 16, gridColumn: "1 / -1" }}>
                         <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 6 }}>Cliente</label>
-                        <input required value={form.customer} onChange={e => setForm({ ...form, customer: e.target.value })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 12, fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                        <select required value={form.customer_id} onChange={e => setForm({ ...form, customer_id: e.target.value })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 12, fontSize: 13, outline: "none", boxSizing: "border-box", background: "#fff" }}>
+                            <option value="">Seleccioná un cliente</option>
+                            {customers.map(c => (
+                                <option key={c.id} value={c.id}>{c.name} — {c.company}</option>
+                            ))}
+                        </select>
+                        {customers.length === 0 && <p style={{ fontSize: 12, color: "#b45309", marginTop: 8 }}>Primero creá un cliente en la pestaña Clientes.</p>}
                     </div>
                     <div style={{ marginBottom: 16 }}>
                         <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 6 }}>Subtotal ($)</label>
@@ -202,12 +216,19 @@ export function QuotationModal({ onClose }) {
 
 export function OrderModal({ onClose }) {
     const addOrder = useStore(state => state.addOrder);
+    const customers = useStore(state => state.customers);
     const [form, setForm] = useState({
-        number: `PED-000${Math.floor(Math.random() * 1000)}`, customer: "", status: "preparing", total: 0, carrier: "Servientrega", delivery: new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0]
+        number: `PED-${Date.now().toString().slice(-6)}`,
+        customer_id: "",
+        status: "confirmed",
+        total: 0,
+        carrier: "Servientrega",
+        delivery_date: new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0]
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (!form.customer_id) return;
         addOrder(form);
         onClose();
     };
@@ -217,9 +238,14 @@ export function OrderModal({ onClose }) {
             <h2 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 20px" }}>Nuevo Pedido</h2>
             <form onSubmit={handleSubmit}>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 12px" }}>
-                    <div style={{ marginBottom: 16 }}>
+                    <div style={{ marginBottom: 16, gridColumn: "1 / -1" }}>
                         <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 6 }}>Cliente</label>
-                        <input required value={form.customer} onChange={e => setForm({ ...form, customer: e.target.value })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 12, fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                        <select required value={form.customer_id} onChange={e => setForm({ ...form, customer_id: e.target.value })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 12, fontSize: 13, outline: "none", boxSizing: "border-box", background: "#fff" }}>
+                            <option value="">Seleccioná un cliente</option>
+                            {customers.map(c => (
+                                <option key={c.id} value={c.id}>{c.name} — {c.company}</option>
+                            ))}
+                        </select>
                     </div>
                     <div style={{ marginBottom: 16 }}>
                         <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 6 }}>Total ($)</label>
@@ -233,8 +259,64 @@ export function OrderModal({ onClose }) {
                     </div>
                     <div style={{ marginBottom: 16 }}>
                         <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 6 }}>Fecha Entrega</label>
-                        <input type="date" value={form.delivery} onChange={e => setForm({ ...form, delivery: e.target.value })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 12, fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                        <input type="date" value={form.delivery_date} onChange={e => setForm({ ...form, delivery_date: e.target.value })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 12, fontSize: 13, outline: "none", boxSizing: "border-box" }} />
                     </div>
+                </div>
+                <ModalActions onCancel={onClose} />
+            </form>
+        </Overlay>
+    );
+}
+
+export function OpportunityModal({ onClose }) {
+    const addPipelineOpportunity = useStore(state => state.addPipelineOpportunity);
+    const customers = useStore(state => state.customers);
+    const [form, setForm] = useState({
+        name: "",
+        value: 1000000,
+        probability: 50,
+        customer_id: "",
+        stage: "lead",
+    });
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!form.name.trim()) return;
+        addPipelineOpportunity(form.stage, {
+            name: form.name.trim(),
+            value: Number(form.value) || 0,
+            probability: Number(form.probability) || 50,
+            customer_id: form.customer_id || null,
+        });
+        onClose();
+    };
+
+    return (
+        <Overlay>
+            <h2 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 20px" }}>Nueva Oportunidad</h2>
+            <form onSubmit={handleSubmit}>
+                <Input label="Nombre de la oportunidad" required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 12px" }}>
+                    <Input label="Valor ($)" type="number" min="0" value={form.value} onChange={e => setForm({ ...form, value: e.target.value })} />
+                    <Input label="Probabilidad (%)" type="number" min="0" max="100" value={form.probability} onChange={e => setForm({ ...form, probability: e.target.value })} />
+                </div>
+                <Select label="Etapa inicial" value={form.stage} onChange={e => setForm({ ...form, stage: e.target.value })}
+                    options={[
+                        { value: "lead", label: "Lead" },
+                        { value: "contact", label: "Contacto" },
+                        { value: "qualification", label: "Calificación" },
+                        { value: "proposal", label: "Propuesta" },
+                        { value: "negotiation", label: "Negociación" },
+                    ]}
+                />
+                <div style={{ marginBottom: 16 }}>
+                    <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 6 }}>Cliente (opcional)</label>
+                    <select value={form.customer_id} onChange={e => setForm({ ...form, customer_id: e.target.value })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 12, fontSize: 13, outline: "none", boxSizing: "border-box", background: "#fff" }}>
+                        <option value="">—</option>
+                        {customers.map(c => (
+                            <option key={c.id} value={c.id}>{c.name}</option>
+                        ))}
+                    </select>
                 </div>
                 <ModalActions onCancel={onClose} />
             </form>
