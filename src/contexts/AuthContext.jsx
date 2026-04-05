@@ -24,52 +24,59 @@ export function AuthProvider({ children }) {
   const [error, setError] = useState(null)
   const [isConfigured, setIsConfigured] = useState(false)
 
-  // Verificar configuración al inicio
   useEffect(() => {
-    setIsConfigured(isSupabaseConfigured())
-  }, [])
+    const configured = isSupabaseConfigured()
+    setIsConfigured(configured)
 
-  // Escuchar cambios en autenticación
-  useEffect(() => {
-    if (!isSupabaseConfigured()) {
+    if (!configured) {
       setLoading(false)
       return
     }
 
-    // Verificar sesión existente al cargar
+    let unsubscribe = () => {}
+
     const initAuth = async () => {
-      const { session } = await getSession()
-      if (session?.user) {
-        setUser(session.user)
-        // Cargar perfil
-        const { data: profileData } = await getProfile(session.user.id)
-        if (profileData) {
-          setProfile(profileData)
+      try {
+        const { session } = await getSession()
+        if (session?.user) {
+          setUser(session.user)
+          const { data: profileData } = await getProfile(session.user.id)
+          if (profileData) {
+            setProfile(profileData)
+          }
         }
+      } catch (e) {
+        console.error('Auth init error:', e)
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
 
     initAuth()
 
-    // Suscribirse a cambios de auth
-    const subscription = onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_OUT') {
-        setUser(null)
-        setProfile(null)
-      } else if (session?.user) {
-        setUser(session.user)
-        // Cargar perfil cuando cambia el usuario
-        const { data: profileData } = await getProfile(session.user.id)
-        setProfile(profileData)
+    unsubscribe = onAuthStateChange(async (event, session) => {
+      try {
+        if (event === 'SIGNED_OUT') {
+          setUser(null)
+          setProfile(null)
+        } else if (session?.user) {
+          setUser(session.user)
+          const { data: profileData } = await getProfile(session.user.id)
+          setProfile(profileData)
+        }
+      } catch (e) {
+        console.error('Auth state change error:', e)
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     })
 
     return () => {
-      subscription
+      if (typeof unsubscribe === 'function') {
+        unsubscribe()
+      }
     }
-  }, [isConfigured])
+  }, [])
 
   /**
    * Iniciar sesión con email y password

@@ -93,7 +93,7 @@ export const onAuthStateChange = (callback) => {
   const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
     callback(event, session)
   })
-  return subscription.unsubscribe
+  return () => subscription.unsubscribe()
 }
 
 /**
