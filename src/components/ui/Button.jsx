@@ -11,6 +11,8 @@ const Button = forwardRef(({
   const variants = {
     primary: 'bg-primary text-white hover:bg-primary-light active:scale-[0.98]',
     secondary: 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300',
+    outline:
+      'border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700',
     ghost: 'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800',
     danger: 'bg-red-500 text-white hover:bg-red-600',
   };

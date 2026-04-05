@@ -19,6 +19,7 @@ function Layout({ children, currentPage, onNavigate, user, onLogout, title, subt
           user={user} 
           title={title} 
           subtitle={subtitle} 
+          onNavigate={onNavigate}
           onCommandPalette={() => setCommandPaletteOpen(true)}
         />
         <main className="flex-1 overflow-auto p-6">

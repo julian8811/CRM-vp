@@ -13,6 +13,7 @@ export const PIPELINE_DATA = {
     proposal: [],
     negotiation: [],
     closed_won: [],
+    closed_lost: [],
 };
 
 export const SALES_TREND = [

@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 
-function Avatar({ name, size = 'md', className }) {
+function Avatar({ name, src, size = 'md', className }) {
   const sizes = {
     sm: 'w-8 h-8 text-xs',
     md: 'w-10 h-10 text-sm',
@@ -18,6 +18,16 @@ function Avatar({ name, size = 'md', className }) {
   ];
   
   const colorIndex = name ? name.charCodeAt(0) % colors.length : 0;
+
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt=""
+        className={cn('rounded-full object-cover flex-shrink-0 border border-slate-200 dark:border-slate-600', sizes[size], className)}
+      />
+    );
+  }
 
   return (
     <div className={cn(

@@ -1,108 +1,59 @@
-# CRM-VP - Sistema CRM Innovador
+# CRM VP
 
-Sistema de gestión de relaciones con clientes (CRM) construido con React 19, Vite y Tailwind CSS v4. Interfaz moderna estilo HubSpot optimizada para ventas con gestión completa del ciclo comercial.
+Aplicación CRM (Vite + React + Supabase).
 
-## 🚀 Características
+## Variables de entorno (cliente)
 
-### Páginas Principales
-- **Dashboard** - Métricas, gráficos de tendencia, embudo de ventas, top vendedores, acciones rápidas
-- **Pipeline Kanban** - Drag & drop con @dnd-kit para gestionar oportunidades entre etapas
-- **Clientes** - DataTable con búsqueda, orden, exportación Excel
-- **Leads** - Gestión de prospectos con scoring y conversión
-- **Productos** - Catálogo con stock, precios y descuentos
-- **Cotizaciones** - Estado, envío, aceptación
-- **Pedidos** - Seguimiento y estado de pago
-- **Automatizaciones** - Workflows activos/pausados
-- **Reportes** - Analytics, ventas por vendedor, embudo de conversión
-- **IA Comercial** - Asistente AI y features de inteligencia
-- **Postventa** - Tickets de soporte
-- **Configuración** - Perfil, notificaciones, integraciones
-- **Usuarios** - Gestión de equipo
+Crear `.env` o configurar en Vercel:
 
-### Features
-- 🎨 **Theme Toggle** - Modo oscuro/claro
-- ⌘ **Command Palette** - Navegación rápida con Ctrl+K
-- 📊 **Export to Excel** - En todas las tablas de datos
-- 🔐 **Supabase Auth** - Login/registro real
-- 🗄️ **Supabase DB** - Base de datos PostgreSQL
-- 🧪 **Testing** - Suite de tests con Vitest
+| Variable | Descripción |
+|----------|-------------|
+| `VITE_SUPABASE_URL` | URL del proyecto Supabase |
+| `VITE_SUPABASE_ANON_KEY` | Clave anónima (pública) |
 
-## 🛠️ Tech Stack
+Sin estas variables, la app usa datos mock locales para desarrollo.
 
-| Tecnología | Propósito |
-|------------|-----------|
-| React 19 | Frontend framework |
-| Vite | Build tool |
-| Tailwind CSS v4 | Estilos |
-| Zustand | State management |
-| @dnd-kit | Drag & drop |
-| Supabase | Auth + DB |
-| Recharts | Gráficos |
-| Lucide | Iconos |
-| xlsx | Export Excel |
-| Vitest | Testing |
+## Supabase Edge Functions (servidor)
 
-## 📦 Instalación
+Desplegar funciones con `supabase functions deploy` y definir secretos **solo en el dashboard** (no en el frontend):
+
+| Secreto | Uso |
+|---------|-----|
+| `OPENAI_API_KEY` | Función `crm-ai` (OpenAI) |
+| `CRON_SECRET` | Función `run-automations` (opcional, invocación programada) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Funciones `invite-user` / `run-automations` si aplica |
+
+## Migraciones
+
+Aplicar SQL en Supabase SQL Editor o con CLI:
 
 ```bash
-# Instalar dependencias
-npm install
-
-# Desarrollo
-npm run dev
-
-# Testing
-npm run test:run
-
-# Build producción
-npm run build
+supabase db push
 ```
 
-## 🔧 Configuración Supabase
+Incluye tablas `support_tickets`, `automation_rules`, `user_preferences`, `notifications`, función `search_crm`, políticas RLS y Realtime para `notifications`.
 
-1. Crear proyecto en [Supabase](https://supabase.com)
-2. Ejecutar `supabase-schema.sql` en el SQL Editor
-3. Crear `.env.local`:
-```env
-VITE_SUPABASE_URL=tu_url
-VITE_SUPABASE_ANON_KEY=tu_key
-```
+## Edge Functions (despliegue)
 
-## 📁 Estructura
-
-```
-src/
-├── components/
-│   ├── ui/          # Button, Card, Input, Badge, etc.
-│   └── layout/       # Layout, Sidebar, Header
-├── contexts/         # AuthContext, ThemeContext
-├── pages/            # Dashboard, Pipeline, Customers, etc.
-├── store/            # Zustand store
-├── lib/              # API, supabase, utils
-├── data/             # Mock data
-└── test/             # Tests
-```
-
-## 🧪 Tests
+Desde la carpeta del proyecto, con [Supabase CLI](https://supabase.com/docs/guides/cli):
 
 ```bash
-# Run tests
-npm run test:run
-
-# UI interactivo
-npm run test:ui
+supabase functions deploy crm-ai
+supabase functions deploy invite-user
+supabase functions deploy run-automations --no-verify-jwt
 ```
 
-## 🚀 Despliegue
+(`run-automations` valida el header `x-cron-secret`; las otras dos requieren JWT de usuario.)
 
-### Vercel (Recomendado)
+Secretos en Dashboard → Edge Functions → Secrets: `OPENAI_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (invite-user y run-automations), `CRON_SECRET` (run-automations). Invocación programada de `run-automations`:
+
 ```bash
-npm i -g vercel
-vercel
+curl -X POST "https://<PROJECT_REF>.supabase.co/functions/v1/run-automations" -H "x-cron-secret: $CRON_SECRET"
 ```
 
-O importar el repo en https://vercel.com
+## Scripts
 
-## 📄 Licencia
-
-MIT
+- `npm run dev` — desarrollo
+- `npm run build` — producción
+- `npm run test:run` — tests Vitest
+- CI: `.github/workflows/ci.yml` (build + test)

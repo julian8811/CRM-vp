@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
-import { CUSTOMERS, LEADS, PRODUCTS, PIPELINE_DATA, QUOTATIONS, ORDERS } from '../data/mockData';
 import api from '../lib/api';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
+import { getInitialEntityState } from './initialState';
 
 async function getAuthUserId() {
   const {
@@ -19,14 +19,13 @@ async function getAuthUserId() {
  */
 export const useStore = create((set, get) => ({
   // ============================================
-  // ESTADO BASE
+  // ESTADO BASE (vacío con Supabase; mock solo sin API)
   // ============================================
-  customers: CUSTOMERS,
-  leads: LEADS,
-  products: PRODUCTS,
-  pipeline: PIPELINE_DATA,
-  quotations: QUOTATIONS,
-  orders: ORDERS,
+  ...getInitialEntityState(),
+  tickets: [],
+  automations: [],
+  userPreferences: null,
+  appNotifications: [],
 
   // ============================================
   // LOADING STATES
@@ -38,6 +37,10 @@ export const useStore = create((set, get) => ({
     opportunities: false,
     quotations: false,
     orders: false,
+    tickets: false,
+    automations: false,
+    preferences: false,
+    notifications: false,
   },
   error: null,
 
@@ -516,5 +519,194 @@ export const useStore = create((set, get) => ({
       set({ orders: [newOrder, ...orders] });
       return newOrder;
     }
+  },
+
+  // ============================================
+  // SUPPORT TICKETS
+  // ============================================
+  fetchTickets: async () => {
+    const { isApiReady } = get();
+    if (!isApiReady()) return;
+    set((state) => ({ loading: { ...state.loading, tickets: true } }));
+    try {
+      const result = await api.supportTickets.getAll();
+      if (result.success) set({ tickets: result.data });
+    } catch (err) {
+      console.error('Error fetching tickets:', err);
+    } finally {
+      set((state) => ({ loading: { ...state.loading, tickets: false } }));
+    }
+  },
+
+  addTicket: async (ticket) => {
+    const { isApiReady, tickets } = get();
+    if (!isApiReady()) {
+      const id = `TK-${Date.now().toString().slice(-8)}`;
+      const row = {
+        id,
+        subject: ticket.subject,
+        body: ticket.body || null,
+        status: 'open',
+        customer_label: ticket.customer_label || 'Cliente',
+        priority: ticket.priority || 'medium',
+        created_at: new Date().toISOString(),
+      };
+      set({ tickets: [row, ...tickets] });
+      return row;
+    }
+    const uid = await getAuthUserId();
+    if (!uid) return null;
+    set((state) => ({ loading: { ...state.loading, tickets: true } }));
+    try {
+      const result = await api.supportTickets.create({
+        user_id: uid,
+        customer_id: ticket.customer_id || null,
+        customer_label: ticket.customer_label || null,
+        subject: ticket.subject,
+        body: ticket.body || null,
+        priority: ticket.priority || 'medium',
+        status: 'open',
+      });
+      if (result.success) {
+        set({ tickets: [result.data, ...tickets] });
+        return result.data;
+      }
+      return null;
+    } finally {
+      set((state) => ({ loading: { ...state.loading, tickets: false } }));
+    }
+  },
+
+  updateTicket: async (id, updates) => {
+    const { isApiReady, tickets } = get();
+    if (!isApiReady()) {
+      set({ tickets: tickets.map((t) => (t.id === id ? { ...t, ...updates } : t)) });
+      return;
+    }
+    const result = await api.supportTickets.update(id, updates);
+    if (result.success) {
+      set({ tickets: tickets.map((t) => (t.id === id ? result.data : t)) });
+    }
+  },
+
+  // ============================================
+  // USER PREFERENCES
+  // ============================================
+  fetchPreferences: async () => {
+    const { isApiReady } = get();
+    if (!isApiReady()) return;
+    set((state) => ({ loading: { ...state.loading, preferences: true } }));
+    try {
+      const result = await api.userPreferences.get();
+      if (result.success) set({ userPreferences: result.data });
+    } catch (e) {
+      console.error(e);
+    } finally {
+      set((state) => ({ loading: { ...state.loading, preferences: false } }));
+    }
+  },
+
+  savePreferences: async (prefs) => {
+    const { isApiReady } = get();
+    if (!isApiReady()) return null;
+    const result = await api.userPreferences.upsert(prefs);
+    if (result.success) {
+      set({ userPreferences: result.data });
+      return result.data;
+    }
+    return null;
+  },
+
+  // ============================================
+  // AUTOMATION RULES
+  // ============================================
+  fetchAutomations: async () => {
+    const { isApiReady } = get();
+    if (!isApiReady()) return;
+    set((state) => ({ loading: { ...state.loading, automations: true } }));
+    try {
+      const result = await api.automationRules.getAll();
+      if (result.success) set({ automations: result.data });
+    } catch (e) {
+      console.error(e);
+    } finally {
+      set((state) => ({ loading: { ...state.loading, automations: false } }));
+    }
+  },
+
+  addAutomationRule: async (rule) => {
+    const { isApiReady, automations } = get();
+    const uid = await getAuthUserId();
+    if (!isApiReady() || !uid) return null;
+    const result = await api.automationRules.create({
+      user_id: uid,
+      name: rule.name,
+      trigger_config: rule.trigger_config || {},
+      action_config: rule.action_config || {},
+      status: rule.status || 'active',
+    });
+    if (result.success) {
+      set({ automations: [result.data, ...automations] });
+      return result.data;
+    }
+    return null;
+  },
+
+  updateAutomationRule: async (id, updates) => {
+    const { isApiReady, automations } = get();
+    if (!isApiReady()) return null;
+    const result = await api.automationRules.update(id, updates);
+    if (result.success) {
+      set({ automations: automations.map((a) => (a.id === id ? result.data : a)) });
+      return result.data;
+    }
+    return null;
+  },
+
+  // ============================================
+  // APP NOTIFICATIONS (tabla)
+  // ============================================
+  fetchAppNotifications: async () => {
+    const { isApiReady } = get();
+    if (!isApiReady()) return;
+    set((state) => ({ loading: { ...state.loading, notifications: true } }));
+    try {
+      const result = await api.appNotifications.getAll();
+      if (result.success) set({ appNotifications: result.data });
+    } catch (e) {
+      console.error(e);
+    } finally {
+      set((state) => ({ loading: { ...state.loading, notifications: false } }));
+    }
+  },
+
+  markNotificationRead: async (id) => {
+    const { isApiReady, appNotifications } = get();
+    if (!isApiReady()) return;
+    const result = await api.appNotifications.markRead(id);
+    if (result.success) {
+      set({
+        appNotifications: appNotifications.map((n) =>
+          n.id === id ? { ...n, read_at: result.data.read_at } : n
+        ),
+      });
+    }
+  },
+
+  markAllNotificationsRead: async () => {
+    const { isApiReady } = get();
+    if (!isApiReady()) return;
+    const result = await api.appNotifications.markAllRead();
+    if (result.success) await get().fetchAppNotifications();
+  },
+
+  // ============================================
+  // SEARCH
+  // ============================================
+  searchCrm: async (q) => {
+    const { isApiReady } = get();
+    if (!isApiReady()) return [];
+    const result = await api.search.crm(q);
+    return result.success ? result.data : [];
   }
 }));

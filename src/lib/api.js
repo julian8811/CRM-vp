@@ -329,6 +329,148 @@ export const api = {
       if (error) return handleError(error)
       return handleSuccess(data)
     }
+  },
+
+  supportTickets: {
+    getAll: async () => {
+      const { data, error } = await supabase
+        .from('support_tickets')
+        .select('*')
+        .order('created_at', { ascending: false })
+      if (error) return handleError(error)
+      return handleSuccess(data)
+    },
+    create: async (row) => {
+      const { data, error } = await supabase
+        .from('support_tickets')
+        .insert([row])
+        .select()
+        .single()
+      if (error) return handleError(error)
+      return handleSuccess(data)
+    },
+    update: async (id, updates) => {
+      const { data, error } = await supabase
+        .from('support_tickets')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single()
+      if (error) return handleError(error)
+      return handleSuccess(data)
+    }
+  },
+
+  userPreferences: {
+    get: async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return { success: false, error: 'No session' }
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle()
+      if (error) return handleError(error)
+      return handleSuccess(data)
+    },
+    upsert: async (prefs) => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return { success: false, error: 'No session' }
+      const payload = {
+        user_id: user.id,
+        ai_assistant_enabled: prefs.ai_assistant_enabled ?? false,
+        notification_flags: prefs.notification_flags ?? {},
+        updated_at: new Date().toISOString()
+      }
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .upsert(payload, { onConflict: 'user_id' })
+        .select()
+        .single()
+      if (error) return handleError(error)
+      return handleSuccess(data)
+    }
+  },
+
+  automationRules: {
+    getAll: async () => {
+      const { data, error } = await supabase
+        .from('automation_rules')
+        .select('*')
+        .order('created_at', { ascending: false })
+      if (error) return handleError(error)
+      return handleSuccess(data)
+    },
+    create: async (row) => {
+      const { data, error } = await supabase
+        .from('automation_rules')
+        .insert([row])
+        .select()
+        .single()
+      if (error) return handleError(error)
+      return handleSuccess(data)
+    },
+    update: async (id, updates) => {
+      const { data, error } = await supabase
+        .from('automation_rules')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single()
+      if (error) return handleError(error)
+      return handleSuccess(data)
+    },
+    delete: async (id) => {
+      const { error } = await supabase
+        .from('automation_rules')
+        .delete()
+        .eq('id', id)
+      if (error) return handleError(error)
+      return handleSuccess({ deleted: true })
+    }
+  },
+
+  appNotifications: {
+    getAll: async () => {
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(100)
+      if (error) return handleError(error)
+      return handleSuccess(data)
+    },
+    markRead: async (id) => {
+      const { data, error } = await supabase
+        .from('notifications')
+        .update({ read_at: new Date().toISOString() })
+        .eq('id', id)
+        .select()
+        .single()
+      if (error) return handleError(error)
+      return handleSuccess(data)
+    },
+    markAllRead: async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return { success: false, error: 'No session' }
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read_at: new Date().toISOString() })
+        .eq('user_id', user.id)
+        .is('read_at', null)
+      if (error) return handleError(error)
+      return handleSuccess({ ok: true })
+    }
+  },
+
+  search: {
+    crm: async (searchQuery) => {
+      const q = (searchQuery || '').trim()
+      if (!q) return handleSuccess([])
+      const { data, error } = await supabase.rpc('search_crm', { search_query: q })
+      if (error) return handleError(error)
+      return handleSuccess(data || [])
+    }
   }
 }
 

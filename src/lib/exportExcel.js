@@ -51,6 +51,48 @@ export function exportToExcel(data, filename, columns) {
 }
 
 /**
+ * Un solo archivo .xlsx con varias hojas (evita que el navegador bloquee la 2.ª descarga).
+ * @param {string} filePrefix - Nombre base del archivo
+ * @param {{ sheetName: string, data: object[], columns: { key: string, header?: string }[] }[]} sheets
+ */
+export function exportWorkbook(filePrefix, sheets) {
+  const wb = XLSX.utils.book_new();
+  const timestamp = new Date().toISOString().split('T')[0];
+  let added = 0;
+
+  for (const { sheetName, data, columns } of sheets) {
+    if (!data?.length || !columns?.length) continue;
+
+    const exportData = data.map((row) => {
+      const transformed = {};
+      columns.forEach((col) => {
+        transformed[col.header || col.key] = row[col.key];
+      });
+      return transformed;
+    });
+
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    ws['!cols'] = columns.map((col) => ({
+      wch: Math.max(col.header?.length || 10, 15),
+    }));
+
+    const safeName = String(sheetName || 'Hoja')
+      .slice(0, 31)
+      .replace(/[:\\/?*[\]]/g, '');
+    const uniqueName = added > 0 && wb.SheetNames.includes(safeName) ? `${safeName.slice(0, 28)}_${added}` : safeName;
+    XLSX.utils.book_append_sheet(wb, ws, uniqueName || 'Datos');
+    added += 1;
+  }
+
+  if (wb.SheetNames.length === 0) {
+    const ws = XLSX.utils.json_to_sheet([{ Mensaje: 'Sin datos para exportar en este periodo' }]);
+    XLSX.utils.book_append_sheet(wb, ws, 'Info');
+  }
+
+  XLSX.writeFile(wb, `${filePrefix}_${timestamp}.xlsx`);
+}
+
+/**
  * Export current table data to Excel with page name
  */
 export function exportCurrentPage(pageName, data, columns) {
