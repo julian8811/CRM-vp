@@ -274,6 +274,18 @@ CREATE POLICY "Authenticated users can insert products" ON public.products
     TO public
     WITH CHECK (auth.uid() IS NOT NULL);
 
+-- Mismo criterio que INSERT: sesión válida (catálogo compartido, sin user_id en fila).
+CREATE POLICY "Authenticated users can update products" ON public.products
+    FOR UPDATE
+    TO public
+    USING (auth.uid() IS NOT NULL)
+    WITH CHECK (auth.uid() IS NOT NULL);
+
+CREATE POLICY "Authenticated users can delete products" ON public.products
+    FOR DELETE
+    TO public
+    USING (auth.uid() IS NOT NULL);
+
 -- ============================================
 -- QUOTATIONS POLICIES
 -- ============================================

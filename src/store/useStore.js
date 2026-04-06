@@ -328,9 +328,19 @@ export const useStore = create((set, get) => ({
     if (isApiReady()) {
       try {
         const result = await api.products.delete(id);
-        if (result.success) set({ products: products.filter((p) => p.id !== id) });
+        if (result.success) {
+          set({ products: products.filter((p) => p.id !== id) });
+        } else if (typeof window !== 'undefined') {
+          const msg =
+            result.error ||
+            'No se pudo eliminar el producto. En Supabase ejecutá la migración que añade políticas DELETE en `products` (RLS).';
+          window.alert(msg);
+        }
       } catch (err) {
         console.error('Error deleting product:', err);
+        if (typeof window !== 'undefined') {
+          window.alert(err?.message || 'Error al eliminar el producto.');
+        }
       }
     } else {
       set({ products: products.filter((p) => p.id !== id) });
