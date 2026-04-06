@@ -282,7 +282,7 @@ export const useStore = create((set, get) => ({
         const result = await api.products.create({
           sku: product.sku,
           name: product.name,
-          category: product.category || 'Software',
+          category: product.category || 'General',
           price: product.price,
           discount_price: product.discount_price ?? null,
           stock: product.stock ?? 0,

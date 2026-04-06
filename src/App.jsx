@@ -762,7 +762,7 @@ function ProductsContent() {
               <Package className="w-10 h-10 text-slate-300" />
               {product.stock <= 5 && (
                 <div className="absolute top-2 right-2 flex items-center gap-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs px-2 py-1 rounded-full font-medium">
-                  <AlertTriangle className="w-3 h-3" /> Stock bajo
+                  <AlertTriangle className="w-3 h-3" /> Existencia baja
                 </div>
               )}
               <div className="absolute top-2 left-2">
@@ -771,6 +771,11 @@ function ProductsContent() {
             </div>
             <CardContent className="p-4">
               <div className="text-xs text-slate-500 font-mono mb-1">{product.sku}</div>
+              {product.category && (
+                <div className="text-[11px] text-slate-500 mb-1 line-clamp-1" title={product.category}>
+                  {product.category}
+                </div>
+              )}
               <div className="font-semibold text-slate-900 dark:text-white mb-2 line-clamp-2">{product.name}</div>
               <div className="flex items-baseline gap-2 mb-3">
                 {product.discount_price ? (
@@ -783,7 +788,7 @@ function ProductsContent() {
                 )}
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-slate-500">Stock: <span className={`font-medium ${product.stock <= 5 ? 'text-red-500' : 'text-slate-700 dark:text-slate-300'}`}>{product.stock}</span></span>
+                <span className="text-slate-500">Existencia: <span className={`font-medium ${product.stock <= 5 ? 'text-red-500' : 'text-slate-700 dark:text-slate-300'}`}>{product.stock}</span></span>
                 <span className="text-slate-500">Margen: <span className="font-medium text-slate-700 dark:text-slate-300">{product.margin}%</span></span>
               </div>
             </CardContent>

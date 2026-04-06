@@ -25,11 +25,14 @@ export default function ProductsPage() {
                         onMouseEnter={e => e.currentTarget.style.boxShadow = "0 6px 20px rgba(0,0,0,.07)"} onMouseLeave={e => e.currentTarget.style.boxShadow = "none"}>
                         <div style={{ height: 100, background: "linear-gradient(135deg, #f8fafc, #eef2ff)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
                             <Package size={36} color="#cbd5e1" />
-                            {p.stock <= 5 && <div style={{ position: "absolute", top: 8, right: 8, background: "#f59e0b", color: "#fff", fontSize: 10, padding: "2px 8px", borderRadius: 20, display: "flex", alignItems: "center", gap: 3, fontWeight: 600 }}><AlertTriangle size={10} /> Stock bajo</div>}
+                            {p.stock <= 5 && <div style={{ position: "absolute", top: 8, right: 8, background: "#f59e0b", color: "#fff", fontSize: 10, padding: "2px 8px", borderRadius: 20, display: "flex", alignItems: "center", gap: 3, fontWeight: 600 }}><AlertTriangle size={10} /> Existencia baja</div>}
                             <div style={{ position: "absolute", top: 8, left: 8 }}><Badge variant="green">Activo</Badge></div>
                         </div>
                         <div style={{ padding: 14 }}>
                             <div style={{ fontSize: 10, color: "#94a3b8", fontFamily: "monospace", marginBottom: 4 }}>{p.sku}</div>
+                            {p.category && (
+                                <div style={{ fontSize: 11, color: "#64748b", marginBottom: 4, lineHeight: 1.2 }} title={p.category}>{p.category}</div>
+                            )}
                             <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b", marginBottom: 8, lineHeight: 1.3, minHeight: 34 }}>{p.name}</div>
                             <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 8 }}>
                                 {p.discount_price ? (
@@ -40,7 +43,7 @@ export default function ProductsPage() {
                                 ) : <span style={{ fontSize: 16, fontWeight: 800, color: "#1B3A5C" }}>{fmt(p.price)}</span>}
                             </div>
                             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#64748b" }}>
-                                <span>Stock: <strong style={{ color: p.stock <= 5 ? "#ef4444" : "#334155" }}>{p.stock}</strong></span>
+                                <span>Existencia: <strong style={{ color: p.stock <= 5 ? "#ef4444" : "#334155" }}>{p.stock}</strong></span>
                                 <span>Margen: {p.margin}%</span>
                             </div>
                         </div>

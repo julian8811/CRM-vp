@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useStore } from "../store/useStore";
+import { PRODUCT_CATEGORY_PRESETS } from "../data/productCategories";
 
 const modalFieldStyle = {
     width: "100%",
@@ -155,7 +156,7 @@ export function LeadModal({ onClose }) {
 export function ProductModal({ onClose }) {
     const addProduct = useStore(state => state.addProduct);
     const [form, setForm] = useState({
-        sku: "", name: "", category: "Software", price: "", stock: "", margin: "", status: "active"
+        sku: "", name: "", category: "", price: "", stock: "", margin: "", status: "active"
     });
     const [submitError, setSubmitError] = useState("");
 
@@ -175,10 +176,11 @@ export function ProductModal({ onClose }) {
         }
         let marginClamped = Number.isFinite(margin) ? margin : 0;
         marginClamped = Math.min(100, Math.max(0, marginClamped));
+        const categoryLabel = form.category.trim() || "General";
         const payload = {
             sku: form.sku.trim(),
             name: form.name.trim(),
-            category: form.category || "Software",
+            category: categoryLabel.slice(0, 200),
             price,
             stock,
             margin: marginClamped,
@@ -202,13 +204,30 @@ export function ProductModal({ onClose }) {
                     <Input label="SKU" required value={form.sku} onChange={e => setForm({ ...form, sku: e.target.value })} />
                     <Input label="Nombre del Producto" required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 12px" }}>
-                    <Select label="Categoría" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}
-                        options={[{ value: "Software", label: "Software" }, { value: "Hardware", label: "Hardware" }, { value: "Servicios", label: "Servicios" }, { value: "Capacitación", label: "Capacitación" }]} />
-                    <Input label="Precio ($)" inputMode="decimal" required value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} placeholder="0" />
+                <div style={{ marginBottom: 16 }}>
+                    <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 6 }}>Categoría comercial</label>
+                    <input
+                        list="crm-product-category-presets"
+                        style={modalFieldStyle}
+                        value={form.category}
+                        onChange={e => setForm({ ...form, category: e.target.value })}
+                        placeholder="Escribí o elegí una sugerencia (cualquier rubro)"
+                        maxLength={200}
+                    />
+                    <datalist id="crm-product-category-presets">
+                        {PRODUCT_CATEGORY_PRESETS.map((c) => (
+                            <option key={c} value={c} />
+                        ))}
+                    </datalist>
+                    <p style={{ fontSize: 11, color: "#64748b", margin: "6px 0 0" }}>
+                        Lista orientativa; no estás limitado a estas opciones.
+                    </p>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 12px" }}>
-                    <Input label="Stock Inicial" inputMode="numeric" required value={form.stock} onChange={e => setForm({ ...form, stock: e.target.value })} placeholder="0" />
+                    <Input label="Precio ($)" inputMode="decimal" required value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} placeholder="0" />
+                    <Input label="Existencia (unidades en stock)" inputMode="numeric" required value={form.stock} onChange={e => setForm({ ...form, stock: e.target.value })} placeholder="0" />
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 12px" }}>
                     <Input label="Margen (%)" inputMode="numeric" value={form.margin} onChange={e => setForm({ ...form, margin: e.target.value })} placeholder="0" />
                 </div>
                 <ModalActions onCancel={onClose} />

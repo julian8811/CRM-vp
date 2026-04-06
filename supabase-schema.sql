@@ -87,7 +87,7 @@ CREATE TABLE public.products (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     sku TEXT UNIQUE NOT NULL,
     name TEXT NOT NULL,
-    category TEXT DEFAULT 'Software' CHECK (category IN ('Software', 'Hardware', 'Servicios', 'Capacitación')),
+    category TEXT DEFAULT 'General',
     price DECIMAL(15,2) NOT NULL,
     discount_price DECIMAL(15,2),
     stock INT DEFAULT 0,
