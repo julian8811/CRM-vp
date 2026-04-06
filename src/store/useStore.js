@@ -268,6 +268,15 @@ export const useStore = create((set, get) => ({
     const { isApiReady, products } = get();
     
     if (isApiReady()) {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session?.user) {
+        return {
+          ok: false,
+          error: 'No hay sesión activa. Cerrá sesión y volvé a iniciar para crear productos.',
+        };
+      }
       set((state) => ({ loading: { ...state.loading, products: true } }));
       try {
         const result = await api.products.create({
