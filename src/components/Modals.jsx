@@ -1,9 +1,38 @@
 import { useState, useEffect } from "react";
 import { useStore } from "../store/useStore";
 
+const modalFieldStyle = {
+    width: "100%",
+    padding: "10px 14px",
+    border: "1px solid #e2e8f0",
+    borderRadius: 12,
+    fontSize: 13,
+    outline: "none",
+    boxSizing: "border-box",
+    color: "#0f172a",
+    backgroundColor: "#ffffff",
+};
+
+const modalDisabledFieldStyle = {
+    ...modalFieldStyle,
+    backgroundColor: "#f8fafc",
+    color: "#0f172a",
+};
+
 const Overlay = ({ children }) => (
     <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(15, 23, 42, 0.4)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 }}>
-        <div style={{ background: "#fff", borderRadius: 16, padding: 24, width: "100%", maxWidth: 500, boxShadow: "0 20px 40px rgba(0,0,0,.15)" }} onClick={e => e.stopPropagation()}>
+        <div
+            style={{
+                background: "#fff",
+                borderRadius: 16,
+                padding: 24,
+                width: "100%",
+                maxWidth: 500,
+                boxShadow: "0 20px 40px rgba(0,0,0,.15)",
+                color: "#0f172a",
+            }}
+            onClick={e => e.stopPropagation()}
+        >
             {children}
         </div>
     </div>
@@ -11,15 +40,15 @@ const Overlay = ({ children }) => (
 
 const Input = ({ label, ...props }) => (
     <div style={{ marginBottom: 16 }}>
-        <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 6 }}>{label}</label>
-        <input style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 12, fontSize: 13, outline: "none", boxSizing: "border-box" }} {...props} />
+        <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 6 }}>{label}</label>
+        <input style={modalFieldStyle} {...props} />
     </div>
 );
 
 const Select = ({ label, options, ...props }) => (
     <div style={{ marginBottom: 16 }}>
-        <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 6 }}>{label}</label>
-        <select style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 12, fontSize: 13, outline: "none", boxSizing: "border-box", background: "#fff" }} {...props}>
+        <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 6 }}>{label}</label>
+        <select style={modalFieldStyle} {...props}>
             {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
     </div>
@@ -27,7 +56,7 @@ const Select = ({ label, options, ...props }) => (
 
 const ModalActions = ({ onCancel }) => (
     <div style={{ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 24 }}>
-        <button type="button" onClick={onCancel} style={{ padding: "10px 18px", borderRadius: 12, border: "1px solid #e2e8f0", background: "#fff", color: "#64748b", fontWeight: 600, cursor: "pointer" }}>Cancelar</button>
+        <button type="button" onClick={onCancel} style={{ padding: "10px 18px", borderRadius: 12, border: "1px solid #e2e8f0", background: "#fff", color: "#475569", fontWeight: 600, cursor: "pointer" }}>Cancelar</button>
         <button type="submit" style={{ padding: "10px 18px", borderRadius: 12, border: "none", background: "#1B3A5C", color: "#fff", fontWeight: 600, cursor: "pointer" }}>Guardar</button>
     </div>
 );
@@ -58,7 +87,7 @@ export function CustomerModal({ onClose, customer }) {
 
     return (
         <Overlay>
-            <h2 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 20px" }}>{isEditing ? "Editar Cliente" : "Nuevo Cliente"}</h2>
+            <h2 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 20px", color: "#0f172a" }}>{isEditing ? "Editar Cliente" : "Nuevo Cliente"}</h2>
             <form onSubmit={handleSubmit}>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 12px" }}>
                     <Input label="Nombre de Contacto" required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
@@ -100,7 +129,7 @@ export function LeadModal({ onClose }) {
 
     return (
         <Overlay>
-            <h2 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 20px" }}>Nuevo Lead</h2>
+            <h2 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 20px", color: "#0f172a" }}>Nuevo Lead</h2>
             <form onSubmit={handleSubmit}>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 12px" }}>
                     <Input label="Nombre" required value={form.first_name} onChange={e => setForm({ ...form, first_name: e.target.value })} />
@@ -123,21 +152,51 @@ export function LeadModal({ onClose }) {
     );
 }
 
-export function ProductModal({ onClose, product }) {
+export function ProductModal({ onClose }) {
     const addProduct = useStore(state => state.addProduct);
     const [form, setForm] = useState({
-        sku: "", name: "", category: "Software", price: 0, stock: 0, margin: 0, status: "active"
+        sku: "", name: "", category: "Software", price: "", stock: "", margin: "", status: "active"
     });
+    const [submitError, setSubmitError] = useState("");
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        addProduct(form);
-        onClose();
+        setSubmitError("");
+        const price = parseFloat(String(form.price).replace(",", "."));
+        const stock = parseInt(String(form.stock), 10);
+        const margin = parseInt(String(form.margin), 10);
+        if (!Number.isFinite(price) || price < 0) {
+            setSubmitError("Ingresá un precio válido.");
+            return;
+        }
+        if (!Number.isFinite(stock) || stock < 0) {
+            setSubmitError("Ingresá un stock válido (número entero ≥ 0).");
+            return;
+        }
+        let marginClamped = Number.isFinite(margin) ? margin : 0;
+        marginClamped = Math.min(100, Math.max(0, marginClamped));
+        const payload = {
+            sku: form.sku.trim(),
+            name: form.name.trim(),
+            category: form.category || "Software",
+            price,
+            stock,
+            margin: marginClamped,
+            status: form.status || "active",
+        };
+        const res = await addProduct(payload);
+        if (res?.ok) onClose();
+        else setSubmitError(res?.error || "No se pudo crear el producto.");
     };
 
     return (
         <Overlay>
-            <h2 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 20px" }}>Nuevo Producto</h2>
+            <h2 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 20px", color: "#0f172a" }}>Nuevo Producto</h2>
+            {submitError && (
+                <div style={{ marginBottom: 16, padding: "10px 12px", borderRadius: 12, background: "#fef2f2", border: "1px solid #fecaca", color: "#991b1b", fontSize: 13 }}>
+                    {submitError}
+                </div>
+            )}
             <form onSubmit={handleSubmit}>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 12px" }}>
                     <Input label="SKU" required value={form.sku} onChange={e => setForm({ ...form, sku: e.target.value })} />
@@ -146,11 +205,11 @@ export function ProductModal({ onClose, product }) {
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 12px" }}>
                     <Select label="Categoría" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}
                         options={[{ value: "Software", label: "Software" }, { value: "Hardware", label: "Hardware" }, { value: "Servicios", label: "Servicios" }, { value: "Capacitación", label: "Capacitación" }]} />
-                    <Input label="Precio ($)" type="number" required value={form.price} onChange={e => setForm({ ...form, price: parseInt(e.target.value) || 0 })} />
+                    <Input label="Precio ($)" inputMode="decimal" required value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} placeholder="0" />
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 12px" }}>
-                    <Input label="Stock Inicial" type="number" required value={form.stock} onChange={e => setForm({ ...form, stock: parseInt(e.target.value) || 0 })} />
-                    <Input label="Margen (%)" type="number" value={form.margin} onChange={e => setForm({ ...form, margin: parseInt(e.target.value) || 0 })} />
+                    <Input label="Stock Inicial" inputMode="numeric" required value={form.stock} onChange={e => setForm({ ...form, stock: e.target.value })} placeholder="0" />
+                    <Input label="Margen (%)" inputMode="numeric" value={form.margin} onChange={e => setForm({ ...form, margin: e.target.value })} placeholder="0" />
                 </div>
                 <ModalActions onCancel={onClose} />
             </form>
@@ -180,12 +239,12 @@ export function QuotationModal({ onClose }) {
 
     return (
         <Overlay>
-            <h2 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 20px" }}>Nueva Cotización</h2>
+            <h2 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 20px", color: "#0f172a" }}>Nueva Cotización</h2>
             <form onSubmit={handleSubmit}>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 12px" }}>
                     <div style={{ marginBottom: 16, gridColumn: "1 / -1" }}>
-                        <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 6 }}>Cliente</label>
-                        <select required value={form.customer_id} onChange={e => setForm({ ...form, customer_id: e.target.value })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 12, fontSize: 13, outline: "none", boxSizing: "border-box", background: "#fff" }}>
+                        <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 6 }}>Cliente</label>
+                        <select required value={form.customer_id} onChange={e => setForm({ ...form, customer_id: e.target.value })} style={modalFieldStyle}>
                             <option value="">Seleccioná un cliente</option>
                             {customers.map(c => (
                                 <option key={c.id} value={c.id}>{c.name} — {c.company}</option>
@@ -194,18 +253,18 @@ export function QuotationModal({ onClose }) {
                         {customers.length === 0 && <p style={{ fontSize: 12, color: "#b45309", marginTop: 8 }}>Primero creá un cliente en la pestaña Clientes.</p>}
                     </div>
                     <div style={{ marginBottom: 16 }}>
-                        <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 6 }}>Subtotal ($)</label>
-                        <input type="number" required value={form.subtotal} onChange={e => { const v = parseInt(e.target.value) || 0; setForm({ ...form, subtotal: v, tax: v * 0.19, total: v * 1.19 }); }} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 12, fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                        <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 6 }}>Subtotal ($)</label>
+                        <input inputMode="numeric" required value={form.subtotal === 0 ? "" : String(form.subtotal)} onChange={e => { const raw = e.target.value; const v = raw === "" ? 0 : parseInt(raw, 10) || 0; setForm({ ...form, subtotal: v, tax: v * 0.19, total: v * 1.19 }); }} style={modalFieldStyle} />
                     </div>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 12px" }}>
                     <div style={{ marginBottom: 16 }}>
-                        <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 6 }}>Impuestos Auto ($)</label>
-                        <input disabled value={form.tax} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 12, fontSize: 13, outline: "none", boxSizing: "border-box", background: "#f8fafc" }} />
+                        <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 6 }}>Impuestos Auto ($)</label>
+                        <input disabled value={form.tax} style={modalDisabledFieldStyle} />
                     </div>
                     <div style={{ marginBottom: 16 }}>
-                        <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#1e293b", marginBottom: 6 }}>Total ($)</label>
-                        <input disabled value={form.total} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 12, fontSize: 13, outline: "none", boxSizing: "border-box", background: "#f8fafc", fontWeight: 700 }} />
+                        <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 6 }}>Total ($)</label>
+                        <input disabled value={form.total} style={{ ...modalDisabledFieldStyle, fontWeight: 700 }} />
                     </div>
                 </div>
                 <ModalActions onCancel={onClose} />
@@ -235,12 +294,12 @@ export function OrderModal({ onClose }) {
 
     return (
         <Overlay>
-            <h2 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 20px" }}>Nuevo Pedido</h2>
+            <h2 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 20px", color: "#0f172a" }}>Nuevo Pedido</h2>
             <form onSubmit={handleSubmit}>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 12px" }}>
                     <div style={{ marginBottom: 16, gridColumn: "1 / -1" }}>
-                        <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 6 }}>Cliente</label>
-                        <select required value={form.customer_id} onChange={e => setForm({ ...form, customer_id: e.target.value })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 12, fontSize: 13, outline: "none", boxSizing: "border-box", background: "#fff" }}>
+                        <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 6 }}>Cliente</label>
+                        <select required value={form.customer_id} onChange={e => setForm({ ...form, customer_id: e.target.value })} style={modalFieldStyle}>
                             <option value="">Seleccioná un cliente</option>
                             {customers.map(c => (
                                 <option key={c.id} value={c.id}>{c.name} — {c.company}</option>
@@ -248,18 +307,18 @@ export function OrderModal({ onClose }) {
                         </select>
                     </div>
                     <div style={{ marginBottom: 16 }}>
-                        <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 6 }}>Total ($)</label>
-                        <input type="number" required value={form.total} onChange={e => setForm({ ...form, total: parseInt(e.target.value) || 0 })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 12, fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                        <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 6 }}>Total ($)</label>
+                        <input inputMode="numeric" required value={form.total === 0 ? "" : String(form.total)} onChange={e => { const raw = e.target.value; const v = raw === "" ? 0 : parseInt(raw, 10) || 0; setForm({ ...form, total: v }); }} style={modalFieldStyle} />
                     </div>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 12px" }}>
                     <div style={{ marginBottom: 16 }}>
-                        <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 6 }}>Transportadora</label>
-                        <select value={form.carrier} onChange={e => setForm({ ...form, carrier: e.target.value })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 12, fontSize: 13, outline: "none", boxSizing: "border-box" }}><option value="Servientrega">Servientrega</option><option value="FedEx">FedEx</option></select>
+                        <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 6 }}>Transportadora</label>
+                        <select value={form.carrier} onChange={e => setForm({ ...form, carrier: e.target.value })} style={modalFieldStyle}><option value="Servientrega">Servientrega</option><option value="FedEx">FedEx</option></select>
                     </div>
                     <div style={{ marginBottom: 16 }}>
-                        <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 6 }}>Fecha Entrega</label>
-                        <input type="date" value={form.delivery_date} onChange={e => setForm({ ...form, delivery_date: e.target.value })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 12, fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+                        <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 6 }}>Fecha Entrega</label>
+                        <input type="date" value={form.delivery_date} onChange={e => setForm({ ...form, delivery_date: e.target.value })} style={modalFieldStyle} />
                     </div>
                 </div>
                 <ModalActions onCancel={onClose} />
@@ -273,8 +332,8 @@ export function OpportunityModal({ onClose }) {
     const customers = useStore(state => state.customers);
     const [form, setForm] = useState({
         name: "",
-        value: 1000000,
-        probability: 50,
+        value: "1000000",
+        probability: "50",
         customer_id: "",
         stage: "lead",
     });
@@ -293,12 +352,12 @@ export function OpportunityModal({ onClose }) {
 
     return (
         <Overlay>
-            <h2 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 20px" }}>Nueva Oportunidad</h2>
+            <h2 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 20px", color: "#0f172a" }}>Nueva Oportunidad</h2>
             <form onSubmit={handleSubmit}>
                 <Input label="Nombre de la oportunidad" required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 12px" }}>
-                    <Input label="Valor ($)" type="number" min="0" value={form.value} onChange={e => setForm({ ...form, value: e.target.value })} />
-                    <Input label="Probabilidad (%)" type="number" min="0" max="100" value={form.probability} onChange={e => setForm({ ...form, probability: e.target.value })} />
+                    <Input label="Valor ($)" inputMode="numeric" min="0" value={form.value} onChange={e => setForm({ ...form, value: e.target.value })} />
+                    <Input label="Probabilidad (%)" inputMode="numeric" min="0" max="100" value={form.probability} onChange={e => setForm({ ...form, probability: e.target.value })} />
                 </div>
                 <Select label="Etapa inicial" value={form.stage} onChange={e => setForm({ ...form, stage: e.target.value })}
                     options={[
@@ -310,8 +369,8 @@ export function OpportunityModal({ onClose }) {
                     ]}
                 />
                 <div style={{ marginBottom: 16 }}>
-                    <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 6 }}>Cliente (opcional)</label>
-                    <select value={form.customer_id} onChange={e => setForm({ ...form, customer_id: e.target.value })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 12, fontSize: 13, outline: "none", boxSizing: "border-box", background: "#fff" }}>
+                    <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 6 }}>Cliente (opcional)</label>
+                    <select value={form.customer_id} onChange={e => setForm({ ...form, customer_id: e.target.value })} style={modalFieldStyle}>
                         <option value="">—</option>
                         {customers.map(c => (
                             <option key={c.id} value={c.id}>{c.name}</option>

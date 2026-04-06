@@ -282,19 +282,21 @@ export const useStore = create((set, get) => ({
         });
         if (result.success) {
           set({ products: [result.data, ...products] });
-          return result.data;
+          return { ok: true, data: result.data };
         }
-        return null;
+        const msg = result.error || 'No se pudo crear el producto.';
+        console.error('Error creating product:', msg);
+        return { ok: false, error: typeof msg === 'string' ? msg : String(msg) };
       } catch (err) {
         console.error('Error creating product:', err);
-        return null;
+        return { ok: false, error: err?.message || 'Error de red al crear el producto.' };
       } finally {
         set((state) => ({ loading: { ...state.loading, products: false } }));
       }
     } else {
       const newProduct = { ...product, id: uuidv4(), status: 'active' };
       set({ products: [newProduct, ...products] });
-      return newProduct;
+      return { ok: true, data: newProduct };
     }
   },
 
