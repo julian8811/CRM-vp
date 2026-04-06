@@ -201,7 +201,11 @@ export function ProductModal({ onClose }) {
             )}
             <form onSubmit={handleSubmit}>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 12px" }}>
-                    <Input label="SKU" required value={form.sku} onChange={e => setForm({ ...form, sku: e.target.value })} />
+                    <div style={{ marginBottom: 16 }}>
+                        <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 6 }}>SKU (código único)</label>
+                        <input style={modalFieldStyle} required value={form.sku} onChange={e => setForm({ ...form, sku: e.target.value })} placeholder="Ej. PROD-01031" maxLength={80} />
+                        <p style={{ fontSize: 11, color: "#64748b", margin: "6px 0 0" }}>No puede repetirse: si ya usaste este SKU, cambiá el número o borrá el producto anterior.</p>
+                    </div>
                     <Input label="Nombre del Producto" required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
                 </div>
                 <div style={{ marginBottom: 16 }}>

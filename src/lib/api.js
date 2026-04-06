@@ -19,6 +19,21 @@ const handleSuccess = (data) => {
   return { success: true, data }
 }
 
+/** Mensaje legible para errores de productos (SKU único, etc.). */
+function mapProductError(error) {
+  if (!error) return 'Error al guardar el producto.'
+  const code = error.code
+  const msg = String(error.message || '')
+  if (
+    code === '23505' ||
+    msg.includes('products_sku_key') ||
+    /duplicate key|clave duplicada|unique constraint/i.test(msg)
+  ) {
+    return 'Ya existe un producto con ese SKU. Cambiá el código por uno único o eliminá el producto que lo usa.'
+  }
+  return msg
+}
+
 // ============================================
 // CUSTOMERS API
 // ============================================
@@ -227,7 +242,10 @@ export const api = {
         .insert([product])
         .select()
         .single()
-      if (error) return handleError(error)
+      if (error) {
+        console.error('API Error:', error)
+        return { success: false, error: mapProductError(error) }
+      }
       return handleSuccess(data)
     },
 
@@ -238,7 +256,10 @@ export const api = {
         .eq('id', id)
         .select()
         .single()
-      if (error) return handleError(error)
+      if (error) {
+        console.error('API Error:', error)
+        return { success: false, error: mapProductError(error) }
+      }
       return handleSuccess(data)
     },
 
