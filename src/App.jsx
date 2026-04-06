@@ -43,11 +43,12 @@ import { exportWorkbook } from './lib/exportExcel';
 import { invokeCrmAi } from './lib/crmAi';
 import { isSupabaseConfigured, supabase } from './lib/supabase';
 import { updateProfile } from './lib/auth';
+import { confirmDelete } from './lib/confirmDelete';
 
 const PAGE_TITLES = {
   dashboard: { title: 'Dashboard', subtitle: 'Resumen de tu gestión comercial' },
   customers: { title: 'Clientes', subtitle: 'Gestión de clientes' },
-  leads: { title: 'Leads', subtitle: 'Gestión de prospectos' },
+  leads: { title: 'Dirige', subtitle: 'Gestión de prospectos' },
   pipeline: { title: 'Embudo de Ventas', subtitle: 'Pipeline de oportunidades' },
   products: { title: 'Productos', subtitle: 'Catálogo de productos' },
   quotations: { title: 'Cotizaciones', subtitle: 'Gestión de cotizaciones' },
@@ -124,7 +125,7 @@ function DashboardContent() {
 
   const quickActions = [
     { id: 'customer', icon: Users, label: 'Nuevo cliente', color: 'bg-blue-500' },
-    { id: 'lead', icon: Target, label: 'Nuevo lead', color: 'bg-emerald-500' },
+    { id: 'lead', icon: Target, label: 'Nuevo prospecto', color: 'bg-emerald-500' },
     { id: 'quotation', icon: DollarSign, label: 'Nueva cotización', color: 'bg-violet-500' },
     { id: 'order', icon: ShoppingCart, label: 'Nuevo pedido', color: 'bg-amber-500' },
   ];
@@ -653,7 +654,7 @@ function CustomersContent() {
         <button type="button" onClick={() => openModal('customer', { customer: row })} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-blue-500 transition-colors">
           <Edit2 className="w-4 h-4" />
         </button>
-        <button type="button" onClick={() => deleteCustomer(row.id)} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-red-500 transition-colors">
+        <button type="button" onClick={() => { if (confirmDelete('este cliente')) deleteCustomer(row.id); }} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-red-500 transition-colors" title="Eliminar cliente">
           <Trash2 className="w-4 h-4" />
         </button>
       </div>
@@ -682,6 +683,7 @@ function LeadsContent() {
   const { openModal } = useCrmModal();
   const leads = useStore(state => state.leads);
   const convertLead = useStore(state => state.convertLead);
+  const deleteLead = useStore(state => state.deleteLead);
   
   const columns = [
     { key: 'name', header: 'Lead', sortable: true, render: (val, row) => (
@@ -709,13 +711,21 @@ function LeadsContent() {
     )},
     { key: 'budget', header: 'Presupuesto', render: (val) => val ? <span className="text-slate-600 dark:text-slate-400">${Math.round(val).toLocaleString()}</span> : '—' },
     { key: 'actions', header: '', render: (val, row) => (
-      <div className="flex justify-center">
+      <div className="flex justify-center items-center gap-2 flex-wrap">
         {row.status !== 'converted' ? (
           <Button size="sm" variant="outline" type="button" onClick={() => convertLead(row.id)}>
             <ArrowRightCircle className="w-3 h-3" />
             Convertir
           </Button>
         ) : <Badge variant="purple">✓ Convertido</Badge>}
+        <button
+          type="button"
+          title="Eliminar prospecto"
+          onClick={() => { if (confirmDelete('este prospecto')) deleteLead(row.id); }}
+          className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-red-500 transition-colors"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
       </div>
     )},
   ];
@@ -724,15 +734,15 @@ function LeadsContent() {
     <div>
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Leads</h2>
-          <p className="text-sm text-slate-500">{leads.length} leads registrados</p>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Dirige</h2>
+          <p className="text-sm text-slate-500">Gestión de prospectos · {leads.length} registros</p>
         </div>
         <Button type="button" onClick={() => openModal('lead')} className="w-full justify-center sm:w-auto">
           <Plus className="w-4 h-4" />
-          Nuevo Lead
+          Nuevo prospecto
         </Button>
       </div>
-      <DataTable columns={columns} data={leads} searchPlaceholder="Buscar leads..." pageName="leads" />
+      <DataTable columns={columns} data={leads} searchPlaceholder="Buscar prospectos..." pageName="leads" />
     </div>
   );
 }
@@ -741,6 +751,7 @@ function LeadsContent() {
 function ProductsContent() {
   const { openModal } = useCrmModal();
   const products = useStore(state => state.products);
+  const deleteProduct = useStore(state => state.deleteProduct);
 
   return (
     <div>
@@ -791,6 +802,20 @@ function ProductsContent() {
                 <span className="text-slate-500">Existencia: <span className={`font-medium ${product.stock <= 5 ? 'text-red-500' : 'text-slate-700 dark:text-slate-300'}`}>{product.stock}</span></span>
                 <span className="text-slate-500">Margen: <span className="font-medium text-slate-700 dark:text-slate-300">{product.margin}%</span></span>
               </div>
+              <div className="mt-3 flex justify-end border-t border-slate-100 dark:border-slate-700 pt-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="text-red-600 border-red-200 hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-950/40"
+                  onClick={() => {
+                    if (confirmDelete(`el producto «${product.name}»`)) deleteProduct(product.id);
+                  }}
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  Eliminar
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ))}
@@ -800,7 +825,7 @@ function ProductsContent() {
 }
 
 // Componente de tarjeta de oportunidad en el Pipeline
-function OpportunityCard({ opp, stage }) {
+function OpportunityCard({ opp, stage, onDelete }) {
   const {
     attributes,
     listeners,
@@ -825,9 +850,21 @@ function OpportunityCard({ opp, stage }) {
       style={style}
       {...attributes}
       {...listeners}
-      className="bg-white dark:bg-slate-800 rounded-lg p-3 shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow group"
+      className="relative bg-white dark:bg-slate-800 rounded-lg p-3 shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow group"
     >
-      <div className="flex items-start gap-2">
+      <button
+        type="button"
+        title="Eliminar oportunidad"
+        className="absolute right-2 top-2 z-10 rounded-md p-1 text-slate-400 opacity-0 transition-opacity hover:bg-red-50 hover:text-red-600 group-hover:opacity-100 dark:hover:bg-red-950/40"
+        onPointerDown={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete?.(opp.id, stage);
+        }}
+      >
+        <Trash2 className="h-3.5 w-3.5" />
+      </button>
+      <div className="flex items-start gap-2 pr-6">
         <GripVertical className="w-4 h-4 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity mt-0.5" />
         <div className="flex-1 min-w-0">
           <div className="font-medium text-sm text-slate-900 dark:text-white mb-1 truncate">{opp.name}</div>
@@ -859,7 +896,7 @@ function OpportunityCard({ opp, stage }) {
 }
 
 // Columna del Kanban
-function PipelineColumn({ stage, opps }) {
+function PipelineColumn({ stage, opps, onDeleteOpp }) {
   const {
     setNodeRef,
     isOver,
@@ -889,7 +926,7 @@ function PipelineColumn({ stage, opps }) {
             <div className="text-center py-8 text-sm text-slate-400">Sin oportunidades</div>
           ) : (
             opps.map(opp => (
-              <OpportunityCard key={opp.id} opp={opp} stage={stage} />
+              <OpportunityCard key={opp.id} opp={opp} stage={stage} onDelete={onDeleteOpp} />
             ))
           )}
         </SortableContext>
@@ -902,6 +939,12 @@ function PipelineContent() {
   const { openModal } = useCrmModal();
   const pipeline = useStore(state => state.pipeline) || {};
   const movePipelineOpportunity = useStore(state => state.movePipelineOpportunity);
+  const deleteOpportunity = useStore(state => state.deleteOpportunity);
+
+  const handleDeleteOpp = useCallback((oppId, stage) => {
+    if (!confirmDelete('esta oportunidad del embudo')) return;
+    deleteOpportunity(oppId, stage);
+  }, [deleteOpportunity]);
   const stages = useMemo(
     () => ['lead', 'contact', 'qualification', 'proposal', 'negotiation', 'closed_won'],
     []
@@ -993,7 +1036,7 @@ function PipelineContent() {
       >
         <div className="flex gap-4 overflow-x-auto pb-4">
           {stages.map(stage => (
-            <PipelineColumn key={stage} stage={stage} opps={pipeline[stage] || []} />
+            <PipelineColumn key={stage} stage={stage} opps={pipeline[stage] || []} onDeleteOpp={handleDeleteOpp} />
           ))}
         </div>
         <DragOverlay>
@@ -1016,6 +1059,7 @@ function PipelineContent() {
 function QuotationsContent() {
   const { openModal } = useCrmModal();
   const quotations = useStore(state => state.quotations);
+  const deleteQuotation = useStore(state => state.deleteQuotation);
   
   const columns = [
     { key: 'quote_number', header: 'Número', sortable: true, render: (val) => <span className="font-mono text-sm font-medium text-slate-900 dark:text-white">{val}</span> },
@@ -1033,16 +1077,27 @@ function QuotationsContent() {
     }},
     { key: 'valid_until', header: 'Válida hasta', render: (val) => val ? new Date(val).toLocaleDateString('es-CO') : '—' },
     { key: 'created_at', header: 'Fecha', render: (val) => new Date(val).toLocaleDateString('es-CO') },
-    { key: 'actions', header: '', render: () => (
+    { key: 'actions', header: '', render: (val, row) => (
       <div className="flex items-center gap-2 justify-end">
-        <button className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-blue-500 transition-colors">
+        <button type="button" className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-blue-500 transition-colors">
           <Eye className="w-4 h-4" />
         </button>
-        <button className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-green-500 transition-colors">
+        <button type="button" className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-green-500 transition-colors">
           <Send className="w-4 h-4" />
         </button>
-        <button className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+        <button type="button" className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
           <FileDown className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          title="Eliminar cotización"
+          onClick={() => {
+            const num = row.quote_number || row.number || '';
+            if (confirmDelete(num ? `la cotización ${num}` : 'esta cotización')) deleteQuotation(row.id);
+          }}
+          className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-red-500 transition-colors"
+        >
+          <Trash2 className="w-4 h-4" />
         </button>
       </div>
     )},
@@ -1069,6 +1124,7 @@ function QuotationsContent() {
 function OrdersContent() {
   const { openModal } = useCrmModal();
   const orders = useStore(state => state.orders);
+  const deleteOrder = useStore(state => state.deleteOrder);
   
   const columns = [
     { key: 'order_number', header: 'Pedido', sortable: true, render: (val) => <span className="font-mono text-sm font-medium text-slate-900 dark:text-white">{val}</span> },
@@ -1086,13 +1142,24 @@ function OrdersContent() {
     }},
     { key: 'carrier', header: 'Transporte', render: (val) => val || '—' },
     { key: 'created_at', header: 'Fecha', render: (val) => new Date(val).toLocaleDateString('es-CO') },
-    { key: 'actions', header: '', render: () => (
+    { key: 'actions', header: '', render: (val, row) => (
       <div className="flex items-center gap-2 justify-end">
-        <button className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-blue-500 transition-colors">
+        <button type="button" className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-blue-500 transition-colors">
           <Eye className="w-4 h-4" />
         </button>
-        <button className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-green-500 transition-colors">
+        <button type="button" className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-green-500 transition-colors">
           <FileCheck className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          title="Eliminar pedido"
+          onClick={() => {
+            const num = row.order_number || row.number || '';
+            if (confirmDelete(num ? `el pedido ${num}` : 'este pedido')) deleteOrder(row.id);
+          }}
+          className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-red-500 transition-colors"
+        >
+          <Trash2 className="w-4 h-4" />
         </button>
       </div>
     )},
@@ -1130,6 +1197,7 @@ function AutomationsContent() {
   const automations = useStore((s) => s.automations);
   const updateAutomationRule = useStore((s) => s.updateAutomationRule);
   const addAutomationRule = useStore((s) => s.addAutomationRule);
+  const deleteAutomationRule = useStore((s) => s.deleteAutomationRule);
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ name: '', trigger: '', action: '' });
   const [info, setInfo] = useState('');
@@ -1240,6 +1308,18 @@ function AutomationsContent() {
                         title={auto.status === 'active' ? 'Pausar' : 'Activar'}
                       >
                         {auto.status === 'active' ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="text-red-600 border-red-200 hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-950/40"
+                        title="Eliminar regla"
+                        onClick={() => {
+                          if (confirmDelete(`la automatización «${auto.name}»`)) deleteAutomationRule(auto.id);
+                        }}
+                      >
+                        <Trash2 className="w-3 h-3" />
                       </Button>
                     </div>
                   </div>
@@ -1596,6 +1676,7 @@ function ticketDisplay(t) {
 function PostsaleContent() {
   const tickets = useStore((s) => s.tickets);
   const addTicket = useStore((s) => s.addTicket);
+  const deleteTicket = useStore((s) => s.deleteTicket);
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ customer: '', subject: '', priority: 'medium' });
 
@@ -1710,6 +1791,16 @@ function PostsaleContent() {
                       {ticket.uiStatus === 'open' ? 'Abierto' : ticket.uiStatus === 'pending' ? 'Pendiente' : 'Resuelto'}
                     </Badge>
                     <span className="text-sm text-slate-400">{ticket.date}</span>
+                    <button
+                      type="button"
+                      title="Eliminar ticket"
+                      onClick={() => {
+                        if (confirmDelete('este ticket de postventa')) deleteTicket(ticket.id);
+                      }}
+                      className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-400 hover:text-red-500 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               </div>

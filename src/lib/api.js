@@ -289,6 +289,15 @@ export const api = {
         .single()
       if (error) return handleError(error)
       return handleSuccess(data)
+    },
+
+    delete: async (id) => {
+      const { error } = await supabase
+        .from('quotations')
+        .delete()
+        .eq('id', id)
+      if (error) return handleError(error)
+      return handleSuccess({ deleted: true })
     }
   },
 
@@ -328,6 +337,15 @@ export const api = {
         .single()
       if (error) return handleError(error)
       return handleSuccess(data)
+    },
+
+    delete: async (id) => {
+      const { error } = await supabase
+        .from('orders')
+        .delete()
+        .eq('id', id)
+      if (error) return handleError(error)
+      return handleSuccess({ deleted: true })
     }
   },
 
@@ -358,6 +376,15 @@ export const api = {
         .single()
       if (error) return handleError(error)
       return handleSuccess(data)
+    },
+
+    delete: async (id) => {
+      const { error } = await supabase
+        .from('support_tickets')
+        .delete()
+        .eq('id', id)
+      if (error) return handleError(error)
+      return handleSuccess({ deleted: true })
     }
   },
 

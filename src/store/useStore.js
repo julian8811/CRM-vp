@@ -244,6 +244,20 @@ export const useStore = create((set, get) => ({
     }
   },
 
+  deleteLead: async (id) => {
+    const { isApiReady, leads } = get();
+    if (isApiReady()) {
+      try {
+        const result = await api.leads.delete(id);
+        if (result.success) set({ leads: leads.filter((l) => l.id !== id) });
+      } catch (err) {
+        console.error('Error deleting lead:', err);
+      }
+    } else {
+      set({ leads: leads.filter((l) => l.id !== id) });
+    }
+  },
+
   // ============================================
   // PRODUCTS
   // ============================================
@@ -306,6 +320,20 @@ export const useStore = create((set, get) => ({
       const newProduct = { ...product, id: uuidv4(), status: 'active' };
       set({ products: [newProduct, ...products] });
       return { ok: true, data: newProduct };
+    }
+  },
+
+  deleteProduct: async (id) => {
+    const { isApiReady, products } = get();
+    if (isApiReady()) {
+      try {
+        const result = await api.products.delete(id);
+        if (result.success) set({ products: products.filter((p) => p.id !== id) });
+      } catch (err) {
+        console.error('Error deleting product:', err);
+      }
+    } else {
+      set({ products: products.filter((p) => p.id !== id) });
     }
   },
 
@@ -421,6 +449,32 @@ export const useStore = create((set, get) => ({
     }
   },
 
+  deleteOpportunity: async (oppId, stage) => {
+    const { isApiReady, pipeline } = get();
+    if (isApiReady()) {
+      try {
+        const result = await api.opportunities.delete(oppId);
+        if (result.success) {
+          set({
+            pipeline: {
+              ...pipeline,
+              [stage]: (pipeline[stage] || []).filter((o) => o.id !== oppId),
+            },
+          });
+        }
+      } catch (err) {
+        console.error('Error deleting opportunity:', err);
+      }
+    } else {
+      set({
+        pipeline: {
+          ...pipeline,
+          [stage]: (pipeline[stage] || []).filter((o) => o.id !== oppId),
+        },
+      });
+    }
+  },
+
   // ============================================
   // QUOTATIONS
   // ============================================
@@ -477,6 +531,20 @@ export const useStore = create((set, get) => ({
     }
   },
 
+  deleteQuotation: async (id) => {
+    const { isApiReady, quotations } = get();
+    if (isApiReady()) {
+      try {
+        const result = await api.quotations.delete(id);
+        if (result.success) set({ quotations: quotations.filter((q) => q.id !== id) });
+      } catch (err) {
+        console.error('Error deleting quotation:', err);
+      }
+    } else {
+      set({ quotations: quotations.filter((q) => q.id !== id) });
+    }
+  },
+
   // ============================================
   // ORDERS
   // ============================================
@@ -529,6 +597,20 @@ export const useStore = create((set, get) => ({
       const newOrder = { ...order, id: uuidv4() };
       set({ orders: [newOrder, ...orders] });
       return newOrder;
+    }
+  },
+
+  deleteOrder: async (id) => {
+    const { isApiReady, orders } = get();
+    if (isApiReady()) {
+      try {
+        const result = await api.orders.delete(id);
+        if (result.success) set({ orders: orders.filter((o) => o.id !== id) });
+      } catch (err) {
+        console.error('Error deleting order:', err);
+      }
+    } else {
+      set({ orders: orders.filter((o) => o.id !== id) });
     }
   },
 
@@ -597,6 +679,20 @@ export const useStore = create((set, get) => ({
     const result = await api.supportTickets.update(id, updates);
     if (result.success) {
       set({ tickets: tickets.map((t) => (t.id === id ? result.data : t)) });
+    }
+  },
+
+  deleteTicket: async (id) => {
+    const { isApiReady, tickets } = get();
+    if (isApiReady()) {
+      try {
+        const result = await api.supportTickets.delete(id);
+        if (result.success) set({ tickets: tickets.filter((t) => t.id !== id) });
+      } catch (err) {
+        console.error('Error deleting ticket:', err);
+      }
+    } else {
+      set({ tickets: tickets.filter((t) => t.id !== id) });
     }
   },
 
@@ -672,6 +768,20 @@ export const useStore = create((set, get) => ({
       return result.data;
     }
     return null;
+  },
+
+  deleteAutomationRule: async (id) => {
+    const { isApiReady, automations } = get();
+    if (!isApiReady()) {
+      set({ automations: automations.filter((a) => a.id !== id) });
+      return;
+    }
+    try {
+      const result = await api.automationRules.delete(id);
+      if (result.success) set({ automations: automations.filter((a) => a.id !== id) });
+    } catch (err) {
+      console.error('Error deleting automation rule:', err);
+    }
   },
 
   // ============================================

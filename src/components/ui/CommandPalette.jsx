@@ -4,7 +4,7 @@ import { Search, X, ArrowRight, FileText, Users, Target, ShoppingCart, Package, 
 const PAGES = [
   { id: 'dashboard', name: 'Dashboard', icon: BarChart3, category: 'Main' },
   { id: 'customers', name: 'Clientes', icon: Users, category: 'CRM' },
-  { id: 'leads', name: 'Leads', icon: Target, category: 'CRM' },
+  { id: 'leads', name: 'Dirige (prospectos)', icon: Target, category: 'CRM' },
   { id: 'pipeline', name: 'Pipeline', icon: DollarSign, category: 'CRM' },
   { id: 'products', name: 'Productos', icon: Package, category: 'Catalog' },
   { id: 'quotations', name: 'Cotizaciones', icon: FileText, category: 'Sales' },
