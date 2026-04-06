@@ -311,22 +311,22 @@ function LoginPage() {
 
   if (!isConfigured) {
     return (
-      <div className="min-h-screen flex bg-gradient-to-br from-[#1B3A5C] via-[#162F4A] to-[#0f2035]">
-        <div className="flex-1 flex items-center justify-center p-12">
+      <div className="flex min-h-screen flex-col bg-gradient-to-br from-[#1B3A5C] via-[#162F4A] to-[#0f2035] lg:flex-row">
+        <div className="flex flex-1 items-center justify-center p-6 sm:p-12">
           <div className="max-w-md">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="mb-8 flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600">
+                <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
               <span className="text-2xl font-bold text-white">CRM-VP</span>
             </div>
-            <h1 className="text-4xl font-bold text-white mb-4">Sistema CRM Innovador</h1>
-            <p className="text-blue-200 mb-8">Gestiona tu ciclo comercial con inteligencia artificial.</p>
-            <div className="bg-white/10 backdrop-blur rounded-xl p-6 text-sm text-blue-200">
-              <p className="font-semibold text-white mb-2">Configuración requerida:</p>
-              <ol className="space-y-1 list-decimal list-inside">
+            <h1 className="mb-4 text-3xl font-bold text-white sm:text-4xl">Sistema CRM Innovador</h1>
+            <p className="mb-8 text-blue-200">Gestiona tu ciclo comercial con inteligencia artificial.</p>
+            <div className="rounded-xl bg-white/10 p-6 text-sm text-blue-200 backdrop-blur">
+              <p className="mb-2 font-semibold text-white">Configuración requerida:</p>
+              <ol className="list-inside list-decimal space-y-1">
                 <li>Crea un proyecto en Supabase</li>
                 <li>Ejecuta el schema SQL</li>
                 <li>Configura .env.local</li>
@@ -334,10 +334,10 @@ function LoginPage() {
             </div>
           </div>
         </div>
-        <div className="w-[480px] bg-white dark:bg-slate-800 flex items-center justify-center p-12">
+        <div className="flex w-full items-center justify-center bg-white p-8 dark:bg-slate-800 sm:p-12 lg:w-[480px] lg:max-w-none lg:flex-shrink-0">
           <div className="w-full max-w-sm text-center">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Configuración Requerida</h2>
-            <p className="text-slate-500 mb-6">Completá las variables de entorno</p>
+            <h2 className="mb-2 text-2xl font-bold text-slate-900 dark:text-white">Configuración Requerida</h2>
+            <p className="mb-6 text-slate-500">Completá las variables de entorno</p>
           </div>
         </div>
       </div>
@@ -346,30 +346,30 @@ function LoginPage() {
 
   if (registerSuccess) {
     return (
-      <div className="min-h-screen flex bg-gradient-to-br from-[#1B3A5C] via-[#162F4A] to-[#0f2035]">
-        <div className="flex-1 flex items-center justify-center p-12">
+      <div className="flex min-h-screen flex-col bg-gradient-to-br from-[#1B3A5C] via-[#162F4A] to-[#0f2035] lg:flex-row">
+        <div className="flex flex-1 items-center justify-center p-6 sm:p-12">
           <div className="max-w-md">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="mb-8 flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600">
+                <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
               <span className="text-2xl font-bold text-white">CRM-VP</span>
             </div>
-            <h1 className="text-4xl font-bold text-white mb-4">Sistema CRM Innovador</h1>
+            <h1 className="mb-4 text-3xl font-bold text-white sm:text-4xl">Sistema CRM Innovador</h1>
             <p className="text-blue-200">Gestiona tu ciclo comercial.</p>
           </div>
         </div>
-        <div className="w-[480px] bg-white dark:bg-slate-800 flex items-center justify-center p-12">
+        <div className="flex w-full items-center justify-center bg-white p-8 dark:bg-slate-800 sm:p-12 lg:w-[480px] lg:max-w-none lg:flex-shrink-0">
           <div className="w-full max-w-sm text-center">
-            <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+              <svg className="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">¡Registro Exitoso!</h2>
-            <p className="text-slate-500 mb-6">Verificá tu correo electrónico.</p>
+            <h2 className="mb-2 text-2xl font-bold text-slate-900 dark:text-white">¡Registro Exitoso!</h2>
+            <p className="mb-6 text-slate-500">Verificá tu correo electrónico.</p>
             <Button onClick={() => setRegisterSuccess(false)} className="w-full">
               Volver al login
             </Button>
@@ -380,31 +380,31 @@ function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-[#1B3A5C] via-[#162F4A] to-[#0f2035]">
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-[#1B3A5C] via-[#162F4A] to-[#0f2035] lg:flex-row">
       {/* Left - Branding */}
-      <div className="flex-1 flex items-center justify-center p-12 relative overflow-hidden">
-        <div className="absolute top-20 left-20 w-48 h-48 rounded-full bg-blue-500/20 blur-3xl" />
-        <div className="absolute bottom-20 right-20 w-64 h-64 rounded-full bg-blue-400/10 blur-3xl" />
+      <div className="relative flex flex-1 items-center justify-center overflow-hidden p-6 sm:p-12">
+        <div className="absolute left-10 top-16 h-48 w-48 rounded-full bg-blue-500/20 blur-3xl sm:left-20 sm:top-20" />
+        <div className="absolute bottom-16 right-10 h-64 w-64 rounded-full bg-blue-400/10 blur-3xl sm:bottom-20 sm:right-20" />
         <div className="relative z-10 max-w-md">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
-              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="mb-8 flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 shadow-lg shadow-blue-500/30">
+              <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
             <span className="text-2xl font-bold text-white">CRM-VP</span>
           </div>
-          <h1 className="text-4xl font-bold text-white mb-4 leading-tight">
+          <h1 className="mb-4 text-3xl font-bold leading-tight text-white sm:text-4xl">
             Sistema CRM Innovador para Ventas
           </h1>
-          <p className="text-blue-200 text-lg">
+          <p className="text-lg text-blue-200">
             Gestiona tu ciclo comercial con inteligencia artificial, automatización y analítica avanzada.
           </p>
         </div>
       </div>
 
       {/* Right - Login Form */}
-      <div className="w-[480px] bg-white dark:bg-slate-800 flex items-center justify-center p-12">
+      <div className="flex w-full items-center justify-center bg-white p-6 dark:bg-slate-800 sm:p-12 lg:w-[480px] lg:max-w-none lg:flex-shrink-0">
         <div className="w-full max-w-sm">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">
             {isRegistering ? 'Crear Cuenta' : 'Bienvenido'}
@@ -421,7 +421,7 @@ function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {isRegistering && (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
                   <Label required>Nombre</Label>
                   <Input
@@ -662,12 +662,12 @@ function CustomersContent() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Clientes</h2>
           <p className="text-sm text-slate-500">{customers.length} clientes registrados</p>
         </div>
-        <Button type="button" onClick={() => openModal('customer')}>
+        <Button type="button" onClick={() => openModal('customer')} className="w-full justify-center sm:w-auto">
           <Plus className="w-4 h-4" />
           Nuevo Cliente
         </Button>
@@ -722,12 +722,12 @@ function LeadsContent() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Leads</h2>
           <p className="text-sm text-slate-500">{leads.length} leads registrados</p>
         </div>
-        <Button type="button" onClick={() => openModal('lead')}>
+        <Button type="button" onClick={() => openModal('lead')} className="w-full justify-center sm:w-auto">
           <Plus className="w-4 h-4" />
           Nuevo Lead
         </Button>
@@ -744,12 +744,12 @@ function ProductsContent() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Productos</h2>
           <p className="text-sm text-slate-500">{products.length} productos en catálogo</p>
         </div>
-        <Button type="button" onClick={() => openModal('product')}>
+        <Button type="button" onClick={() => openModal('product')} className="w-full justify-center sm:w-auto">
           <Plus className="w-4 h-4" />
           Nuevo Producto
         </Button>
@@ -969,12 +969,12 @@ function PipelineContent() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Embudo de Ventas</h2>
           <p className="text-sm text-slate-500">Arrastrá las oportunidades entre etapas</p>
         </div>
-        <Button type="button" onClick={() => openModal('opportunity')}>
+        <Button type="button" onClick={() => openModal('opportunity')} className="w-full justify-center sm:w-auto">
           <Plus className="w-4 h-4" />
           Nueva Oportunidad
         </Button>
@@ -1045,12 +1045,12 @@ function QuotationsContent() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Cotizaciones</h2>
           <p className="text-sm text-slate-500">{quotations.length} cotizaciones</p>
         </div>
-        <Button type="button" onClick={() => openModal('quotation')}>
+        <Button type="button" onClick={() => openModal('quotation')} className="w-full justify-center sm:w-auto">
           <Plus className="w-4 h-4" />
           Nueva Cotización
         </Button>
@@ -1095,12 +1095,12 @@ function OrdersContent() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Pedidos</h2>
           <p className="text-sm text-slate-500">{orders.length} pedidos</p>
         </div>
-        <Button type="button" onClick={() => openModal('order')}>
+        <Button type="button" onClick={() => openModal('order')} className="w-full justify-center sm:w-auto">
             <Plus className="w-4 h-4" />
             Nuevo Pedido
           </Button>
@@ -1150,7 +1150,7 @@ function AutomationsContent() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Automatizaciones</h2>
           <p className="text-sm text-slate-500">
@@ -1158,7 +1158,7 @@ function AutomationsContent() {
             <code className="text-xs">run-automations</code>.
           </p>
         </div>
-        <Button type="button" variant="outline" onClick={() => setModalOpen(true)}>
+        <Button type="button" variant="outline" onClick={() => setModalOpen(true)} className="w-full justify-center sm:w-auto">
           <Plus className="w-4 h-4" />
           Nueva Automatización
         </Button>
@@ -1210,19 +1210,19 @@ function AutomationsContent() {
             return (
               <Card key={auto.id} hover>
                 <CardContent className="p-5">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-xl ${auto.status === 'active' ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-slate-100 dark:bg-slate-700'}`}>
-                        <Workflow className={`w-5 h-5 ${auto.status === 'active' ? 'text-emerald-600' : 'text-slate-400'}`} />
+                  <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div className={`flex-shrink-0 rounded-xl p-2 ${auto.status === 'active' ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-slate-100 dark:bg-slate-700'}`}>
+                        <Workflow className={`h-5 w-5 ${auto.status === 'active' ? 'text-emerald-600' : 'text-slate-400'}`} />
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <h3 className="font-semibold text-slate-900 dark:text-white">{auto.name}</h3>
-                        <div className="text-sm text-slate-500">
+                        <div className="break-words text-sm text-slate-500">
                           {trigger} → {action}
                         </div>
                       </div>
                     </div>
-                    <Badge variant={auto.status === 'active' ? 'green' : 'gray'}>{auto.status === 'active' ? 'Activa' : 'Pausada'}</Badge>
+                    <Badge className="w-fit flex-shrink-0" variant={auto.status === 'active' ? 'green' : 'gray'}>{auto.status === 'active' ? 'Activa' : 'Pausada'}</Badge>
                   </div>
                   <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-700">
                     <span className="text-xs text-slate-400">Último cambio: {lastRun}</span>
@@ -1339,7 +1339,7 @@ function ReportsContent() {
               Periodo: {filterPreset === '7d' ? '7 días' : filterPreset === '30d' ? '30 días' : filterPreset === '90d' ? '90 días' : 'Todo'}
             </Button>
             {filterOpen && (
-              <div className="absolute right-0 top-full mt-1 z-[100] min-w-[200px] rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 shadow-lg py-1">
+              <div className="absolute left-0 right-0 top-full z-[100] mt-1 min-w-[200px] rounded-lg border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-600 dark:bg-slate-800 sm:left-auto sm:right-0">
                 {[
                   { id: '7d', label: 'Últimos 7 días' },
                   { id: '30d', label: 'Últimos 30 días' },
@@ -1484,7 +1484,7 @@ function AIContent() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">IA Comercial</h2>
           <p className="text-sm text-slate-500">Preferencia guardada en Supabase. Desplegá la Edge Function crm-ai y OPENAI_API_KEY en el proyecto.</p>
@@ -1535,9 +1535,9 @@ function AIContent() {
                 </div>
               )}
             </div>
-            <form onSubmit={sendAi} className="flex gap-2">
-              <Input value={aiInput} onChange={(e) => setAiInput(e.target.value)} placeholder="Ej. Cómo priorizo leads esta semana?" className="flex-1" />
-              <Button type="submit" disabled={aiLoading}>
+            <form onSubmit={sendAi} className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
+              <Input value={aiInput} onChange={(e) => setAiInput(e.target.value)} placeholder="Ej. Cómo priorizo leads esta semana?" className="min-w-0 flex-1" />
+              <Button type="submit" disabled={aiLoading} className="w-full shrink-0 sm:w-auto">
                 Enviar
               </Button>
             </form>
@@ -1614,12 +1614,12 @@ function PostsaleContent() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Postventa</h2>
           <p className="text-sm text-slate-500">Tickets en la tabla support_tickets (Supabase).</p>
         </div>
-        <Button type="button" onClick={() => setModalOpen(true)}>
+        <Button type="button" onClick={() => setModalOpen(true)} className="w-full justify-center sm:w-auto">
           <Plus className="w-4 h-4" />
           Nuevo Ticket
         </Button>
@@ -1687,8 +1687,8 @@ function PostsaleContent() {
           <div className="divide-y divide-slate-100 dark:divide-slate-700">
             {rows.map((ticket) => (
               <div key={ticket.id} className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex min-w-0 items-center gap-4">
                     <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-700">
                       <Wrench className="w-5 h-5 text-slate-500" />
                     </div>
@@ -1697,7 +1697,7 @@ function PostsaleContent() {
                       <div className="text-sm text-slate-500">{ticket.customer} • {String(ticket.id).slice(0, 8)}</div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                     <Badge variant={ticket.priority === 'high' ? 'red' : ticket.priority === 'medium' ? 'amber' : 'gray'}>
                       {ticket.priority === 'high' ? 'Alta' : ticket.priority === 'medium' ? 'Media' : 'Baja'}
                     </Badge>
@@ -1774,7 +1774,7 @@ function SettingsContent() {
                   {avatarErr && <p className="text-xs text-red-600 mt-1">{avatarErr}</p>}
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <Label>Nombre</Label>
                   <Input readOnly value={meta.first_name || ''} placeholder="—" />
@@ -1913,14 +1913,14 @@ function UsersContent() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Usuarios</h2>
           <p className="text-sm text-slate-500">
             {users.length ? `${users.length} usuario en sesión` : 'Sin listado de equipo'} · El alta de usuarios se gestiona en Supabase Auth.
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
           {profile?.role === 'admin' && (
             <>
               <Input
@@ -1928,9 +1928,9 @@ function UsersContent() {
                 placeholder="email@empresa.com"
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
-                className="w-56"
+                className="w-full min-w-0 sm:w-56"
               />
-              <Button type="button" variant="outline" onClick={sendInvite}>
+              <Button type="button" variant="outline" onClick={sendInvite} className="w-full justify-center sm:w-auto">
                 <UserPlus className="w-4 h-4" />
                 Invitar
               </Button>
@@ -1939,6 +1939,7 @@ function UsersContent() {
           <Button
             type="button"
             variant="outline"
+            className="w-full justify-center sm:w-auto"
             onClick={() => window.open('https://supabase.com/dashboard/project/_/auth/users', '_blank', 'noopener')}
           >
             Gestionar en Supabase

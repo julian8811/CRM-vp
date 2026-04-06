@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Bell, Sun, Moon, Command } from 'lucide-react';
+import { Search, Bell, Sun, Moon, Command, Menu } from 'lucide-react';
 import { Input } from '@/components/ui/Input';
 import { Avatar } from '@/components/ui/Avatar';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -17,7 +17,7 @@ function entityTypeToPage(entityType) {
   return m[entityType] || 'dashboard';
 }
 
-function Header({ user, title, subtitle, onNavigate, onCommandPalette }) {
+function Header({ user, title, subtitle, onNavigate, onCommandPalette, onOpenMobileNav }) {
   const { theme, toggleTheme } = useTheme();
   const { items, unreadCount, open, setOpen, markRead, markAllRead } = useNotifications();
   const searchCrm = useStore((s) => s.searchCrm);
@@ -78,13 +78,35 @@ function Header({ user, title, subtitle, onNavigate, onCommandPalette }) {
   };
 
   return (
-    <header className="relative z-30 h-16 bg-white dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between px-6">
-      <div>
-        <h1 className="text-xl font-bold text-slate-900 dark:text-white">{title}</h1>
-        {subtitle && <p className="text-sm text-slate-500">{subtitle}</p>}
+    <header className="relative z-30 min-h-16 bg-white dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 px-3 sm:px-6 py-2 sm:py-0 sm:h-16">
+      <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+        {onOpenMobileNav && (
+          <button
+            type="button"
+            onClick={onOpenMobileNav}
+            className="lg:hidden flex-shrink-0 rounded-lg p-2 text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700"
+            aria-label="Abrir menú"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+        )}
+        <div className="min-w-0">
+          <h1 className="text-base sm:text-xl font-bold text-slate-900 dark:text-white truncate">{title}</h1>
+          {subtitle && (
+            <p className="text-xs sm:text-sm text-slate-500 line-clamp-2 sm:line-clamp-1 sm:truncate">{subtitle}</p>
+          )}
+        </div>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex flex-shrink-0 items-center gap-1 sm:gap-4">
+        <button
+          type="button"
+          className="md:hidden rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700"
+          aria-label="Buscar"
+          onClick={() => onCommandPalette?.()}
+        >
+          <Search className="h-5 w-5" />
+        </button>
         <div className="relative hidden md:block" ref={searchRootRef} data-global-search-root>
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <Input
@@ -140,7 +162,7 @@ function Header({ user, title, subtitle, onNavigate, onCommandPalette }) {
 
           {open && (
             <div
-              className="absolute right-0 top-full mt-2 w-96 max-h-[min(70vh,420px)] overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 shadow-xl z-50"
+              className="absolute right-0 top-full mt-2 w-[min(24rem,calc(100vw-1.5rem))] max-h-[min(70vh,420px)] overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 shadow-xl z-50"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-700">

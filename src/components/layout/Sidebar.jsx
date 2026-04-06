@@ -25,14 +25,23 @@ const NAV_ITEMS = [
   { key: 'users', icon: Shield, label: 'Usuarios' },
 ];
 
-function Sidebar({ currentPage, onNavigate, user, onLogout }) {
+function Sidebar({ currentPage, onNavigate, user, onLogout, mobileOpen, onCloseMobile }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
+  const handleNav = (key) => {
+    onNavigate(key);
+    onCloseMobile?.();
+  };
+
   return (
-    <aside className={cn(
-      'h-screen bg-slate-900 text-slate-400 flex flex-col transition-all duration-300',
-      isCollapsed ? 'w-[72px]' : 'w-[260px]'
-    )}>
+    <aside
+      className={cn(
+        'h-screen flex-shrink-0 bg-slate-900 text-slate-400 flex flex-col transition-[transform,width] duration-300 ease-out',
+        'fixed inset-y-0 left-0 z-40 w-[260px] lg:relative lg:z-auto',
+        isCollapsed ? 'lg:w-[72px]' : 'lg:w-[260px]',
+        mobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0 lg:shadow-none'
+      )}
+    >
       {/* Logo */}
       <div className="p-4 flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center flex-shrink-0">
@@ -56,7 +65,7 @@ function Sidebar({ currentPage, onNavigate, user, onLogout }) {
           return (
             <button
               key={item.key}
-              onClick={() => onNavigate(item.key)}
+              onClick={() => handleNav(item.key)}
               className={cn(
                 'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150',
                 isActive 
@@ -96,15 +105,16 @@ function Sidebar({ currentPage, onNavigate, user, onLogout }) {
           )}
         </div>
         
-        {/* Collapse Toggle */}
+        {/* Collapse Toggle (desktop) */}
         <button
+          type="button"
           onClick={() => setIsCollapsed(!isCollapsed)}
           className={cn(
-            'w-full mt-3 flex items-center justify-center gap-2 py-2 rounded-lg text-sm text-slate-500 hover:bg-slate-800 transition-colors',
+            'hidden lg:flex w-full mt-3 items-center justify-center gap-2 py-2 rounded-lg text-sm text-slate-500 hover:bg-slate-800 transition-colors',
             isCollapsed && 'justify-center'
           )}
         >
-          {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <><ChevronLeft className="w-4 h-4" /><span>Collapse</span></>}
+          {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <><ChevronLeft className="w-4 h-4" /><span>Colapsar</span></>}
         </button>
       </div>
     </aside>

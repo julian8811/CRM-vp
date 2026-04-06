@@ -57,8 +57,8 @@ function DataTable({
 
   return (
     <div className="card overflow-hidden">
-      <div className="p-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between gap-4">
-        <div className="relative max-w-xs flex-1">
+      <div className="p-3 sm:p-4 border-b border-slate-100 dark:border-slate-700 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative w-full sm:max-w-xs sm:flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <Input
             type="text"
@@ -69,22 +69,22 @@ function DataTable({
           />
         </div>
         {pageName && data.length > 0 && (
-          <Button variant="outline" size="sm" onClick={handleExport}>
+          <Button variant="outline" size="sm" onClick={handleExport} className="w-full sm:w-auto shrink-0 justify-center">
             <Download className="w-4 h-4" />
             Exportar
           </Button>
         )}
       </div>
       
-      <div className="overflow-x-auto">
-        <table className="w-full">
+      <div className="overflow-x-auto -mx-px">
+        <table className="w-full min-w-[640px]">
           <thead>
             <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700">
               {columns.map((col) => (
                 <th
                   key={col.key}
                   className={cn(
-                    'px-6 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider',
+                    'px-3 sm:px-6 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider',
                     col.sortable && 'cursor-pointer hover:text-slate-700 dark:hover:text-slate-200'
                   )}
                   onClick={() => col.sortable && handleSort(col.key)}
@@ -102,7 +102,7 @@ function DataTable({
           <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
             {sortedData.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="px-6 py-12 text-center text-slate-500">
+                <td colSpan={columns.length} className="px-4 sm:px-6 py-12 text-center text-slate-500">
                   {emptyMessage}
                 </td>
               </tr>
@@ -117,7 +117,7 @@ function DataTable({
                   onClick={() => onRowClick?.(row)}
                 >
                   {columns.map((col) => (
-                    <td key={col.key} className="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">
+                    <td key={col.key} className="px-3 sm:px-6 py-4 text-sm text-slate-600 dark:text-slate-300">
                       {col.render ? col.render(row[col.key], row) : row[col.key]}
                     </td>
                   ))}
