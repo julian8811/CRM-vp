@@ -261,11 +261,18 @@ CREATE POLICY "Owners can delete opportunities" ON public.opportunities
 CREATE POLICY "Anyone can view products" ON public.products
     FOR SELECT USING (status = 'active');
 
--- Solo admins pueden crear/actualizar/borrar
+-- Admins: gestión completa (SELECT/INSERT/UPDATE/DELETE)
 CREATE POLICY "Admins can manage products" ON public.products
     FOR ALL USING (
         EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
     );
+
+-- Usuarios logueados (JWT) pueden crear filas en el catálogo; anon sin sesión no (auth.uid() IS NULL).
+-- TO public + WITH CHECK (auth.uid() IS NOT NULL) encaja con el cliente Supabase (anon key + sesión).
+CREATE POLICY "Authenticated users can insert products" ON public.products
+    FOR INSERT
+    TO public
+    WITH CHECK (auth.uid() IS NOT NULL);
 
 -- ============================================
 -- QUOTATIONS POLICIES
