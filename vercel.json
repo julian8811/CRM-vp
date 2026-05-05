@@ -1,13 +1,5 @@
 {
   "rewrites": [
-    {
-      "source": "/crm-vp-app/assets/(.*)",
-      "destination": "/assets/$1"
-    },
-    {
-      "source": "/crm-vp-app/favicon.svg",
-      "destination": "/favicon.svg"
-    },
-    { "source": "/api/(.*)", "destination": "/api/$1" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

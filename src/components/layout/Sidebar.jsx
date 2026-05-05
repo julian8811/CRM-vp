@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { key: 'orders', icon: ShoppingCart, label: 'Pedidos' },
   { div: true },
   { key: 'automations', icon: Zap, label: 'Automatizaciones' },
+  { key: 'meta', icon: Zap, label: 'Meta' },
   { key: 'reports', icon: BarChart3, label: 'Reportes' },
   { key: 'ai', icon: Brain, label: 'IA Comercial' },
   { key: 'postsale', icon: Headphones, label: 'Postventa' },

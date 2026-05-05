@@ -10,6 +10,7 @@ const PAGES = [
   { id: 'quotations', name: 'Cotizaciones', icon: FileText, category: 'Sales' },
   { id: 'orders', name: 'Pedidos', icon: ShoppingCart, category: 'Sales' },
   { id: 'automations', name: 'Automatizaciones', icon: Settings, category: 'Automation' },
+  { id: 'meta', name: 'Meta', icon: Settings, category: 'Integrations' },
   { id: 'reports', name: 'Reportes', icon: BarChart3, category: 'Analytics' },
   { id: 'ai', name: 'IA Comercial', icon: Bot, category: 'Analytics' },
   { id: 'postsale', name: 'Postventa', icon: Wrench, category: 'Support' },
@@ -114,7 +115,6 @@ export function CommandPalette({ isOpen, onClose, onNavigate }) {
                 </div>
                 {pages.map((page) => {
                   const isSelected = globalIndex === selectedIndex;
-                  const currentIndex = globalIndex;
                   globalIndex++;
                   
                   return (

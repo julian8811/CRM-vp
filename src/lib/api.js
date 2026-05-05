@@ -511,6 +511,134 @@ export const api = {
     }
   },
 
+  metaIntegrations: {
+    getAll: async () => {
+      const { data, error } = await supabase
+        .from('meta_integrations')
+        .select('*')
+        .order('created_at', { ascending: false })
+      if (error) return handleError(error)
+      return handleSuccess(data)
+    },
+    create: async (row) => {
+      const { data, error } = await supabase
+        .from('meta_integrations')
+        .insert([row])
+        .select()
+        .single()
+      if (error) return handleError(error)
+      return handleSuccess(data)
+    },
+    update: async (id, updates) => {
+      const { data, error } = await supabase
+        .from('meta_integrations')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single()
+      if (error) return handleError(error)
+      return handleSuccess(data)
+    },
+    delete: async (id) => {
+      const { error } = await supabase
+        .from('meta_integrations')
+        .delete()
+        .eq('id', id)
+      if (error) return handleError(error)
+      return handleSuccess({ deleted: true })
+    }
+  },
+
+  metaLeadForms: {
+    getAll: async () => {
+      const { data, error } = await supabase
+        .from('meta_lead_forms')
+        .select('*')
+        .order('created_at', { ascending: false })
+      if (error) return handleError(error)
+      return handleSuccess(data)
+    },
+    create: async (row) => {
+      const { data, error } = await supabase
+        .from('meta_lead_forms')
+        .insert([row])
+        .select()
+        .single()
+      if (error) return handleError(error)
+      return handleSuccess(data)
+    },
+    update: async (id, updates) => {
+      const { data, error } = await supabase
+        .from('meta_lead_forms')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single()
+      if (error) return handleError(error)
+      return handleSuccess(data)
+    },
+    delete: async (id) => {
+      const { error } = await supabase
+        .from('meta_lead_forms')
+        .delete()
+        .eq('id', id)
+      if (error) return handleError(error)
+      return handleSuccess({ deleted: true })
+    }
+  },
+
+  metaLeadsRaw: {
+    getRecent: async () => {
+      const { data, error } = await supabase
+        .from('meta_leads_raw')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50)
+      if (error) return handleError(error)
+      return handleSuccess(data)
+    }
+  },
+
+  crmConversations: {
+    getAll: async () => {
+      const { data, error } = await supabase
+        .from('crm_conversations')
+        .select('*')
+        .order('last_message_at', { ascending: false, nullsFirst: false })
+      if (error) return handleError(error)
+      return handleSuccess(data)
+    }
+  },
+
+  crmMessages: {
+    getByConversation: async (conversationId) => {
+      const { data, error } = await supabase
+        .from('crm_messages')
+        .select('*')
+        .eq('conversation_id', conversationId)
+        .order('created_at', { ascending: true })
+      if (error) return handleError(error)
+      return handleSuccess(data)
+    }
+  },
+
+  metaFunctions: {
+    syncLeads: async (integrationId, formId = null) => {
+      const { data, error } = await supabase.functions.invoke('meta-sync-leads', {
+        body: { integration_id: integrationId, form_id: formId },
+      })
+      if (error) return handleError(error)
+      return handleSuccess(data)
+    },
+    sendWhatsApp: async (conversationId, text) => {
+      const { data, error } = await supabase.functions.invoke('meta-send-whatsapp', {
+        body: { conversation_id: conversationId, text },
+      })
+      if (error) return handleError(error)
+      return handleSuccess(data)
+    }
+  },
+
   search: {
     crm: async (searchQuery) => {
       const q = (searchQuery || '').trim()

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useStore } from "../store/useStore";
 import { PRODUCT_CATEGORY_PRESETS } from "../data/productCategories";
 
@@ -243,7 +243,7 @@ export function ProductModal({ onClose }) {
 export function QuotationModal({ onClose }) {
     const addQuotation = useStore(state => state.addQuotation);
     const customers = useStore(state => state.customers);
-    const [form, setForm] = useState({
+    const [form, setForm] = useState(() => ({
         number: `COT-${Date.now().toString().slice(-6)}`,
         customer_id: "",
         status: "draft",
@@ -251,7 +251,7 @@ export function QuotationModal({ onClose }) {
         tax: 0,
         total: 0,
         validity: new Date().toISOString().split('T')[0]
-    });
+    }));
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -299,14 +299,14 @@ export function QuotationModal({ onClose }) {
 export function OrderModal({ onClose }) {
     const addOrder = useStore(state => state.addOrder);
     const customers = useStore(state => state.customers);
-    const [form, setForm] = useState({
+    const [form, setForm] = useState(() => ({
         number: `PED-${Date.now().toString().slice(-6)}`,
         customer_id: "",
         status: "confirmed",
         total: 0,
         carrier: "Servientrega",
         delivery_date: new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0]
-    });
+    }));
 
     const handleSubmit = (e) => {
         e.preventDefault();

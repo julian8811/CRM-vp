@@ -26,6 +26,11 @@ export const useStore = create((set, get) => ({
   automations: [],
   userPreferences: null,
   appNotifications: [],
+  metaIntegrations: [],
+  metaLeadForms: [],
+  metaLeadsRaw: [],
+  crmConversations: [],
+  crmMessagesByConversation: {},
 
   // ============================================
   // LOADING STATES
@@ -41,6 +46,8 @@ export const useStore = create((set, get) => ({
     automations: false,
     preferences: false,
     notifications: false,
+    meta: false,
+    conversations: false,
   },
   error: null,
 
@@ -829,6 +836,145 @@ export const useStore = create((set, get) => ({
     if (!isApiReady()) return;
     const result = await api.appNotifications.markAllRead();
     if (result.success) await get().fetchAppNotifications();
+  },
+
+  // ============================================
+  // META INTEGRATIONS
+  // ============================================
+  fetchMetaIntegrations: async () => {
+    const { isApiReady } = get();
+    if (!isApiReady()) return;
+    set((state) => ({ loading: { ...state.loading, meta: true } }));
+    try {
+      const [integrations, forms, rawLeads, conversations] = await Promise.all([
+        api.metaIntegrations.getAll(),
+        api.metaLeadForms.getAll(),
+        api.metaLeadsRaw.getRecent(),
+        api.crmConversations.getAll(),
+      ]);
+      if (integrations.success) set({ metaIntegrations: integrations.data });
+      if (forms.success) set({ metaLeadForms: forms.data });
+      if (rawLeads.success) set({ metaLeadsRaw: rawLeads.data });
+      if (conversations.success) set({ crmConversations: conversations.data });
+    } catch (e) {
+      console.error('Error fetching Meta integrations:', e);
+    } finally {
+      set((state) => ({ loading: { ...state.loading, meta: false } }));
+    }
+  },
+
+  addMetaIntegration: async (integration) => {
+    const { isApiReady, metaIntegrations } = get();
+    if (!isApiReady()) return null;
+    const uid = await getAuthUserId();
+    if (!uid) return null;
+    const payload = {
+      user_id: uid,
+      name: integration.name || 'Meta Business',
+      status: integration.status || 'draft',
+      page_id: integration.page_id || null,
+      page_name: integration.page_name || null,
+      ad_account_id: integration.ad_account_id || null,
+      waba_id: integration.waba_id || null,
+      phone_number_id: integration.phone_number_id || null,
+      phone_number_label: integration.phone_number_label || null,
+      token_ref: integration.token_ref || 'META_PAGE_ACCESS_TOKEN',
+      default_source: integration.default_source || 'social_media',
+      settings: integration.settings || {},
+    };
+    const result = await api.metaIntegrations.create(payload);
+    if (result.success) {
+      set({ metaIntegrations: [result.data, ...metaIntegrations] });
+      return result.data;
+    }
+    return null;
+  },
+
+  updateMetaIntegration: async (id, updates) => {
+    const { isApiReady, metaIntegrations } = get();
+    if (!isApiReady()) return null;
+    const result = await api.metaIntegrations.update(id, updates);
+    if (result.success) {
+      set({ metaIntegrations: metaIntegrations.map((m) => (m.id === id ? result.data : m)) });
+      return result.data;
+    }
+    return null;
+  },
+
+  deleteMetaIntegration: async (id) => {
+    const { isApiReady, metaIntegrations, metaLeadForms } = get();
+    if (!isApiReady()) return;
+    const result = await api.metaIntegrations.delete(id);
+    if (result.success) {
+      set({
+        metaIntegrations: metaIntegrations.filter((m) => m.id !== id),
+        metaLeadForms: metaLeadForms.filter((f) => f.integration_id !== id),
+      });
+    }
+  },
+
+  addMetaLeadForm: async (form) => {
+    const { isApiReady, metaLeadForms } = get();
+    if (!isApiReady()) return null;
+    const uid = await getAuthUserId();
+    if (!uid) return null;
+    const result = await api.metaLeadForms.create({
+      user_id: uid,
+      integration_id: form.integration_id,
+      page_id: form.page_id,
+      form_id: form.form_id,
+      form_name: form.form_name || null,
+      status: form.status || 'active',
+      field_mappings: form.field_mappings || undefined,
+    });
+    if (result.success) {
+      set({ metaLeadForms: [result.data, ...metaLeadForms] });
+      return result.data;
+    }
+    return null;
+  },
+
+  deleteMetaLeadForm: async (id) => {
+    const { isApiReady, metaLeadForms } = get();
+    if (!isApiReady()) return;
+    const result = await api.metaLeadForms.delete(id);
+    if (result.success) set({ metaLeadForms: metaLeadForms.filter((f) => f.id !== id) });
+  },
+
+  syncMetaLeads: async (integrationId, formId = null) => {
+    const { isApiReady } = get();
+    if (!isApiReady()) return { success: false, error: 'Supabase no configurado' };
+    const result = await api.metaFunctions.syncLeads(integrationId, formId);
+    await get().fetchMetaIntegrations();
+    await get().fetchLeads();
+    return result;
+  },
+
+  fetchCrmMessages: async (conversationId) => {
+    const { isApiReady, crmMessagesByConversation } = get();
+    if (!isApiReady() || !conversationId) return [];
+    const result = await api.crmMessages.getByConversation(conversationId);
+    if (result.success) {
+      set({
+        crmMessagesByConversation: {
+          ...crmMessagesByConversation,
+          [conversationId]: result.data,
+        },
+      });
+      return result.data;
+    }
+    return [];
+  },
+
+  sendWhatsAppMessage: async (conversationId, text) => {
+    const { isApiReady } = get();
+    if (!isApiReady()) return { success: false, error: 'Supabase no configurado' };
+    const result = await api.metaFunctions.sendWhatsApp(conversationId, text);
+    if (result.success) {
+      await get().fetchCrmMessages(conversationId);
+      await get().fetchMetaIntegrations();
+    }
+    return result;
   },
 
   // ============================================

@@ -42,6 +42,7 @@ export const Badge = ({ children, variant = "gray" }) => {
 };
 
 export const StatCard = ({ icon: Icon, label, value, change, color }) => {
+    const IconComponent = Icon;
     const gradients = {
         blue: "linear-gradient(135deg, #1B3A5C, #2E75B6)",
         green: "linear-gradient(135deg, #059669, #14b8a6)",
@@ -55,7 +56,7 @@ export const StatCard = ({ icon: Icon, label, value, change, color }) => {
             onMouseLeave={e => e.currentTarget.style.boxShadow = "none"}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
                 <div style={{ background: gradients[color], padding: 10, borderRadius: 14, boxShadow: "0 4px 12px rgba(0,0,0,.15)" }}>
-                    <Icon size={18} color="#fff" />
+                    <IconComponent size={18} color="#fff" />
                 </div>
                 {change != null && (
                     <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: change >= 0 ? "#ecfdf5" : "#fef2f2", color: change >= 0 ? "#047857" : "#dc2626" }}>
@@ -79,13 +80,14 @@ export const ScoreBar = ({ score }) => (
 );
 
 export function GenericPage({ icon: Icon, title, subtitle, children }) {
+    const IconComponent = Icon;
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <div><h1 style={{ fontSize: 24, fontWeight: 800, color: "#0f172a", margin: 0 }}>{title}</h1>
                 <p style={{ fontSize: 13, color: "#94a3b8", margin: "2px 0 0" }}>{subtitle}</p></div>
             {children || (
                 <div style={{ background: "#fff", borderRadius: 18, padding: 48, textAlign: "center", border: "1px solid #f1f5f9" }}>
-                    <Icon size={40} color="#cbd5e1" style={{ marginBottom: 12 }} />
+                    <IconComponent size={40} color="#cbd5e1" style={{ marginBottom: 12 }} />
                     <div style={{ fontSize: 16, fontWeight: 700, color: "#475569", marginBottom: 4 }}>{title}</div>
                     <div style={{ fontSize: 13, color: "#94a3b8", maxWidth: 340, margin: "0 auto" }}>{subtitle}</div>
                 </div>
