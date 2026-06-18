@@ -12,7 +12,7 @@
 - IA (`OPENAI_API_KEY`), notificaciones, trigger de leads
 
 ### Pendiente (requiere credenciales externas)
-- [ ] Google OAuth: `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` → `bash scripts/setup-google-oauth.sh`
+- [x] Google OAuth: `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` → `npx supabase config push`
 - [ ] Meta: secretos `META_*` + webhook en Developers
 - [ ] Emails Resend (opcional): `RESEND_API_KEY`
 

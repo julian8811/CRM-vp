@@ -15,7 +15,7 @@
 | 5 | Frontend en Vercel | ✅ Hecho | Merge PR #2 para Google OAuth + features nuevas |
 | 6 | Cron `run-automations` | ✅ Hecho | `pg_cron` job `crm-vp-run-automations` cada 15 min |
 | 7 | Webhook Meta | ⚠️ Manual | Requiere secretos Meta + callback en Developers |
-| 8 | Google OAuth | ⚠️ Manual | `site_url` configurado · faltan Client ID/Secret de Google Cloud |
+| 8 | Google OAuth | ✅ Hecho | Provider habilitado en Supabase (`config push`) |
 | 9 | Usuario admin | ✅ Hecho | `Julián Esteban Pineda Montoya` → `admin` |
 | 10 | Emails (Resend) | Opcional | `RESEND_API_KEY` no configurado aún |
 
@@ -113,9 +113,17 @@ Backup opcional: workflow `.github/workflows/cron-automations.yml` (requiere `CR
 
 ## 5. Google OAuth
 
-`site_url` y redirects ya apuntan a `https://crm-vp.vercel.app`.
+**Configurado en Supabase** (provider Google habilitado).
 
-Falta crear credenciales en [Google Cloud Console](https://console.cloud.google.com/apis/credentials) y ejecutar:
+Para recrear o actualizar credenciales:
+
+```bash
+export GOOGLE_CLIENT_ID=....apps.googleusercontent.com
+export GOOGLE_CLIENT_SECRET=GOCSPX-...
+npx supabase config push --yes
+```
+
+O vía Management API:
 
 ```bash
 export SUPABASE_ACCESS_TOKEN=sbp_...
