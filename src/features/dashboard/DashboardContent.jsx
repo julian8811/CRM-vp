@@ -6,9 +6,10 @@ import {
 } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  XAxis, YAxis, CartesianGrid, Tooltip,
   Legend, RadialBarChart, RadialBar,
 } from 'recharts';
+import { StitchResponsiveContainer } from '@/components/stitch/StitchResponsiveContainer';
 import { useCrmModal } from '@/contexts/CrmModalContext';
 import { Avatar } from '@/components/ui/Avatar';
 import { useStore } from '@/store/useStore';
@@ -29,11 +30,11 @@ function MiniSparkline({ data, color = '#5f8bff' }) {
   if (!data?.length) return null;
   return (
     <div className="w-16 h-6">
-      <ResponsiveContainer width="100%" height="100%">
+      <StitchResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-          <Bar dataKey="v" fill={color} radius={[2, 2, 0, 0]} isAnimationActive />
+          <Bar dataKey="v" fill={color} radius={[2, 2, 0, 0]} isAnimationActive={false} />
         </BarChart>
-      </ResponsiveContainer>
+      </StitchResponsiveContainer>
     </div>
   );
 }
@@ -76,11 +77,18 @@ function ChartTooltip({ active, payload, label, formatter }) {
   return (
     <div className="rounded-lg border border-stitch-border bg-stitch-surface px-3 py-2 shadow-xl">
       <p className="text-[11px] font-mono text-stitch-muted mb-1">{label}</p>
-      {payload.map((p) => (
-        <p key={p.dataKey} className="text-sm font-semibold text-stitch-text">
-          {formatter ? formatter(p.value, p.name) : `${p.name}: ${p.value}`}
-        </p>
-      ))}
+      {payload.map((p) => {
+        const text = formatter
+          ? (Array.isArray(formatter(p.value, p.name))
+            ? formatter(p.value, p.name).filter(Boolean).join(' · ')
+            : formatter(p.value, p.name))
+          : `${p.name}: ${p.value}`;
+        return (
+          <p key={p.dataKey} className="text-sm font-semibold text-stitch-text">
+            {text}
+          </p>
+        );
+      })}
     </div>
   );
 }
@@ -267,7 +275,7 @@ export function DashboardContent() {
             </div>
           </div>
           <div className="p-3 sm:p-4 chart-h-sm min-h-[13rem]">
-            <ResponsiveContainer width="100%" height="100%">
+            <StitchResponsiveContainer width="100%" height="100%">
               <AreaChart data={salesTrend} margin={{ top: 10, right: 4, left: -12, bottom: 0 }}>
                 <defs>
                   <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
@@ -304,7 +312,7 @@ export function DashboardContent() {
                   isAnimationActive
                 />
               </AreaChart>
-            </ResponsiveContainer>
+            </StitchResponsiveContainer>
           </div>
         </div>
 
@@ -316,7 +324,7 @@ export function DashboardContent() {
             </div>
             <div className="p-3 sm:p-4 chart-h-md min-h-[11rem]">
               {pieData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
+                <StitchResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={pieData}
@@ -339,7 +347,7 @@ export function DashboardContent() {
                       formatter={(value) => <span className="text-stitch-muted capitalize">{value}</span>}
                     />
                   </PieChart>
-                </ResponsiveContainer>
+                </StitchResponsiveContainer>
               ) : (
                 <p className="text-sm text-stitch-muted text-center py-8">Sin oportunidades en pipeline</p>
               )}
@@ -352,7 +360,7 @@ export function DashboardContent() {
               <Sparkles className="w-4 h-4 text-stitch-primary-bright" />
             </div>
             <div className="p-3 sm:p-4 h-32 sm:h-36 flex items-center justify-center">
-              <ResponsiveContainer width="100%" height="100%">
+              <StitchResponsiveContainer width="100%" height="100%">
                 <RadialBarChart
                   cx="50%"
                   cy="50%"
@@ -373,7 +381,7 @@ export function DashboardContent() {
                     {convPct}%
                   </text>
                 </RadialBarChart>
-              </ResponsiveContainer>
+              </StitchResponsiveContainer>
             </div>
           </div>
         </div>
@@ -386,7 +394,7 @@ export function DashboardContent() {
             <p className="text-xs text-stitch-muted mt-0.5">Distribución por etapa</p>
           </div>
           <div className="p-3 sm:p-4 chart-h-md min-h-[11rem]">
-            <ResponsiveContainer width="100%" height="100%">
+            <StitchResponsiveContainer width="100%" height="100%">
               <BarChart data={pipelineSummary} layout="vertical" margin={{ left: 20, right: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" horizontal={false} />
                 <XAxis type="number" tick={{ fontSize: 11, fill: '#8c90a1' }} axisLine={{ stroke: '#1e293b' }} />
@@ -405,7 +413,7 @@ export function DashboardContent() {
                   ))}
                 </Bar>
               </BarChart>
-            </ResponsiveContainer>
+            </StitchResponsiveContainer>
           </div>
         </div>
 
@@ -459,9 +467,11 @@ export function DashboardContent() {
               ) : (
                 recentActivity.map((row) => (
                   <tr key={row.id} className="hover:bg-stitch-surface-elevated/50 transition-colors border-b border-stitch-border/30 last:border-0">
-                    <td className="p-3 font-medium flex items-center gap-2">
-                      <Avatar name={row.label} size="sm" />
-                      {row.label}
+                    <td className="p-3 font-medium">
+                      <div className="flex items-center gap-2">
+                        <Avatar name={row.label} size="sm" />
+                        <span className="truncate">{row.label}</span>
+                      </div>
                     </td>
                     <td className="p-3">
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono border ${

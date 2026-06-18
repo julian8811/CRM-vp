@@ -244,7 +244,7 @@ export function PipelineContent() {
             />
           ))}
         </div>
-        <DragOverlay>
+        <DragOverlay dropAnimation={null}>
           {activeOppData ? (
             <div className="stitch-kanban-card w-72 shadow-glow opacity-95">
               <div className="font-semibold text-sm text-stitch-text mb-1">{activeOppData.name}</div>

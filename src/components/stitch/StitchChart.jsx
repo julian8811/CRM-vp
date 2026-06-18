@@ -1,5 +1,13 @@
 import { TrendingDown, TrendingUp, Minus } from 'lucide-react';
-import { BarChart, Bar, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar } from 'recharts';
+import { StitchResponsiveContainer } from '@/components/stitch/StitchResponsiveContainer';
+
+function formatTooltipValue(formatter, value, name) {
+  if (!formatter) return `${name}: ${value}`;
+  const result = formatter(value, name);
+  if (Array.isArray(result)) return result.filter(Boolean).join(' · ');
+  return result;
+}
 
 export function StitchChartTooltip({ active, payload, label, formatter }) {
   if (!active || !payload?.length) return null;
@@ -8,7 +16,7 @@ export function StitchChartTooltip({ active, payload, label, formatter }) {
       {label && <p className="text-[11px] font-mono text-stitch-muted mb-1">{label}</p>}
       {payload.map((p) => (
         <p key={p.dataKey} className="text-sm font-semibold text-stitch-text">
-          {formatter ? formatter(p.value, p.name) : `${p.name}: ${p.value}`}
+          {formatTooltipValue(formatter, p.value, p.name)}
         </p>
       ))}
     </div>
@@ -19,11 +27,11 @@ export function StitchMiniSparkline({ data, color = '#5f8bff' }) {
   if (!data?.length) return null;
   return (
     <div className="w-16 h-6">
-      <ResponsiveContainer width="100%" height="100%">
+      <StitchResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-          <Bar dataKey="v" fill={color} radius={[2, 2, 0, 0]} isAnimationActive />
+          <Bar dataKey="v" fill={color} radius={[2, 2, 0, 0]} isAnimationActive={false} />
         </BarChart>
-      </ResponsiveContainer>
+      </StitchResponsiveContainer>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useLayoutEffect, useCallback, startTransition } from 'react';
 
 const ThemeContext = createContext();
 
@@ -27,12 +27,14 @@ export function ThemeProvider({ children }) {
     return 'dark';
   });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     applyTheme(theme);
   }, [theme]);
 
   const toggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+    startTransition(() => {
+      setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+    });
   }, []);
 
   return (

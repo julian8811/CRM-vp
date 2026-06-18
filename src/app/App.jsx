@@ -131,7 +131,7 @@ export default function App() {
         title={pageInfo.title}
         subtitle={pageInfo.subtitle}
       >
-        {renderPage()}
+        <div key={currentPage}>{renderPage()}</div>
       </Layout>
       <CrmModalsHost />
     </>

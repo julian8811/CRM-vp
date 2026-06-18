@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { Search, X, ArrowRight, FileText, Users, Target, ShoppingCart, Package, BarChart3, Bot, Wrench, Settings, UserPlus, DollarSign } from 'lucide-react';
 
 const PAGES = [
@@ -74,7 +75,7 @@ export function CommandPalette({ isOpen, onClose, onNavigate }) {
 
   let globalIndex = 0;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[max(1rem,env(safe-area-inset-top))] sm:pt-[15vh] px-3 sm:px-4 safe-bottom">
       <div 
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
@@ -155,6 +156,7 @@ export function CommandPalette({ isOpen, onClose, onNavigate }) {
           </span>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -12,6 +12,9 @@
   "engines": {
     "node": ">=20.19.0"
   },
+  "overrides": {
+    "react-is": "$react"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",

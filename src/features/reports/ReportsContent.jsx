@@ -4,8 +4,9 @@ import {
 } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts';
+import { StitchResponsiveContainer } from '@/components/stitch/StitchResponsiveContainer';
 import { Button } from '@/components/ui/Button';
 import { useStore } from '@/store/useStore';
 import {
@@ -218,7 +219,7 @@ export function ReportsContent() {
             </div>
           </div>
           <div className="p-3 sm:p-4 chart-h-sm min-h-[13rem]">
-            <ResponsiveContainer width="100%" height="100%">
+            <StitchResponsiveContainer width="100%" height="100%">
               <AreaChart data={salesTrend}>
                 <defs>
                   <linearGradient id="reportsGradient" x1="0" y1="0" x2="0" y2="1">
@@ -255,7 +256,7 @@ export function ReportsContent() {
                   isAnimationActive
                 />
               </AreaChart>
-            </ResponsiveContainer>
+            </StitchResponsiveContainer>
           </div>
         </div>
 
@@ -265,7 +266,7 @@ export function ReportsContent() {
           </div>
           <div className="p-3 sm:p-4 chart-h-sm min-h-[13rem]">
             {leadStatusData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
+              <StitchResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={leadStatusData}
@@ -285,7 +286,7 @@ export function ReportsContent() {
                   <Tooltip content={<StitchChartTooltip formatter={(v, n) => [`${v} leads`, n]} />} />
                   <Legend wrapperStyle={{ fontSize: '11px' }} formatter={(v) => <span className="text-stitch-muted capitalize">{v}</span>} />
                 </PieChart>
-              </ResponsiveContainer>
+              </StitchResponsiveContainer>
             ) : (
               <p className="text-sm text-stitch-muted text-center py-12">Sin leads registrados</p>
             )}
@@ -324,7 +325,7 @@ export function ReportsContent() {
             <p className="text-xs text-stitch-muted">Conversión por etapa</p>
           </div>
           <div className="p-3 sm:p-4 chart-h-sm min-h-[13rem]">
-            <ResponsiveContainer width="100%" height="100%">
+            <StitchResponsiveContainer width="100%" height="100%">
               <BarChart data={funnelRows} layout="vertical" margin={{ left: 10, right: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" horizontal={false} />
                 <XAxis type="number" tick={{ fontSize: 11, fill: '#8c90a1' }} />
@@ -343,7 +344,7 @@ export function ReportsContent() {
                   ))}
                 </Bar>
               </BarChart>
-            </ResponsiveContainer>
+            </StitchResponsiveContainer>
           </div>
         </div>
       </div>
