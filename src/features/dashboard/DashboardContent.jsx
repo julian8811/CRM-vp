@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   DollarSign, Users, Target, ShoppingCart,
   Percent, Receipt, GitBranch, Sparkles,
@@ -28,13 +28,20 @@ const CHART_COLORS = ['#5f8bff', '#4ade80', '#fbbf24', '#a78bfa', '#f87171', '#3
 
 function MiniSparkline({ data, color = '#5f8bff' }) {
   if (!data?.length) return null;
+  const max = Math.max(...data.map((d) => d.v || 0), 1);
   return (
-    <div className="w-16 h-6">
-      <StitchResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-          <Bar dataKey="v" fill={color} radius={[2, 2, 0, 0]} isAnimationActive={false} />
-        </BarChart>
-      </StitchResponsiveContainer>
+    <div className="flex h-6 w-16 items-end gap-0.5">
+      {data.map((d, i) => (
+        <div
+          key={i}
+          className="flex-1 rounded-t-sm"
+          style={{
+            height: `${Math.max(8, (d.v / max) * 100)}%`,
+            backgroundColor: color,
+            minHeight: 2,
+          }}
+        />
+      ))}
     </div>
   );
 }
@@ -101,6 +108,24 @@ export function DashboardContent() {
   const orders = useStore((state) => state.orders);
 
   const [chartRange, setChartRange] = useState('6m');
+  const [chartsReady, setChartsReady] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    let outer = 0;
+    let inner = 0;
+    outer = requestAnimationFrame(() => {
+      inner = requestAnimationFrame(() => {
+        if (!cancelled) setChartsReady(true);
+      });
+    });
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(outer);
+      cancelAnimationFrame(inner);
+    };
+  }, []);
+
   const range30 = useMemo(() => getRangeFromPreset('30d'), []);
   const rangePrev30 = useMemo(() => {
     const end = new Date(range30.from);
@@ -251,6 +276,16 @@ export function DashboardContent() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {!chartsReady ? (
+          <>
+            <div className="lg:col-span-2 stitch-panel chart-h-sm min-h-[13rem] animate-pulse bg-stitch-surface-elevated/40" />
+            <div className="flex flex-col gap-4">
+              <div className="stitch-panel flex-1 chart-h-md min-h-[11rem] animate-pulse bg-stitch-surface-elevated/40" />
+              <div className="stitch-panel h-32 sm:h-36 animate-pulse bg-stitch-surface-elevated/40" />
+            </div>
+          </>
+        ) : (
+        <>
         <div className="lg:col-span-2 stitch-panel flex flex-col">
           <div className="p-4 border-b border-stitch-border flex flex-wrap justify-between items-center gap-2">
             <div>
@@ -309,7 +344,7 @@ export function DashboardContent() {
                   fill="url(#salesGradient)"
                   dot={{ r: 4, fill: '#031427', stroke: '#5f8bff', strokeWidth: 2 }}
                   activeDot={{ r: 6, fill: '#5f8bff', stroke: '#fff', strokeWidth: 2 }}
-                  isAnimationActive
+                  isAnimationActive={false}
                 />
               </AreaChart>
             </StitchResponsiveContainer>
@@ -335,7 +370,7 @@ export function DashboardContent() {
                       innerRadius={45}
                       outerRadius={70}
                       paddingAngle={3}
-                      isAnimationActive
+                      isAnimationActive={false}
                     >
                       {pieData.map((entry, i) => (
                         <Cell key={entry.stage} fill={entry.fill || CHART_COLORS[i % CHART_COLORS.length]} />
@@ -375,7 +410,7 @@ export function DashboardContent() {
                     background={{ fill: '#1e293b' }}
                     dataKey="value"
                     cornerRadius={6}
-                    isAnimationActive
+                    isAnimationActive={false}
                   />
                   <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="fill-stitch-text text-2xl font-bold">
                     {convPct}%
@@ -385,6 +420,8 @@ export function DashboardContent() {
             </div>
           </div>
         </div>
+        </>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -394,6 +431,9 @@ export function DashboardContent() {
             <p className="text-xs text-stitch-muted mt-0.5">Distribución por etapa</p>
           </div>
           <div className="p-3 sm:p-4 chart-h-md min-h-[11rem]">
+            {!chartsReady ? (
+              <div className="h-full min-h-[11rem] animate-pulse rounded-lg bg-stitch-surface-elevated/40" />
+            ) : (
             <StitchResponsiveContainer width="100%" height="100%">
               <BarChart data={pipelineSummary} layout="vertical" margin={{ left: 20, right: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" horizontal={false} />
@@ -407,13 +447,14 @@ export function DashboardContent() {
                   width={90}
                 />
                 <Tooltip content={<ChartTooltip formatter={(v) => [`${v} opps`, 'Cantidad']} />} />
-                <Bar dataKey="count" radius={[0, 4, 4, 0]} isAnimationActive>
+                <Bar dataKey="count" radius={[0, 4, 4, 0]} isAnimationActive={false}>
                   {pipelineSummary.map((entry) => (
                     <Cell key={entry.stage} fill={entry.fill} />
                   ))}
                 </Bar>
               </BarChart>
             </StitchResponsiveContainer>
+            )}
           </div>
         </div>
 

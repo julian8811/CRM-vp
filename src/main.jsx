@@ -1,4 +1,3 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './app/App.jsx'
@@ -9,17 +8,15 @@ import { ThemeProvider } from './contexts/ThemeContext'
 import { ErrorBoundary } from './components/ErrorBoundary.jsx'
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <ErrorBoundary>
-      <ThemeProvider>
-        <AuthProvider>
-          <CrmModalProvider>
-            <NotificationsProvider>
-              <App />
-            </NotificationsProvider>
-          </CrmModalProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </ErrorBoundary>
-  </StrictMode>,
+  <ErrorBoundary>
+    <ThemeProvider>
+      <AuthProvider>
+        <CrmModalProvider>
+          <NotificationsProvider>
+            <App />
+          </NotificationsProvider>
+        </CrmModalProvider>
+      </AuthProvider>
+    </ThemeProvider>
+  </ErrorBoundary>,
 )

@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getPortalRoot } from '@/lib/portalRoot';
 
 function Modal({ isOpen, onClose, title, children, size = 'md' }) {
   const sizes = {
@@ -28,6 +29,9 @@ function Modal({ isOpen, onClose, title, children, size = 'md' }) {
 
   if (!isOpen) return null;
 
+  const portalRoot = getPortalRoot();
+  if (!portalRoot) return null;
+
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div 
@@ -50,7 +54,7 @@ function Modal({ isOpen, onClose, title, children, size = 'md' }) {
         <div className="p-6">{children}</div>
       </div>
     </div>,
-    document.body
+    portalRoot
   );
 }
 

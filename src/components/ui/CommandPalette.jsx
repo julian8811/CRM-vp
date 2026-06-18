@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
+import { getPortalRoot } from '@/lib/portalRoot';
 import { Search, X, ArrowRight, FileText, Users, Target, ShoppingCart, Package, BarChart3, Bot, Wrench, Settings, UserPlus, DollarSign } from 'lucide-react';
 
 const PAGES = [
@@ -72,6 +73,9 @@ export function CommandPalette({ isOpen, onClose, onNavigate }) {
   };
 
   if (!isOpen) return null;
+
+  const portalRoot = getPortalRoot();
+  if (!portalRoot) return null;
 
   let globalIndex = 0;
 
@@ -157,6 +161,6 @@ export function CommandPalette({ isOpen, onClose, onNavigate }) {
         </div>
       </div>
     </div>,
-    document.body
+    portalRoot
   );
 }

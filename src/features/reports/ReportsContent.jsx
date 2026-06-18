@@ -253,7 +253,7 @@ export function ReportsContent() {
                   fill="url(#reportsGradient)"
                   dot={{ r: 3, fill: '#031427', stroke: '#5f8bff', strokeWidth: 2 }}
                   activeDot={{ r: 5, fill: '#5f8bff' }}
-                  isAnimationActive
+                  isAnimationActive={false}
                 />
               </AreaChart>
             </StitchResponsiveContainer>
@@ -277,7 +277,7 @@ export function ReportsContent() {
                     innerRadius={50}
                     outerRadius={80}
                     paddingAngle={2}
-                    isAnimationActive
+                    isAnimationActive={false}
                   >
                     {leadStatusData.map((entry) => (
                       <Cell key={entry.name} fill={entry.fill} />
@@ -338,7 +338,7 @@ export function ReportsContent() {
                   tickLine={false}
                 />
                 <Tooltip content={<StitchChartTooltip formatter={(v, n) => [`${v}`, n]} />} />
-                <Bar dataKey="count" radius={[0, 4, 4, 0]} isAnimationActive>
+                <Bar dataKey="count" radius={[0, 4, 4, 0]} isAnimationActive={false}>
                   {funnelRows.map((_, i) => (
                     <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
                   ))}

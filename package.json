@@ -13,7 +13,8 @@
     "node": ">=20.19.0"
   },
   "overrides": {
-    "react-is": "$react"
+    "react-is": "$react",
+    "immer": "11.1.4"
   },
   "scripts": {
     "dev": "vite",
@@ -39,7 +40,7 @@
     "lucide-react": "^0.577.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "recharts": "^3.8.0",
+    "recharts": "^3.8.1",
     "uuid": "^13.0.0",
     "xlsx": "^0.18.5",
     "zustand": "^5.0.12"
