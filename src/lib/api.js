@@ -665,8 +665,39 @@ export const api = {
         .single()
       if (error) return handleError(error)
       return handleSuccess(data)
-    }
-  }
+    },
+  },
+
+  aiContext: {
+    /** Tickets + mensajes recientes del usuario para análisis IA */
+    getConversationSummary: async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return { success: false, error: 'No session' }
+
+      const [ticketsRes, messagesRes] = await Promise.all([
+        supabase
+          .from('support_tickets')
+          .select('subject, body, status, priority, customer_label, created_at')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(12),
+        supabase
+          .from('crm_messages')
+          .select('direction, body, channel, created_at')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(20),
+      ])
+
+      if (ticketsRes.error) return handleError(ticketsRes.error)
+      if (messagesRes.error) return handleError(messagesRes.error)
+
+      return handleSuccess({
+        tickets: ticketsRes.data || [],
+        messages: messagesRes.data || [],
+      })
+    },
+  },
 }
 
 export default api

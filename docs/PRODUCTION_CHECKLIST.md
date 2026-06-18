@@ -9,15 +9,17 @@
 | # | Tarea | Estado | Notas |
 |---|--------|--------|-------|
 | 1 | Variables `VITE_SUPABASE_*` en Vercel | ✅ Hecho | Login en producción OK |
-| 2 | Schema base + migraciones | ✅ Hecho | 7 migraciones aplicadas en `tgosnmvlvzaykiuolrot` |
+| 2 | Schema base + migraciones | ✅ Hecho | 12 migraciones (RLS + leads + admin) |
 | 3 | Edge Functions desplegadas | ✅ Hecho | 6 functions desplegadas |
-| 4 | Secretos Supabase | ⚠️ Parcial | Configurar `GEMINI_API_KEY` · `SERVICE_ROLE` OK · `CRON_SECRET` OK · faltan `META_*` y `RESEND_*` |
-| 5 | Frontend en Vercel | ✅ Hecho | Merge PR #2 para Google OAuth + features nuevas |
-| 6 | Cron `run-automations` | ✅ Hecho | `pg_cron` job `crm-vp-run-automations` cada 15 min |
-| 7 | Webhook Meta | ⚠️ Manual | Requiere secretos Meta + callback en Developers |
-| 8 | Google OAuth | ✅ Hecho | Provider habilitado en Supabase (`config push`) |
-| 9 | Usuario admin | ✅ Hecho | `Julián Esteban Pineda Montoya` → `admin` |
-| 10 | Emails (Resend) | Opcional | `RESEND_API_KEY` no configurado aún |
+| 4 | Secretos Supabase | ⚠️ Parcial | `GEMINI_API_KEY` OK · `CRON_SECRET` OK · faltan `META_*` y `RESEND_*` (opcionales) |
+| 5 | Frontend en Vercel | ✅ Hecho | |
+| 6 | Cron `run-automations` | ✅ Hecho | `pg_cron` cada 15 min |
+| 7 | Webhook Meta | ⏸️ Opcional | Requiere secretos Meta |
+| 8 | Google OAuth | ✅ Hecho | Provider habilitado |
+| 9 | Usuario admin | ✅ Hecho | Julián Pineda → `admin` |
+| 10 | Emails (Resend) | ⏸️ Opcional | Sin `RESEND_API_KEY` |
+| 11 | IA Gemini + análisis conversaciones | ✅ Hecho | Chat + tarjetas rápidas |
+| 12 | QA producción | ✅ Hecho | `npm run qa:production` |
 
 ## Credenciales que el agente / operador necesita
 
@@ -113,17 +115,9 @@ Backup opcional: workflow `.github/workflows/cron-automations.yml` (requiere `CR
 
 ## 5. Google OAuth
 
-**Configurado en Supabase** (provider Google habilitado).
+`site_url` y redirects ya apuntan a `https://crm-vp.vercel.app`.
 
-Para recrear o actualizar credenciales:
-
-```bash
-export GOOGLE_CLIENT_ID=....apps.googleusercontent.com
-export GOOGLE_CLIENT_SECRET=GOCSPX-...
-npx supabase config push --yes
-```
-
-O vía Management API:
+Falta crear credenciales en [Google Cloud Console](https://console.cloud.google.com/apis/credentials) y ejecutar:
 
 ```bash
 export SUPABASE_ACCESS_TOKEN=sbp_...

@@ -90,8 +90,8 @@ export function AutomationsContent() {
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Automatizaciones</h2>
           <p className="text-sm text-slate-500">
-            {automations.filter((a) => a.status === 'active').length} activas · Datos en Supabase. Motor: Edge Function{' '}
-            <code className="text-xs">run-automations</code>.
+            {automations.filter((a) => a.status === 'active').length} activas · Ejecución programada cada 15 min (
+            <code className="text-xs">pg_cron</code>) · Notificaciones in-app.
           </p>
         </div>
         <Button type="button" variant="outline" onClick={() => setModalOpen(true)} className="w-full justify-center sm:w-auto">

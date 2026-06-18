@@ -223,16 +223,16 @@
 2. ~~RLS faltante pipeline/pedidos/cotizaciones~~ → `20260618150000`
 3. ~~Leads no editables/eliminables~~ → `20260618160000`
 
-### P1 — Para cerrar integraciones
-1. Configurar `RESEND_API_KEY` + dominio → emails de leads y automatizaciones
+### P1 — Para cerrar integraciones (excluido por pedido del cliente)
+1. Configurar `RESEND_API_KEY` + dominio → emails
 2. Configurar secretos `META_*` + webhook en Meta Developers
-3. Mergear PRs #9, #10, #11 a `main`
 
-### P2 — Mejoras producto
-1. Implementar «Análisis de conversaciones» o quitar tarjeta
-2. Actualizar textos UI IA (OpenAI → Gemini)
-3. Motor de automatizaciones en tiempo real (opcional)
-4. Probar flujo admin: invitar usuario y cambiar roles
+### P2 — Resuelto en consolidación 2026-06-18
+1. ~~Implementar «Análisis de conversaciones»~~ → tarjeta con análisis de tickets + mensajes CRM
+2. ~~Actualizar textos UI IA~~ → Gemini
+3. ~~Leads edit/delete silencioso~~ → migración RLS
+4. ~~Admin invite error handling~~ → mejorado en UsersContent
+5. ~~Merge PRs pendientes~~ → branch `cursor/fix-all-except-meta-resend-b954`
 
 ### P3 — Menor
 1. Investigar 404 en GET bucket avatars (upload OK)
