@@ -117,7 +117,11 @@ function DataTable({
                   onClick={() => onRowClick?.(row)}
                 >
                   {columns.map((col) => (
-                    <td key={col.key} className="px-3 sm:px-6 py-4 text-sm text-stitch-text">
+                    <td
+                      key={col.key}
+                      className="px-3 sm:px-6 py-4 text-sm text-stitch-text"
+                      onClick={col.key === 'actions' ? (e) => e.stopPropagation() : undefined}
+                    >
                       {col.render ? col.render(row[col.key], row) : row[col.key]}
                     </td>
                   ))}

@@ -239,19 +239,44 @@ export const useStore = create((set, get) => ({
 
   convertLead: async (id) => {
     const { isApiReady, leads } = get();
-    
+    const lead = leads.find((l) => l.id === id);
+    if (!lead) return { ok: false, error: 'Prospecto no encontrado' };
+    if (lead.status === 'converted') return { ok: false, error: 'Este prospecto ya fue convertido' };
+
+    const customerPayload = {
+      name: `${lead.first_name || ''} ${lead.last_name || ''}`.trim() || lead.email || 'Cliente',
+      company: lead.company || lead.company_name || '—',
+      email: lead.email || '',
+      phone: lead.phone || '',
+      city: lead.city || 'Medellín',
+      customer_type: 'corporate',
+      score: lead.score ?? 50,
+    };
+
     if (isApiReady()) {
       try {
+        const customer = await get().addCustomer(customerPayload);
+        if (!customer) {
+          return { ok: false, error: 'No se pudo crear el cliente. Verificá permisos en Supabase.' };
+        }
         const result = await api.leads.convert(id);
         if (result.success) {
-          set({ leads: leads.map(l => l.id === id ? { ...l, status: 'converted' } : l) });
+          set({
+            leads: get().leads.map((l) => (l.id === id ? { ...l, status: 'converted' } : l)),
+          });
+          return { ok: true, customer };
         }
+        const errMsg = typeof result.error === 'string' ? result.error : 'No se pudo marcar el lead como convertido';
+        return { ok: false, error: errMsg };
       } catch (err) {
         console.error('Error converting lead:', err);
+        return { ok: false, error: err?.message || 'Error al convertir el prospecto' };
       }
-    } else {
-      set({ leads: leads.map(l => l.id === id ? { ...l, status: 'converted' } : l) });
     }
+
+    await get().addCustomer(customerPayload);
+    set({ leads: leads.map((l) => (l.id === id ? { ...l, status: 'converted' } : l)) });
+    return { ok: true };
   },
 
   deleteLead: async (id) => {
@@ -396,41 +421,37 @@ export const useStore = create((set, get) => ({
 
   movePipelineOpportunity: async (oppId, fromStage, toStage) => {
     const { isApiReady, pipeline } = get();
-    
+
+    const stageOpps = pipeline[fromStage] || [];
+    const opp = stageOpps.find((o) => o.id === oppId);
+    if (!opp) return { ok: false, error: 'Oportunidad no encontrada' };
+
+    const prevPipeline = pipeline;
+    set({
+      pipeline: {
+        ...pipeline,
+        [fromStage]: (pipeline[fromStage] || []).filter((o) => o.id !== oppId),
+        [toStage]: [...(pipeline[toStage] || []), { ...opp, stage: toStage }],
+      },
+    });
+
     if (isApiReady()) {
       try {
         const result = await api.opportunities.moveStage(oppId, toStage);
-        if (result.success) {
-          // Actualizar localmente
-          const stageOpps = pipeline[fromStage];
-          const opp = stageOpps.find(o => o.id === oppId);
-          if (!opp) return;
-
-          set({
-            pipeline: {
-              ...pipeline,
-              [fromStage]: pipeline[fromStage].filter(o => o.id !== oppId),
-              [toStage]: [...pipeline[toStage], { ...opp, stage: toStage }]
-            }
-          });
+        if (!result.success) {
+          set({ pipeline: prevPipeline });
+          const errMsg = typeof result.error === 'string' ? result.error : 'No se pudo mover la oportunidad';
+          return { ok: false, error: errMsg };
         }
+        return { ok: true };
       } catch (err) {
         console.error('Error moving opportunity:', err);
+        set({ pipeline: prevPipeline });
+        return { ok: false, error: err?.message || 'Error al mover la oportunidad' };
       }
-    } else {
-      // Fallback local
-      const stageOpps = pipeline[fromStage];
-      const opp = stageOpps.find(o => o.id === oppId);
-      if (!opp) return;
-
-      set({
-        pipeline: {
-          ...pipeline,
-          [fromStage]: pipeline[fromStage].filter(o => o.id !== oppId),
-          [toStage]: [...pipeline[toStage], { ...opp, stage: toStage }]
-        }
-      });
     }
+
+    return { ok: true };
   },
 
   addPipelineOpportunity: async (stage, opp) => {
@@ -565,6 +586,62 @@ export const useStore = create((set, get) => ({
     }
   },
 
+  updateQuotation: async (id, updates) => {
+    const { isApiReady, quotations } = get();
+    if (isApiReady()) {
+      try {
+        const result = await api.quotations.update(id, updates);
+        if (result.success) {
+          set({
+            quotations: quotations.map((q) =>
+              q.id === id
+                ? {
+                    ...q,
+                    ...result.data,
+                    quote_number: result.data.number ?? q.quote_number,
+                    customer_name: q.customer_name,
+                    valid_until: result.data.validity ?? q.valid_until,
+                  }
+                : q
+            ),
+          });
+          return { ok: true, data: result.data };
+        }
+        const errMsg = typeof result.error === 'string' ? result.error : 'No se pudo actualizar la cotización';
+        return { ok: false, error: errMsg };
+      } catch (err) {
+        console.error('Error updating quotation:', err);
+        return { ok: false, error: err?.message || 'Error al actualizar la cotización' };
+      }
+    }
+
+    set({
+      quotations: quotations.map((q) => (q.id === id ? { ...q, ...updates } : q)),
+    });
+    return { ok: true };
+  },
+
+  convertQuotationToOrder: async (id) => {
+    const { quotations } = get();
+    const quote = quotations.find((q) => q.id === id);
+    if (!quote) return { ok: false, error: 'Cotización no encontrada' };
+    if (!quote.customer_id) return { ok: false, error: 'La cotización no tiene cliente asociado' };
+
+    const order = await get().addOrder({
+      number: `PED-${Date.now().toString().slice(-6)}`,
+      customer_id: quote.customer_id,
+      status: 'confirmed',
+      total: quote.total ?? 0,
+      carrier: 'Servientrega',
+      delivery_date: new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0],
+    });
+
+    if (!order) return { ok: false, error: 'No se pudo crear el pedido' };
+
+    await get().updateQuotation(id, { status: 'approved' });
+    return { ok: true, order };
+  },
+
   // ============================================
   // ORDERS
   // ============================================
@@ -632,6 +709,53 @@ export const useStore = create((set, get) => ({
     } else {
       set({ orders: orders.filter((o) => o.id !== id) });
     }
+  },
+
+  updateOrder: async (id, updates) => {
+    const { isApiReady, orders } = get();
+    if (isApiReady()) {
+      try {
+        const result = await api.orders.update(id, updates);
+        if (result.success) {
+          set({
+            orders: orders.map((o) =>
+              o.id === id
+                ? {
+                    ...o,
+                    ...result.data,
+                    order_number: result.data.number ?? o.order_number,
+                    customer_name: o.customer_name,
+                  }
+                : o
+            ),
+          });
+          return { ok: true, data: result.data };
+        }
+        const errMsg = typeof result.error === 'string' ? result.error : 'No se pudo actualizar el pedido';
+        return { ok: false, error: errMsg };
+      } catch (err) {
+        console.error('Error updating order:', err);
+        return { ok: false, error: err?.message || 'Error al actualizar el pedido' };
+      }
+    }
+
+    set({
+      orders: orders.map((o) => (o.id === id ? { ...o, ...updates } : o)),
+    });
+    return { ok: true };
+  },
+
+  advanceOrderStatus: async (id) => {
+    const flow = ['confirmed', 'preparing', 'shipped', 'delivered'];
+    const { orders } = get();
+    const order = orders.find((o) => o.id === id);
+    if (!order) return { ok: false, error: 'Pedido no encontrado' };
+
+    const idx = flow.indexOf(order.status);
+    const next = idx >= 0 && idx < flow.length - 1 ? flow[idx + 1] : null;
+    if (!next) return { ok: false, error: 'El pedido ya está en el estado final' };
+
+    return get().updateOrder(id, { status: next });
   },
 
   // ============================================

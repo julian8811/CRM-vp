@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Bell, Sun, Moon, Command, Menu } from 'lucide-react';
+import { Search, Sun, Moon, Command, Menu } from 'lucide-react';
 import { Input } from '@/components/ui/Input';
 import { Avatar } from '@/components/ui/Avatar';
 import { useTheme } from '@/contexts/ThemeContext';
-import { useNotifications } from '@/contexts/NotificationsContext';
 import { useStore } from '@/store/useStore';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -20,7 +19,6 @@ function entityTypeToPage(entityType) {
 
 function Header({ user, title, subtitle, onNavigate, onCommandPalette, onOpenMobileNav }) {
   const { theme, toggleTheme } = useTheme();
-  const { items, unreadCount, open, setOpen, markRead, markAllRead } = useNotifications();
   const searchCrm = useStore((s) => s.searchCrm);
 
   const [searchValue, setSearchValue] = useState('');
@@ -147,71 +145,6 @@ function Header({ user, title, subtitle, onNavigate, onCommandPalette, onOpenMob
                     </div>
                   </button>
                 ))}
-              </div>
-            )}
-          </div>
-
-          <div className="relative shrink-0" data-notifications-root>
-            <button
-              type="button"
-              onMouseDown={(e) => e.stopPropagation()}
-              onClick={(e) => {
-                e.stopPropagation();
-                setOpen(!open);
-              }}
-              className={cn(iconBtn, 'relative')}
-              aria-label="Notificaciones"
-            >
-              <Bell className="w-5 h-5" />
-              {unreadCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-stitch-primary-bright rounded-full" />
-              )}
-            </button>
-
-            {open && (
-              <div
-                className="absolute right-0 top-full mt-2 w-[min(24rem,calc(100vw-1.5rem))] max-h-[min(70vh,420px)] overflow-y-auto rounded-xl border border-stitch-border bg-stitch-surface shadow-xl z-50"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="flex items-center justify-between px-4 py-3 border-b border-stitch-border">
-                  <span className="font-semibold text-stitch-text">Notificaciones</span>
-                  <button
-                    type="button"
-                    onClick={markAllRead}
-                    className="text-xs text-stitch-primary-bright hover:underline"
-                  >
-                    Marcar todas leídas
-                  </button>
-                </div>
-                <ul className="divide-y divide-stitch-border/30">
-                  {items.length === 0 ? (
-                    <li className="px-4 py-6 text-sm text-stitch-muted text-center">Sin notificaciones</li>
-                  ) : (
-                    items.map((n) => (
-                      <li key={n.id}>
-                        <button
-                          type="button"
-                          onClick={() => markRead(n.id)}
-                          className={cn(
-                            'w-full text-left px-4 py-3 hover:bg-stitch-surface-elevated flex gap-3',
-                            n.read && 'opacity-70'
-                          )}
-                        >
-                          <span
-                            className={cn(
-                              'mt-0.5 flex-shrink-0 w-2 h-2 rounded-full',
-                              n.read ? 'bg-stitch-muted' : 'bg-stitch-primary-bright'
-                            )}
-                          />
-                          <div className="min-w-0">
-                            <div className="text-sm font-medium text-stitch-text">{n.title}</div>
-                            <div className="text-xs text-stitch-muted mt-0.5 line-clamp-2">{n.body}</div>
-                          </div>
-                        </button>
-                      </li>
-                    ))
-                  )}
-                </ul>
               </div>
             )}
           </div>
