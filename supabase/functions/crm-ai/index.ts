@@ -9,13 +9,16 @@ const SYSTEM_PROMPT =
   "Sos un asistente comercial breve y profesional para un CRM B2B en español. Respondé en máximo 3 párrafos cortos. No inventes datos numéricos del negocio; si faltan datos, pedí aclaración.";
 
 async function callGemini(apiKey: string, message: string) {
-  const model = Deno.env.get("GEMINI_MODEL") || "gemini-2.0-flash";
+  const model = Deno.env.get("GEMINI_MODEL") || "gemini-2.5-flash-lite";
   const url =
-    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "x-goog-api-key": apiKey,
+    },
     body: JSON.stringify({
       systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
       contents: [{ role: "user", parts: [{ text: message }] }],
