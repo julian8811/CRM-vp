@@ -78,7 +78,7 @@ function Header({ user, title, subtitle, onNavigate, onCommandPalette, onOpenMob
   };
 
   return (
-    <header className="relative z-30 min-h-16 bg-white dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 px-3 sm:px-6 py-2 sm:py-0 sm:h-16">
+    <header className="relative z-30 min-h-16 bg-white/80 dark:bg-stitch-bg/80 backdrop-blur-xl border-b border-slate-100 dark:border-stitch-border/20 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 px-3 sm:px-6 py-2 sm:py-0 sm:h-16">
       <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
         {onOpenMobileNav && (
           <button
@@ -91,9 +91,9 @@ function Header({ user, title, subtitle, onNavigate, onCommandPalette, onOpenMob
           </button>
         )}
         <div className="min-w-0">
-          <h1 className="text-base sm:text-xl font-bold text-slate-900 dark:text-white truncate">{title}</h1>
+          <h1 className="text-base sm:text-xl font-bold text-slate-900 dark:text-stitch-text truncate">{title}</h1>
           {subtitle && (
-            <p className="text-xs sm:text-sm text-slate-500 line-clamp-2 sm:line-clamp-1 sm:truncate">{subtitle}</p>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-stitch-muted line-clamp-2 sm:line-clamp-1 sm:truncate">{subtitle}</p>
           )}
         </div>
       </div>
@@ -115,7 +115,7 @@ function Header({ user, title, subtitle, onNavigate, onCommandPalette, onOpenMob
             onChange={handleSearchChange}
             onFocus={() => setSearchMenuOpen(true)}
             placeholder="Buscar clientes, leads, pedidos… (⌘K)"
-            className="pl-10 w-72 bg-slate-50 dark:bg-slate-900 border-0"
+            className="pl-10 w-72 bg-slate-50 dark:bg-[#05070a] border border-transparent dark:border-stitch-border/20"
             onClick={(e) => e.stopPropagation()}
           />
           <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs text-slate-400 pointer-events-none">
@@ -154,9 +154,7 @@ function Header({ user, title, subtitle, onNavigate, onCommandPalette, onOpenMob
           >
             <Bell className="w-5 h-5" />
             {unreadCount > 0 && (
-              <span className="absolute top-1 right-1 min-w-[8px] h-2 px-0.5 bg-red-500 rounded-full text-[10px] leading-none text-white flex items-center justify-center">
-                {unreadCount > 9 ? '9+' : unreadCount}
-              </span>
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-stitch-primary-bright rounded-full" />
             )}
           </button>
 

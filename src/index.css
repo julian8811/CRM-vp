@@ -1,4 +1,31 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@theme {
+  --color-primary: #1B3A5C;
+  --color-primary-light: #2E75B6;
+  --color-primary-dark: #0f2035;
+  --color-accent: #3b82f6;
+
+  --color-stitch-bg: #031427;
+  --color-stitch-surface: #111827;
+  --color-stitch-surface-elevated: #1b2b3f;
+  --color-stitch-border: #1e293b;
+  --color-stitch-primary: #b3c5ff;
+  --color-stitch-primary-bright: #5f8bff;
+  --color-stitch-action: #3B82F6;
+  --color-stitch-text: #d3e4fe;
+  --color-stitch-muted: #8c90a1;
+  --color-stitch-success: #4ade80;
+  --color-stitch-warning: #fbbf24;
+  --color-stitch-danger: #f87171;
+
+  --font-sans: Geist, Inter, system-ui, sans-serif;
+  --font-mono: JetBrains Mono, ui-monospace, monospace;
+
+  --shadow-glow: 0 0 20px rgba(95, 139, 255, 0.25);
+  --background-image-stitch-gradient: linear-gradient(135deg, #031427 0%, #0f2035 50%, #1B3A5C 100%);
+}
 
 @layer base {
   body {
@@ -6,7 +33,7 @@
   }
   
   .dark body {
-    @apply bg-slate-900 text-slate-100;
+    @apply bg-stitch-bg text-stitch-text;
   }
 }
 
@@ -20,10 +47,45 @@
   }
   
   .btn-secondary {
-    @apply bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300;
+    @apply bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-stitch-surface-elevated dark:text-stitch-text;
   }
   
   .card {
-    @apply bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow;
+    @apply bg-white dark:bg-stitch-surface rounded-lg border border-slate-100 dark:border-stitch-border shadow-sm hover:shadow-md transition-shadow;
+  }
+
+  .stitch-kpi {
+    @apply relative overflow-hidden rounded-lg border border-stitch-border bg-stitch-surface/80 backdrop-blur-md p-4
+           dark:bg-[#111827]/80 dark:border-[#1e293b]
+           transition-all duration-300 hover:border-stitch-primary-bright/30;
+    box-shadow: var(--shadow-glow);
+  }
+
+  .stitch-kpi:hover {
+    box-shadow: 0 0 20px rgba(95, 139, 255, 0.25);
+  }
+
+  .stitch-panel {
+    @apply rounded-lg border border-stitch-border bg-stitch-surface dark:bg-[#111827] dark:border-[#1e293b];
+  }
+
+  .stitch-nav-active {
+    @apply bg-[#3f465c] text-stitch-primary rounded-lg;
+  }
+
+  .bg-stitch-gradient {
+    background-image: var(--background-image-stitch-gradient);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #424655;
+    border-radius: 3px;
   }
 }
