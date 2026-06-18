@@ -90,7 +90,7 @@ export function AIContent() {
   const aiFeatures = [
     { name: 'Predicción de cierre', desc: 'Resúmenes con el asistente cuando está activo.', icon: TrendingUp, active: assistantOn },
     { name: 'Scoring automático', desc: 'Usá preguntas al asistente sobre tus leads.', icon: Target, active: assistantOn },
-    { name: 'Asistente de email', desc: 'Borradores y tono con IA (Edge + OpenAI).', icon: Mail, active: assistantOn },
+    { name: 'Asistente de email', desc: 'Borradores y tono con IA (Gemini).', icon: Mail, active: assistantOn },
     { name: 'Análisis de conversaciones', desc: 'Pendiente de integrar transcripciones.', icon: Bot, active: assistantOn },
     { name: 'Recomendaciones de productos', desc: 'Consultá al asistente con contexto de negocio.', icon: Lightbulb, active: assistantOn },
     { name: 'Alertas de churn', desc: 'Combiná notificaciones del CRM + IA.', icon: AlertTriangle, active: assistantOn },
