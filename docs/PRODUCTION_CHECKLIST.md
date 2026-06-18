@@ -13,9 +13,9 @@
 | 3 | Edge Functions desplegadas | ✅ Hecho | 6 functions desplegadas |
 | 4 | Secretos Supabase | ⚠️ Parcial | `OPENAI_API_KEY`, `SERVICE_ROLE` OK · `CRON_SECRET` configurado · faltan `META_*` y `RESEND_*` si los usás |
 | 5 | Frontend en Vercel | ✅ Hecho | Merge PR #2 para Google OAuth + features nuevas |
-| 6 | Cron `run-automations` | ⚠️ Manual | Secret listo; programar invocación periódica (ver abajo) |
+| 6 | Cron `run-automations` | ✅ Hecho | `pg_cron` job `crm-vp-run-automations` cada 15 min |
 | 7 | Webhook Meta | ⚠️ Manual | Requiere secretos Meta + callback en Developers |
-| 8 | Google OAuth | ⚠️ Manual | Habilitar provider en Supabase Auth |
+| 8 | Google OAuth | ⚠️ Manual | `site_url` configurado · faltan Client ID/Secret de Google Cloud |
 | 9 | Usuario admin | ✅ Hecho | `Julián Esteban Pineda Montoya` → `admin` |
 | 10 | Emails (Resend) | Opcional | `RESEND_API_KEY` no configurado aún |
 
@@ -100,25 +100,35 @@ npm run deploy:functions
 
 ## 4. Cron de automatizaciones
 
-Ejemplo con cron externo o Supabase Scheduler (cada 15 min):
+**Activo en Supabase** (`pg_cron`, cada 15 min, job `crm-vp-run-automations`).
+
+Recrear o verificar:
 
 ```bash
-curl -X POST \
-  "https://tgosnmvlvzaykiuolrot.supabase.co/functions/v1/run-automations" \
-  -H "x-cron-secret: $CRON_SECRET"
+export SUPABASE_ACCESS_TOKEN=sbp_...
+bash scripts/setup-cron.sh
 ```
 
-La función:
-- Resume reglas activas de `automation_rules`
-- Envía emails pendientes si `RESEND_API_KEY` está configurada
-- Las notificaciones de nuevos leads se crean vía trigger SQL (`on_lead_created_notify`)
+Backup opcional: workflow `.github/workflows/cron-automations.yml` (requiere `CRON_SECRET` en GitHub Secrets).
 
 ## 5. Google OAuth
 
-1. Supabase → Authentication → Providers → Google → Enable
-2. Configurar Client ID/Secret de Google Cloud
-3. Redirect URLs: `https://crm-vp.vercel.app`, `http://localhost:5173`
-4. En la app: botón **Continuar con Google** en login
+`site_url` y redirects ya apuntan a `https://crm-vp.vercel.app`.
+
+Falta crear credenciales en [Google Cloud Console](https://console.cloud.google.com/apis/credentials) y ejecutar:
+
+```bash
+export SUPABASE_ACCESS_TOKEN=sbp_...
+export GOOGLE_CLIENT_ID=....apps.googleusercontent.com
+export GOOGLE_CLIENT_SECRET=GOCSPX-...
+bash scripts/setup-google-oauth.sh
+```
+
+Redirect URI obligatorio en Google:
+
+```text
+https://tgosnmvlvzaykiuolrot.supabase.co/auth/v1/callback
+```
 
 ## 6. Primer administrador
 

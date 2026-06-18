@@ -1,0 +1,22 @@
+name: Run automations cron
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  invoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger run-automations
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "CRON_SECRET no configurado en GitHub Secrets. El cron activo es pg_cron en Supabase."
+            exit 0
+          fi
+          curl -fsS -X POST \
+            "https://tgosnmvlvzaykiuolrot.supabase.co/functions/v1/run-automations" \
+            -H "x-cron-secret: $CRON_SECRET"
