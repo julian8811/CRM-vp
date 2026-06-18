@@ -4,30 +4,16 @@
 
 **URL:** https://crm-vp.vercel.app/
 
-El frontend está desplegado y conectado a Supabase. Para operación completa revisá [docs/PRODUCTION_CHECKLIST.md](docs/PRODUCTION_CHECKLIST.md).
+### Completado
+- Frontend en Vercel con 14 módulos CRM
+- Supabase: migraciones, Edge Functions, admin asignado
+- Cron `run-automations` vía `pg_cron` (cada 15 min)
+- Auth: `site_url` y redirects para producción
+- IA (`OPENAI_API_KEY`), notificaciones, trigger de leads
 
-### Páginas (14 módulos)
-- Dashboard, Clientes, Leads, Pipeline, Productos, Cotizaciones, Pedidos
-- Automatizaciones, Meta, Reportes, IA, Postventa, Configuración, Usuarios
+### Pendiente (requiere credenciales externas)
+- [ ] Google OAuth: `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` → `bash scripts/setup-google-oauth.sh`
+- [ ] Meta: secretos `META_*` + webhook en Developers
+- [ ] Emails Resend (opcional): `RESEND_API_KEY`
 
-### Completado en código
-- Theme toggle, Command Palette (Ctrl+K), export Excel
-- Supabase Auth (email + Google OAuth en UI)
-- Listado de equipo (`get_team_profiles`)
-- Notificaciones in-app + trigger por nuevo lead
-- Edge Functions (IA, Meta, automatizaciones, invitaciones)
-- Tests Vitest + CI con lint
-
-### Pendiente de configuración (infra)
-- [ ] Aplicar migración `20260618000000_production_hardening.sql` en Supabase
-- [ ] Desplegar Edge Functions actualizadas (`npm run deploy:functions`)
-- [ ] Configurar secretos (`OPENAI_API_KEY`, `CRON_SECRET`, `META_*`, opcional `RESEND_API_KEY`)
-- [ ] Programar cron de `run-automations`
-- [ ] Habilitar Google provider en Supabase Auth (si se usa OAuth)
-- [ ] Configurar webhook Meta en Developers
-- [ ] Asignar rol `admin` al primer usuario
-
-### Tech stack
-- React 19 + Vite + Tailwind CSS v4
-- Zustand, @dnd-kit, Recharts, Supabase
-- Vitest, Vercel, Supabase Edge Functions
+Ver [docs/PRODUCTION_CHECKLIST.md](docs/PRODUCTION_CHECKLIST.md)
