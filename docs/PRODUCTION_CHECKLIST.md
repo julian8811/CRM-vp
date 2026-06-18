@@ -19,6 +19,23 @@
 | 9 | Usuario admin | ⚠️ Manual | `UPDATE profiles SET role = 'admin' WHERE id = '...'` |
 | 10 | Emails (Resend) | Opcional | `RESEND_API_KEY` + `NOTIFICATION_FROM_EMAIL` |
 
+## Credenciales que el agente / operador necesita
+
+Para ejecutar `npm run setup:production` de forma autónoma:
+
+| Variable | Dónde obtenerla |
+|----------|-----------------|
+| `SUPABASE_ACCESS_TOKEN` | [Account Tokens](https://supabase.com/dashboard/account/tokens) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Settings → API (solo servidor) |
+| `CRON_SECRET` | Generar: `openssl rand -hex 24` |
+| `OPENAI_API_KEY` | OpenAI platform |
+| `RESEND_API_KEY` | Resend.com (emails, opcional) |
+| `META_*` | Meta Developers (opcional) |
+
+**Vercel** ya tiene `VITE_SUPABASE_*` si el login en producción funciona.
+
+**Supabase MCP**: autenticá el servidor Supabase en Cursor IDE para que el agente pueda ejecutar SQL y advisors sin CLI.
+
 ## 1. Vercel (frontend)
 
 Variables en **Vercel → Project → Settings → Environment Variables**:

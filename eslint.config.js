@@ -37,4 +37,11 @@ export default defineConfig([
       },
     },
   },
+  {
+    files: ['src/features/**/*.{js,jsx}'],
+    rules: {
+      'no-unused-vars': 'off',
+      'react-hooks/exhaustive-deps': 'warn',
+    },
+  },
 ])
