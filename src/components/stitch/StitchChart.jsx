@@ -1,6 +1,4 @@
 import { TrendingDown, TrendingUp, Minus } from 'lucide-react';
-import { BarChart, Bar } from 'recharts';
-import { StitchResponsiveContainer } from '@/components/stitch/StitchResponsiveContainer';
 
 function formatTooltipValue(formatter, value, name) {
   if (!formatter) return `${name}: ${value}`;
@@ -25,13 +23,20 @@ export function StitchChartTooltip({ active, payload, label, formatter }) {
 
 export function StitchMiniSparkline({ data, color = '#5f8bff' }) {
   if (!data?.length) return null;
+  const max = Math.max(...data.map((d) => d.v || 0), 1);
   return (
-    <div className="w-16 h-6">
-      <StitchResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-          <Bar dataKey="v" fill={color} radius={[2, 2, 0, 0]} isAnimationActive={false} />
-        </BarChart>
-      </StitchResponsiveContainer>
+    <div className="flex h-6 w-16 items-end gap-0.5">
+      {data.map((d, i) => (
+        <div
+          key={i}
+          className="flex-1 rounded-t-sm"
+          style={{
+            height: `${Math.max(8, (d.v / max) * 100)}%`,
+            backgroundColor: color,
+            minHeight: 2,
+          }}
+        />
+      ))}
     </div>
   );
 }
