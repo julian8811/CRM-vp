@@ -17,7 +17,8 @@ $CLI functions deploy meta-send-whatsapp
 cat <<'EOF'
 
 Funciones desplegadas. Configurá secretos en Dashboard → Edge Functions → Secrets:
-  OPENAI_API_KEY
+  GEMINI_API_KEY
+  GEMINI_MODEL
   SUPABASE_SERVICE_ROLE_KEY
   CRON_SECRET
   META_VERIFY_TOKEN

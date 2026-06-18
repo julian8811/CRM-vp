@@ -62,11 +62,18 @@ export function UsersContent() {
       setInviteStatus('Ingresá un email válido.');
       return;
     }
-    const { error } = await supabase.functions.invoke('invite-user', {
+    const { data, error } = await supabase.functions.invoke('invite-user', {
       body: { email: inviteEmail.trim(), redirectTo: `${window.location.origin}/` },
     });
-    if (error) setInviteStatus(error.message || 'Error al invitar');
-    else setInviteStatus(`Invitación enviada a ${inviteEmail.trim()}.`);
+    if (error) {
+      setInviteStatus(error.message || 'Error al invitar');
+      return;
+    }
+    if (data?.error) {
+      setInviteStatus(data.error);
+      return;
+    }
+    setInviteStatus(`Invitación enviada a ${inviteEmail.trim()}.`);
   };
 
   const users = (teamProfiles.length ? teamProfiles : profile

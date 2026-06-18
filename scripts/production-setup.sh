@@ -44,7 +44,7 @@ Configurá en Supabase → Edge Functions → Secrets:
   Obligatorios para 100%:
     SUPABASE_SERVICE_ROLE_KEY   (Settings → API)
     CRON_SECRET                 (generá uno: openssl rand -hex 24)
-    OPENAI_API_KEY              (IA)
+    GEMINI_API_KEY              (IA — Google AI Studio)
 
   Meta (si usás integración):
     META_VERIFY_TOKEN, META_APP_SECRET, META_PAGE_ACCESS_TOKEN, META_WHATSAPP_TOKEN
