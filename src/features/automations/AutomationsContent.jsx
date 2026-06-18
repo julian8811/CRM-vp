@@ -45,6 +45,7 @@ import { updateProfile } from '@/lib/auth';
 import { confirmDelete } from '@/lib/confirmDelete';
 import { PAGE_TITLES, STAGE_COLORS } from '@/config/crm';
 import { StitchPageHeader } from '@/components/stitch/StitchPageHeader';
+import { PageContainer } from '@/components/stitch/PageContainer';
 
 function triggerActionLabel(row) {
   const tr = row.trigger_config || {};
@@ -86,7 +87,7 @@ export function AutomationsContent() {
   };
 
   return (
-    <div className="max-w-[1440px] mx-auto">
+    <PageContainer>
       <StitchPageHeader
         title="Automatizaciones"
         subtitle={`${automations.filter((a) => a.status === 'active').length} activas · Ejecución programada cada 15 min (pg_cron) · Notificaciones in-app.`}
@@ -190,6 +191,6 @@ export function AutomationsContent() {
           })
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 }

@@ -76,8 +76,8 @@ function DataTable({
         )}
       </div>
       
-      <div className="overflow-x-auto -mx-px">
-        <table className="w-full min-w-[640px]">
+      <div className="overflow-x-auto -mx-px overscroll-x-contain">
+        <table className="w-full min-w-[520px] sm:min-w-[640px]">
           <thead>
             <tr className="bg-[#05070a] border-b border-stitch-border">
               {columns.map((col) => (

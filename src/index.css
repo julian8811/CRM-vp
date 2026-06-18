@@ -28,12 +28,22 @@
 }
 
 @layer base {
+  html {
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
-    @apply bg-slate-50 text-slate-900 font-sans antialiased;
+    @apply bg-slate-50 text-slate-900 font-sans antialiased overflow-x-hidden;
+    min-height: 100dvh;
   }
   
   .dark body {
     @apply bg-stitch-bg text-stitch-text;
+  }
+
+  #root {
+    min-height: 100dvh;
   }
 }
 
@@ -74,7 +84,29 @@
   }
 
   .stitch-kanban-col {
-    @apply w-72 flex-shrink-0 flex flex-col;
+    @apply w-[min(288px,calc(100vw-2.5rem))] sm:w-72 flex-shrink-0 flex flex-col snap-center;
+  }
+
+  .kanban-scroll {
+    @apply flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory;
+    -webkit-overflow-scrolling: touch;
+    scroll-padding-inline: 0.5rem;
+  }
+
+  .chart-h-sm {
+    @apply h-52 sm:h-64 md:h-72;
+  }
+
+  .chart-h-md {
+    @apply h-48 sm:h-56 md:h-64;
+  }
+
+  .safe-bottom {
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+
+  .safe-top {
+    padding-top: max(0px, env(safe-area-inset-top));
   }
 
   .stitch-kanban-card {

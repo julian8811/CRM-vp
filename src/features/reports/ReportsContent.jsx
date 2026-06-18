@@ -24,6 +24,7 @@ import {
   StitchChartTooltip,
   StitchPeriodPills,
 } from '@/components/stitch/StitchChart';
+import { PageContainer } from '@/components/stitch/PageContainer';
 
 const CHART_COLORS = ['#5f8bff', '#4ade80', '#fbbf24', '#a78bfa', '#f87171', '#38bdf8'];
 
@@ -132,17 +133,19 @@ export function ReportsContent() {
   }, [salesInRange, customersInRange, leadsInRange, quotesInRange, filterPreset, pt, funnelRows]);
 
   return (
-    <div className="max-w-[1440px] mx-auto space-y-6">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-stitch-text tracking-tight">Reportes y Analítica</h2>
-          <p className="text-sm text-stitch-muted mt-1">
+    <PageContainer className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 sm:gap-4">
+        <div className="min-w-0">
+          <h2 className="text-xl sm:text-2xl font-bold text-stitch-text tracking-tight">Reportes y Analítica</h2>
+          <p className="text-xs sm:text-sm text-stitch-muted mt-1">
             Métricas en tiempo real calculadas desde tus datos.
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <StitchPeriodPills value={filterPreset} onChange={setFilterPreset} options={PERIOD_OPTIONS} />
-          <Button type="button" variant="outline" onClick={handleExport} className="border-stitch-border text-stitch-text hover:bg-stitch-surface-elevated">
+        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 sm:gap-3 w-full md:w-auto">
+          <div className="overflow-x-auto -mx-1 px-1 pb-1 sm:pb-0 sm:overflow-visible">
+            <StitchPeriodPills value={filterPreset} onChange={setFilterPreset} options={PERIOD_OPTIONS} />
+          </div>
+          <Button type="button" variant="outline" onClick={handleExport} className="w-full sm:w-auto border-stitch-border text-stitch-text hover:bg-stitch-surface-elevated shrink-0">
             <Download className="w-4 h-4" />
             Exportar
           </Button>
@@ -214,7 +217,7 @@ export function ReportsContent() {
               <p className="text-xs font-mono text-stitch-muted mt-0.5 uppercase">Últimos 6 meses</p>
             </div>
           </div>
-          <div className="p-4 h-72">
+          <div className="p-3 sm:p-4 chart-h-sm min-h-[13rem]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={salesTrend}>
                 <defs>
@@ -260,7 +263,7 @@ export function ReportsContent() {
           <div className="p-4 border-b border-stitch-border">
             <h3 className="font-semibold text-stitch-text">Leads por estado</h3>
           </div>
-          <div className="p-4 h-72">
+          <div className="p-3 sm:p-4 chart-h-sm min-h-[13rem]">
             {leadStatusData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -320,7 +323,7 @@ export function ReportsContent() {
             <h3 className="font-semibold text-stitch-text">Embudo comercial</h3>
             <p className="text-xs text-stitch-muted">Conversión por etapa</p>
           </div>
-          <div className="p-4 h-72">
+          <div className="p-3 sm:p-4 chart-h-sm min-h-[13rem]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={funnelRows} layout="vertical" margin={{ left: 10, right: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" horizontal={false} />
@@ -344,6 +347,6 @@ export function ReportsContent() {
           </div>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

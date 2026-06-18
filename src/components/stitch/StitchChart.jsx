@@ -52,7 +52,7 @@ export function StitchKpiCard({ icon, label, value, trend, sparkData, sparkColor
           <p className="text-[11px] font-mono uppercase tracking-wider text-stitch-muted">{label}</p>
           {!largeIcon && <Icon className="w-4 h-4 text-stitch-primary-bright" />}
         </div>
-        <h2 className="text-2xl md:text-3xl font-bold text-stitch-text tracking-tight">{value}</h2>
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-stitch-text tracking-tight break-words">{value}</h2>
         <div className="mt-3 flex items-center justify-between">
           {trend !== null && trend !== undefined ? (
             <div className={`flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono font-medium border ${trendColor}`}>
@@ -71,13 +71,13 @@ export function StitchKpiCard({ icon, label, value, trend, sparkData, sparkColor
 
 export function StitchPeriodPills({ value, onChange, options }) {
   return (
-    <div className="flex items-center bg-[#05070a] border border-stitch-border/30 rounded p-1">
+    <div className="flex items-center bg-[#05070a] border border-stitch-border/30 rounded p-1 w-max max-w-full shrink-0">
       {options.map((opt) => (
         <button
           key={opt.id}
           type="button"
           onClick={() => onChange(opt.id)}
-          className={`px-3 py-1.5 rounded text-xs font-mono transition-colors ${
+          className={`px-2.5 sm:px-3 py-1.5 rounded text-xs font-mono transition-colors whitespace-nowrap shrink-0 ${
             value === opt.id
               ? 'bg-stitch-surface-elevated text-stitch-text border border-stitch-border/20 shadow-sm'
               : 'text-stitch-muted hover:text-stitch-text'

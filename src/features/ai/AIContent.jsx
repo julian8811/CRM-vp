@@ -9,6 +9,7 @@ import { useStore } from '@/store/useStore';
 import { invokeCrmAi } from '@/lib/crmAi';
 import api from '@/lib/api';
 import { isSupabaseConfigured } from '@/lib/supabase';
+import { PageContainer } from '@/components/stitch/PageContainer';
 
 function formatContextLine(items, mapFn) {
   if (!items?.length) return '';
@@ -144,26 +145,26 @@ export function AIContent() {
   ];
 
   return (
-    <div className="max-w-[1440px] mx-auto space-y-6">
+    <PageContainer className="space-y-4 sm:space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-stitch-text tracking-tight">IA Comercial</h2>
-        <p className="text-sm text-stitch-muted mt-1">
+        <h2 className="text-xl sm:text-2xl font-bold text-stitch-text tracking-tight">IA Comercial</h2>
+        <p className="text-xs sm:text-sm text-stitch-muted mt-1">
           Asistente con Google Gemini. Activá el assistant y usá el chat o las tarjetas rápidas.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[480px]">
-        <div className="lg:col-span-5 stitch-glass rounded-xl p-8 flex flex-col items-center justify-center text-center relative overflow-hidden group">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:min-h-[480px]">
+        <div className="lg:col-span-5 stitch-glass rounded-xl p-5 sm:p-6 md:p-8 flex flex-col items-center justify-center text-center relative overflow-hidden group">
           <div className="absolute inset-0 bg-stitch-primary-bright/5 rounded-xl blur-3xl -z-10 group-hover:bg-stitch-primary-bright/10 transition-colors duration-700" />
-          <div className="relative w-32 h-32 mb-8 flex items-center justify-center">
+          <div className="relative w-24 h-24 sm:w-32 sm:h-32 mb-6 sm:mb-8 flex items-center justify-center">
             <div className="absolute inset-0 rounded-full border border-stitch-primary/30 stitch-pulse-ring" />
             <div className="absolute inset-0 rounded-full border border-stitch-primary/20 stitch-pulse-ring" style={{ animationDelay: '0.5s' }} />
-            <div className="w-20 h-20 bg-stitch-surface-elevated rounded-full border border-stitch-border flex items-center justify-center shadow-glow z-10">
-              <Bot className="w-10 h-10 text-stitch-primary-bright" />
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-stitch-surface-elevated rounded-full border border-stitch-border flex items-center justify-center shadow-glow z-10">
+              <Bot className="w-8 h-8 sm:w-10 sm:h-10 text-stitch-primary-bright" />
             </div>
           </div>
-          <h3 className="text-4xl font-bold stitch-ai-gradient mb-2">CRM AI</h3>
-          <p className="text-sm text-stitch-muted max-w-xs mb-8">
+          <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold stitch-ai-gradient mb-2">CRM AI</h3>
+          <p className="text-xs sm:text-sm text-stitch-muted max-w-xs mb-6 sm:mb-8 px-2">
             {assistantOn
               ? 'Motor de inteligencia comercial activo. Analizá pipelines, redactá comunicaciones y predice cierres.'
               : 'Activá el asistente para habilitar el chat y las acciones rápidas.'}
@@ -180,8 +181,8 @@ export function AIContent() {
           </Button>
         </div>
 
-        <div className={`lg:col-span-7 stitch-panel flex flex-col overflow-hidden ${!assistantOn ? 'opacity-50 pointer-events-none' : ''}`}>
-          <div className="px-6 py-4 border-b border-stitch-border flex justify-between items-center bg-stitch-surface/50">
+        <div className={`lg:col-span-7 stitch-panel flex flex-col overflow-hidden min-h-[320px] sm:min-h-[400px] lg:min-h-0 ${!assistantOn ? 'opacity-50 pointer-events-none' : ''}`}>
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-stitch-border flex justify-between items-center bg-stitch-surface/50">
             <div className="flex items-center gap-3">
               <span className="w-2 h-2 rounded-full bg-stitch-primary-bright animate-pulse" />
               <span className="text-xs font-mono text-stitch-text uppercase tracking-widest">Sesión activa</span>
@@ -189,7 +190,7 @@ export function AIContent() {
             <Sparkles className="w-4 h-4 text-stitch-primary-bright" />
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 min-h-[280px] max-h-[360px] custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 min-h-[12rem] max-h-[45vh] sm:max-h-[360px] custom-scrollbar">
             {aiMessages.length === 0 ? (
               <div className="flex gap-4 max-w-[90%]">
                 <div className="w-8 h-8 rounded-full bg-stitch-surface border border-stitch-primary/30 flex items-center justify-center shrink-0">
@@ -282,6 +283,6 @@ export function AIContent() {
           </button>
         ))}
       </div>
-    </div>
+    </PageContainer>
   );
 }

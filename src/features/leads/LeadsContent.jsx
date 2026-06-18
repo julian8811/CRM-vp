@@ -44,6 +44,7 @@ import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { updateProfile } from '@/lib/auth';
 import { confirmDelete } from '@/lib/confirmDelete';
 import { StitchPageHeader } from '@/components/stitch/StitchPageHeader';
+import { PageContainer } from '@/components/stitch/PageContainer';
 
 
 // Leads Page
@@ -99,7 +100,7 @@ export function LeadsContent() {
   ];
 
   return (
-    <div className="max-w-[1440px] mx-auto">
+    <PageContainer>
       <StitchPageHeader
         title="Dirige"
         subtitle={`Gestión de prospectos · ${leads.length} registros`}
@@ -111,6 +112,6 @@ export function LeadsContent() {
         }
       />
       <DataTable columns={columns} data={leads} searchPlaceholder="Buscar prospectos..." pageName="leads" />
-    </div>
+    </PageContainer>
   );
 }

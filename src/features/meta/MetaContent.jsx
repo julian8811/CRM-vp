@@ -45,6 +45,7 @@ import { updateProfile } from '@/lib/auth';
 import { confirmDelete } from '@/lib/confirmDelete';
 import { statusVariant } from '@/lib/statusVariant';
 import { StitchPageHeader } from '@/components/stitch/StitchPageHeader';
+import { PageContainer } from '@/components/stitch/PageContainer';
 import { PAGE_TITLES, STAGE_COLORS } from '@/config/crm';
 
 
@@ -158,7 +159,7 @@ export function MetaContent() {
   };
 
   return (
-    <div className="max-w-[1440px] mx-auto space-y-6">
+    <PageContainer className="space-y-4 sm:space-y-6">
       <StitchPageHeader title="Meta Ads" subtitle="Lead Ads, WhatsApp y webhooks de integración." />
       <div className="stitch-panel border-stitch-primary-bright/20 bg-stitch-primary-bright/5 p-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -415,6 +416,6 @@ export function MetaContent() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </PageContainer>
   );
 }

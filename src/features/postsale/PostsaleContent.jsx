@@ -44,6 +44,7 @@ import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { updateProfile } from '@/lib/auth';
 import { confirmDelete } from '@/lib/confirmDelete';
 import { StitchPageHeader } from '@/components/stitch/StitchPageHeader';
+import { PageContainer } from '@/components/stitch/PageContainer';
 
 
 function ticketDisplay(t) {
@@ -87,7 +88,7 @@ export function PostsaleContent() {
   };
 
   return (
-    <div className="max-w-[1440px] mx-auto">
+    <PageContainer>
       <StitchPageHeader
         title="Postventa"
         subtitle="Tickets en la tabla support_tickets (Supabase)."
@@ -196,6 +197,6 @@ export function PostsaleContent() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

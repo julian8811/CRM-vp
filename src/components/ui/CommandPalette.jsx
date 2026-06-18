@@ -75,18 +75,15 @@ export function CommandPalette({ isOpen, onClose, onNavigate }) {
   let globalIndex = 0;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-[8vh] sm:pt-[15vh] px-3 sm:px-4">
-      {/* Backdrop */}
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-[max(1rem,env(safe-area-inset-top))] sm:pt-[15vh] px-3 sm:px-4 safe-bottom">
       <div 
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
       
-      {/* Modal */}
-      <div className="relative w-full max-w-xl bg-white dark:bg-slate-800 rounded-xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 max-h-[85vh] flex flex-col">
-        {/* Search Input */}
-        <div className="flex flex-shrink-0 items-center gap-3 px-4 py-3 border-b border-slate-100 dark:border-slate-700">
-          <Search className="w-5 h-5 text-slate-400" />
+      <div className="relative w-full max-w-xl bg-stitch-surface rounded-xl shadow-2xl overflow-hidden border border-stitch-border max-h-[min(85dvh,640px)] flex flex-col">
+        <div className="flex flex-shrink-0 items-center gap-3 px-4 py-3 border-b border-stitch-border">
+          <Search className="w-5 h-5 text-stitch-muted shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -94,23 +91,22 @@ export function CommandPalette({ isOpen, onClose, onNavigate }) {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Buscar página o acción..."
-            className="flex-1 bg-transparent outline-none text-slate-900 dark:text-white placeholder:text-slate-400"
+            className="flex-1 min-w-0 bg-transparent outline-none text-stitch-text placeholder:text-stitch-muted text-base sm:text-sm"
           />
-          <button onClick={onClose} className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700">
-            <X className="w-4 h-4 text-slate-400" />
+          <button type="button" onClick={onClose} className="p-1.5 rounded-lg hover:bg-stitch-surface-elevated shrink-0" aria-label="Cerrar">
+            <X className="w-4 h-4 text-stitch-muted" />
           </button>
         </div>
 
-        {/* Results */}
-        <div className="min-h-0 flex-1 overflow-y-auto py-2 overscroll-contain">
+        <div className="min-h-0 flex-1 overflow-y-auto py-2 overscroll-contain custom-scrollbar">
           {Object.keys(groupedPages).length === 0 ? (
-            <div className="px-4 py-8 text-center text-slate-500">
+            <div className="px-4 py-8 text-center text-stitch-muted">
               No se encontraron resultados
             </div>
           ) : (
             Object.entries(groupedPages).map(([category, pages]) => (
               <div key={category}>
-                <div className="px-4 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                <div className="px-4 py-2 text-xs font-semibold text-stitch-muted uppercase tracking-wider">
                   {category}
                 </div>
                 {pages.map((page) => {
@@ -120,20 +116,21 @@ export function CommandPalette({ isOpen, onClose, onNavigate }) {
                   return (
                     <button
                       key={page.id}
+                      type="button"
                       onClick={() => {
                         onNavigate(page.id);
                         onClose();
                       }}
-                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
+                      className={`w-full flex items-center gap-3 px-4 py-3 sm:py-2.5 text-left transition-colors ${
                         isSelected 
-                          ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' 
-                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
+                          ? 'bg-stitch-primary-bright/10 text-stitch-primary-bright' 
+                          : 'text-stitch-text hover:bg-stitch-surface-elevated'
                       }`}
                     >
-                      <page.icon className="w-5 h-5" />
-                      <span className="flex-1 font-medium">{page.name}</span>
+                      <page.icon className="w-5 h-5 shrink-0" />
+                      <span className="flex-1 font-medium truncate">{page.name}</span>
                       {isSelected && (
-                        <ArrowRight className="w-4 h-4" />
+                        <ArrowRight className="w-4 h-4 shrink-0" />
                       )}
                     </button>
                   );
@@ -143,18 +140,17 @@ export function CommandPalette({ isOpen, onClose, onNavigate }) {
           )}
         </div>
 
-        {/* Footer */}
-        <div className="flex flex-shrink-0 flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2 border-t border-slate-100 dark:border-slate-700 text-xs text-slate-400">
+        <div className="hidden sm:flex flex-shrink-0 flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2 border-t border-stitch-border text-xs text-stitch-muted">
           <span className="flex items-center gap-1">
-            <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-700 rounded text-slate-600 dark:text-slate-400">↑↓</kbd>
+            <kbd className="px-1.5 py-0.5 bg-stitch-surface-elevated rounded text-stitch-text">↑↓</kbd>
             Navegar
           </span>
           <span className="flex items-center gap-1">
-            <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-700 rounded text-slate-600 dark:text-slate-400">↵</kbd>
+            <kbd className="px-1.5 py-0.5 bg-stitch-surface-elevated rounded text-stitch-text">↵</kbd>
             Seleccionar
           </span>
           <span className="flex items-center gap-1">
-            <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-700 rounded text-slate-600 dark:text-slate-400">esc</kbd>
+            <kbd className="px-1.5 py-0.5 bg-stitch-surface-elevated rounded text-stitch-text">esc</kbd>
             Cerrar
           </span>
         </div>

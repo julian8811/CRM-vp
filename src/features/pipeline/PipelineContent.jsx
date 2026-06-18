@@ -23,6 +23,7 @@ import { useStore } from '@/store/useStore';
 import { formatCurrency } from '@/lib/crmMetrics';
 import { confirmDelete } from '@/lib/confirmDelete';
 import { STAGE_COLORS } from '@/config/crm';
+import { PageContainer } from '@/components/stitch/PageContainer';
 
 function probabilityStyle(p) {
   if (p >= 70) return 'text-stitch-success bg-stitch-success/10 border-stitch-success/20';
@@ -119,7 +120,7 @@ function PipelineColumn({ stage, opps, onDeleteOpp }) {
       </div>
       <div
         ref={setNodeRef}
-        className={`flex-1 min-h-[420px] rounded-lg p-2 space-y-3 transition-colors custom-scrollbar overflow-y-auto ${
+        className={`flex-1 min-h-[280px] sm:min-h-[360px] md:min-h-[420px] rounded-lg p-2 space-y-3 transition-colors custom-scrollbar overflow-y-auto ${
           isOver ? 'bg-stitch-primary-bright/5 ring-1 ring-stitch-primary-bright/30' : 'bg-[#05070a]/50'
         }`}
       >
@@ -213,15 +214,15 @@ export function PipelineContent() {
   };
 
   return (
-    <div className="max-w-full space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-stitch-text tracking-tight">Embudo de Ventas</h2>
-          <p className="text-sm text-stitch-muted mt-1">
+    <PageContainer size="full" className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        <div className="min-w-0">
+          <h2 className="text-xl sm:text-2xl font-bold text-stitch-text tracking-tight">Embudo de Ventas</h2>
+          <p className="text-xs sm:text-sm text-stitch-muted mt-1">
             {totalPipeline.count} oportunidades · {formatCurrency(totalPipeline.value)} en pipeline
           </p>
         </div>
-        <Button type="button" onClick={() => openModal('opportunity')} className="w-full sm:w-auto">
+        <Button type="button" onClick={() => openModal('opportunity')} className="w-full sm:w-auto shrink-0">
           <Plus className="w-4 h-4" />
           Nueva Oportunidad
         </Button>
@@ -233,7 +234,7 @@ export function PipelineContent() {
         onDragStart={(e) => setActiveId(e.active.id)}
         onDragEnd={handleDragEnd}
       >
-        <div className="flex gap-6 overflow-x-auto pb-4 custom-scrollbar">
+        <div className="kanban-scroll custom-scrollbar gap-4 sm:gap-6">
           {stages.map((stage) => (
             <PipelineColumn
               key={stage}
@@ -255,6 +256,6 @@ export function PipelineContent() {
           ) : null}
         </DragOverlay>
       </DndContext>
-    </div>
+    </PageContainer>
   );
 }

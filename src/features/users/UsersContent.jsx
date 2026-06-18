@@ -45,6 +45,7 @@ import { updateProfile } from '@/lib/auth';
 import { confirmDelete } from '@/lib/confirmDelete';
 import { PAGE_TITLES, STAGE_COLORS } from '@/config/crm';
 import { StitchPageHeader } from '@/components/stitch/StitchPageHeader';
+import { PageContainer } from '@/components/stitch/PageContainer';
 
 
 // Users Page
@@ -136,7 +137,7 @@ export function UsersContent() {
   ];
 
   return (
-    <div className="max-w-[1440px] mx-auto">
+    <PageContainer>
       <StitchPageHeader
         title="Usuarios"
         subtitle={`${users.length} ${users.length === 1 ? 'usuario' : 'usuarios'} · Equipo desde Supabase Auth + profiles`}
@@ -180,6 +181,6 @@ export function UsersContent() {
       ) : (
         <DataTable columns={columns} data={users} searchPlaceholder="Buscar usuarios..." pageName="users" />
       )}
-    </div>
+    </PageContainer>
   );
 }

@@ -21,6 +21,7 @@ import {
   buildLast6MonthsOrderTrend,
 } from '@/lib/crmMetrics';
 import { STAGE_COLORS } from '@/config/crm';
+import { PageContainer } from '@/components/stitch/PageContainer';
 
 const CHART_COLORS = ['#5f8bff', '#4ade80', '#fbbf24', '#a78bfa', '#f87171', '#38bdf8'];
 
@@ -191,14 +192,14 @@ export function DashboardContent() {
   const isEmpty = customers.length === 0 && leads.length === 0 && orders.length === 0;
 
   return (
-    <div className="max-w-[1440px] mx-auto space-y-4">
+    <PageContainer className="space-y-4">
       {isEmpty && (
         <div className="rounded-lg border border-stitch-warning/30 bg-stitch-warning/10 px-4 py-3 text-sm text-stitch-text">
           Todavía no hay datos cargados: las cifras de este panel salen de <strong>clientes, leads y pedidos</strong> en tu base. Creá registros desde las secciones del menú.
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         <KpiCard
           icon={DollarSign}
           label="Ventas (30d)"
@@ -265,9 +266,9 @@ export function DashboardContent() {
               ))}
             </div>
           </div>
-          <div className="p-4 h-72">
+          <div className="p-3 sm:p-4 chart-h-sm min-h-[13rem]">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={salesTrend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <AreaChart data={salesTrend} margin={{ top: 10, right: 4, left: -12, bottom: 0 }}>
                 <defs>
                   <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#5f8bff" stopOpacity={0.4} />
@@ -313,7 +314,7 @@ export function DashboardContent() {
               <h3 className="text-xs font-mono font-semibold text-stitch-text uppercase tracking-wider">Embudo</h3>
               <span className="text-xs text-stitch-muted">{Object.values(pipeline).flat().length} opps</span>
             </div>
-            <div className="p-4 h-48">
+            <div className="p-3 sm:p-4 chart-h-md min-h-[11rem]">
               {pieData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -350,7 +351,7 @@ export function DashboardContent() {
               <h3 className="text-xs font-mono font-semibold text-stitch-text uppercase tracking-wider">Conversión</h3>
               <Sparkles className="w-4 h-4 text-stitch-primary-bright" />
             </div>
-            <div className="p-4 h-36 flex items-center justify-center">
+            <div className="p-3 sm:p-4 h-32 sm:h-36 flex items-center justify-center">
               <ResponsiveContainer width="100%" height="100%">
                 <RadialBarChart
                   cx="50%"
@@ -384,7 +385,7 @@ export function DashboardContent() {
             <h3 className="font-semibold text-stitch-text">Etapas del embudo</h3>
             <p className="text-xs text-stitch-muted mt-0.5">Distribución por etapa</p>
           </div>
-          <div className="p-4 h-64">
+          <div className="p-3 sm:p-4 chart-h-md min-h-[11rem]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={pipelineSummary} layout="vertical" margin={{ left: 20, right: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" horizontal={false} />
@@ -438,8 +439,8 @@ export function DashboardContent() {
           <h3 className="font-semibold text-stitch-text">Actividad reciente</h3>
           <span className="text-[11px] font-mono text-stitch-muted uppercase">Últimos movimientos</span>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
+        <div className="overflow-x-auto overscroll-x-contain">
+          <table className="w-full min-w-[520px] text-left">
             <thead>
               <tr className="bg-[#05070a]">
                 <th className="p-3 text-[11px] font-mono text-stitch-muted uppercase tracking-wider border-b border-stitch-border">Cuenta</th>
@@ -482,6 +483,6 @@ export function DashboardContent() {
           </table>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

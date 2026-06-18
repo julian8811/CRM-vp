@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { 
   LayoutDashboard, Users, UserPlus, GitBranch, Package, 
   FileText, ShoppingCart, Zap, BarChart3, Brain, Headphones, 
-  Settings, Shield, ChevronLeft, ChevronRight, LogOut 
+  Settings, Shield, ChevronLeft, ChevronRight, LogOut, X 
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar } from '@/components/ui/Avatar';
@@ -38,19 +38,32 @@ function Sidebar({ currentPage, onNavigate, user, onLogout, mobileOpen, onCloseM
   return (
     <aside
       className={cn(
-        'h-screen flex-shrink-0 flex flex-col transition-[transform,width] duration-300 ease-out',
+        'h-dvh flex-shrink-0 flex flex-col transition-[transform,width] duration-300 ease-out safe-top',
         'bg-stitch-bg border-r border-stitch-border/20 text-stitch-muted',
-        'fixed inset-y-0 left-0 z-40 w-[260px] lg:relative lg:z-auto',
+        'fixed inset-y-0 left-0 z-40 w-[min(280px,88vw)] lg:relative lg:z-auto lg:w-[260px]',
         isCollapsed ? 'lg:w-[72px]' : 'lg:w-[260px]',
         mobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0 lg:shadow-none'
       )}
     >
-      <div className={cn('p-4 border-b border-stitch-border/10', isCollapsed && 'flex justify-center')}>
-        {isCollapsed ? (
-          <img src="/assets/stitch/logo.svg" alt="CRM-VP" className="w-9 h-9" />
-        ) : (
-          <CrmLogo size="md" />
-        )}
+      <div className={cn('p-3 sm:p-4 border-b border-stitch-border/10 flex items-center justify-between gap-2', isCollapsed && 'lg:justify-center')}>
+        <div className="min-w-0 flex-1">
+          {isCollapsed ? (
+            <img src="/assets/stitch/logo.svg" alt="CRM-VP" className="w-9 h-9 hidden lg:block" />
+          ) : (
+            <>
+              <CrmLogo size="sm" className="lg:hidden min-w-0" />
+              <CrmLogo size="md" className="hidden lg:flex min-w-0" />
+            </>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={onCloseMobile}
+          className="lg:hidden p-2 rounded-lg hover:bg-stitch-surface-elevated text-stitch-muted shrink-0"
+          aria-label="Cerrar menú"
+        >
+          <X className="w-5 h-5" />
+        </button>
       </div>
 
       <nav className="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto custom-scrollbar">

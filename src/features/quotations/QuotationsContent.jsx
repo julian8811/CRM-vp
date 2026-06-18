@@ -44,6 +44,7 @@ import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { updateProfile } from '@/lib/auth';
 import { confirmDelete } from '@/lib/confirmDelete';
 import { StitchPageHeader } from '@/components/stitch/StitchPageHeader';
+import { PageContainer } from '@/components/stitch/PageContainer';
 
 
 // Quotations Page
@@ -95,7 +96,7 @@ export function QuotationsContent() {
   ];
 
   return (
-    <div className="max-w-[1440px] mx-auto">
+    <PageContainer>
       <StitchPageHeader
         title="Cotizaciones"
         subtitle={`${quotations.length} cotizaciones`}
@@ -107,6 +108,6 @@ export function QuotationsContent() {
         }
       />
       <DataTable columns={columns} data={quotations} searchPlaceholder="Buscar cotizaciones..." pageName="quotations" />
-    </div>
+    </PageContainer>
   );
 }

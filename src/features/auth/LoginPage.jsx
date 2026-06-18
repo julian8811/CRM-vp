@@ -8,7 +8,7 @@ import { CrmLogo } from '@/components/brand/CrmLogo';
 
 function BrandPanel({ title, subtitle }) {
   return (
-    <div className="relative flex flex-1 items-center justify-center overflow-hidden p-6 sm:p-12 bg-stitch-gradient">
+    <div className="relative hidden lg:flex flex-1 items-center justify-center overflow-hidden p-6 sm:p-12 bg-stitch-gradient">
       <div className="absolute left-10 top-16 h-48 w-48 rounded-full bg-stitch-primary-bright/20 blur-3xl sm:left-20 sm:top-20" />
       <div className="absolute bottom-16 right-10 h-64 w-64 rounded-full bg-stitch-action/10 blur-3xl sm:bottom-20 sm:right-20" />
       <div className="relative z-10 max-w-md">
@@ -61,7 +61,7 @@ export function LoginPage() {
 
   if (!isConfigured) {
     return (
-      <div className="flex min-h-screen flex-col lg:flex-row">
+      <div className="flex min-h-dvh flex-col lg:flex-row">
         <BrandPanel
           title="Sistema CRM Innovador"
           subtitle="Gestiona tu ciclo comercial con inteligencia artificial."
@@ -86,7 +86,7 @@ export function LoginPage() {
 
   if (registerSuccess) {
     return (
-      <div className="flex min-h-screen flex-col lg:flex-row">
+      <div className="flex min-h-dvh flex-col lg:flex-row">
         <BrandPanel title="Sistema CRM Innovador" subtitle="Gestiona tu ciclo comercial." />
         <div className="flex w-full items-center justify-center bg-white p-8 dark:bg-stitch-surface sm:p-12 lg:w-[480px] lg:max-w-none lg:flex-shrink-0">
           <div className="w-full max-w-sm text-center">
@@ -107,15 +107,18 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col lg:flex-row">
+    <div className="flex min-h-dvh flex-col lg:flex-row">
       <BrandPanel
         title="Sistema CRM Innovador para Ventas"
         subtitle="Gestiona tu ciclo comercial con inteligencia artificial, automatización y analítica avanzada."
       />
 
-      <div className="flex w-full items-center justify-center bg-white p-6 dark:bg-stitch-surface sm:p-12 lg:w-[480px] lg:max-w-none lg:flex-shrink-0">
+      <div className="flex w-full items-center justify-center bg-white p-6 dark:bg-stitch-surface sm:p-12 lg:w-[480px] lg:max-w-none lg:flex-shrink-0 safe-bottom">
         <div className="w-full max-w-sm">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-stitch-text mb-1">
+          <div className="mb-6 flex justify-center lg:hidden">
+            <CrmLogo size="md" />
+          </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-stitch-text mb-1">
             {isRegistering ? 'Crear Cuenta' : 'Bienvenido'}
           </h2>
           <p className="text-stitch-muted mb-6">

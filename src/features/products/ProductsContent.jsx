@@ -44,6 +44,7 @@ import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { updateProfile } from '@/lib/auth';
 import { confirmDelete } from '@/lib/confirmDelete';
 import { StitchPageHeader } from '@/components/stitch/StitchPageHeader';
+import { PageContainer } from '@/components/stitch/PageContainer';
 
 
 // Products Page
@@ -53,7 +54,7 @@ export function ProductsContent() {
   const deleteProduct = useStore(state => state.deleteProduct);
 
   return (
-    <div className="max-w-[1440px] mx-auto">
+    <PageContainer>
       <StitchPageHeader
         title="Productos"
         subtitle={`${products.length} productos en catálogo`}
@@ -119,7 +120,7 @@ export function ProductsContent() {
           </Card>
         ))}
       </div>
-    </div>
+    </PageContainer>
   );
 }
 

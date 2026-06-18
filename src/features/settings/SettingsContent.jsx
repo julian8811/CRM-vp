@@ -45,6 +45,7 @@ import { updateProfile } from '@/lib/auth';
 import { confirmDelete } from '@/lib/confirmDelete';
 import { PAGE_TITLES, STAGE_COLORS } from '@/config/crm';
 import { StitchPageHeader } from '@/components/stitch/StitchPageHeader';
+import { PageContainer } from '@/components/stitch/PageContainer';
 
 
 // Settings Page
@@ -111,7 +112,7 @@ export function SettingsContent() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <PageContainer size="narrow">
       <StitchPageHeader
         title="Configuración"
         subtitle="Perfil y preferencias en Supabase (tabla user_preferences)."
@@ -216,6 +217,6 @@ export function SettingsContent() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </PageContainer>
   );
 }

@@ -44,6 +44,7 @@ import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { updateProfile } from '@/lib/auth';
 import { confirmDelete } from '@/lib/confirmDelete';
 import { StitchPageHeader } from '@/components/stitch/StitchPageHeader';
+import { PageContainer } from '@/components/stitch/PageContainer';
 
 
 // Customers Page
@@ -103,7 +104,7 @@ export function CustomersContent() {
   ];
 
   return (
-    <div className="max-w-[1440px] mx-auto">
+    <PageContainer>
       <StitchPageHeader
         title="Clientes"
         subtitle={`${customers.length} clientes registrados`}
@@ -115,6 +116,6 @@ export function CustomersContent() {
         }
       />
       <DataTable columns={columns} data={customers} searchPlaceholder="Buscar clientes..." pageName="customers" />
-    </div>
+    </PageContainer>
   );
 }
