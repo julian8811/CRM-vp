@@ -11,7 +11,7 @@
 | 1 | Variables `VITE_SUPABASE_*` en Vercel | ✅ Hecho | Login en producción OK |
 | 2 | Schema base + migraciones | ✅ Hecho | 7 migraciones aplicadas en `tgosnmvlvzaykiuolrot` |
 | 3 | Edge Functions desplegadas | ✅ Hecho | 6 functions desplegadas |
-| 4 | Secretos Supabase | ⚠️ Parcial | `OPENAI_API_KEY`, `SERVICE_ROLE` OK · `CRON_SECRET` configurado · faltan `META_*` y `RESEND_*` si los usás |
+| 4 | Secretos Supabase | ⚠️ Parcial | Configurar `GEMINI_API_KEY` · `SERVICE_ROLE` OK · `CRON_SECRET` OK · faltan `META_*` y `RESEND_*` |
 | 5 | Frontend en Vercel | ✅ Hecho | Merge PR #2 para Google OAuth + features nuevas |
 | 6 | Cron `run-automations` | ✅ Hecho | `pg_cron` job `crm-vp-run-automations` cada 15 min |
 | 7 | Webhook Meta | ⚠️ Manual | Requiere secretos Meta + callback en Developers |
@@ -28,7 +28,7 @@ Para ejecutar `npm run setup:production` de forma autónoma:
 | `SUPABASE_ACCESS_TOKEN` | [Account Tokens](https://supabase.com/dashboard/account/tokens) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Settings → API (solo servidor) |
 | `CRON_SECRET` | Generar: `openssl rand -hex 24` |
-| `OPENAI_API_KEY` | OpenAI platform |
+| `GEMINI_API_KEY` | [Google AI Studio](https://aistudio.google.com/apikey) (gratis) |
 | `RESEND_API_KEY` | Resend.com (emails, opcional) |
 | `META_*` | Meta Developers (opcional) |
 
@@ -88,7 +88,7 @@ npm run deploy:functions
 
 | Secreto | Requerido |
 |---------|-----------|
-| `OPENAI_API_KEY` | IA |
+| `GEMINI_API_KEY` | IA (chat) |
 | `SUPABASE_SERVICE_ROLE_KEY` | invite-user, run-automations |
 | `CRON_SECRET` | run-automations |
 | `META_VERIFY_TOKEN` | Webhook |

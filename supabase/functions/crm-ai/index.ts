@@ -5,6 +5,37 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const SYSTEM_PROMPT =
+  "Sos un asistente comercial breve y profesional para un CRM B2B en español. Respondé en máximo 3 párrafos cortos. No inventes datos numéricos del negocio; si faltan datos, pedí aclaración.";
+
+async function callGemini(apiKey: string, message: string) {
+  const model = Deno.env.get("GEMINI_MODEL") || "gemini-2.0-flash";
+  const url =
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+      contents: [{ role: "user", parts: [{ text: message }] }],
+      generationConfig: {
+        temperature: 0.5,
+        maxOutputTokens: 800,
+      },
+    }),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    return { ok: false as const, status: res.status, detail: errText };
+  }
+
+  const json = await res.json();
+  const reply = json.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "Sin respuesta.";
+  return { ok: true as const, reply };
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -45,50 +76,27 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    const apiKey = Deno.env.get("OPENAI_API_KEY");
+    const apiKey = Deno.env.get("GEMINI_API_KEY");
     if (!apiKey) {
       return new Response(
         JSON.stringify({
           reply:
-            "OPENAI_API_KEY no está configurada en los secretos de la Edge Function. Agregala en Supabase Dashboard → Edge Functions → Secrets.",
+            "GEMINI_API_KEY no está configurada. Creala en https://aistudio.google.com/apikey y agregala en Supabase → Edge Functions → Secrets.",
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    const systemPrompt =
-      "Sos un asistente comercial breve y profesional para un CRM B2B en español. Respondé en máximo 3 párrafos cortos. No inventes datos numéricos del negocio; si faltan datos, pedí aclaración.";
-
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: message },
-        ],
-        max_tokens: 800,
-        temperature: 0.5,
-      }),
-    });
-
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error("OpenAI error:", res.status, errText);
+    const result = await callGemini(apiKey, message);
+    if (!result.ok) {
+      console.error("Gemini error:", result.status, result.detail);
       return new Response(
-        JSON.stringify({ error: "Error al llamar al modelo", detail: errText.slice(0, 200) }),
+        JSON.stringify({ error: "Error al llamar a Gemini", detail: result.detail.slice(0, 200) }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    const json = await res.json();
-    const reply = json.choices?.[0]?.message?.content?.trim() || "Sin respuesta.";
-
-    return new Response(JSON.stringify({ reply }), {
+    return new Response(JSON.stringify({ reply: result.reply }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

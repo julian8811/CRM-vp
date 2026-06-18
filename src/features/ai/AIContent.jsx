@@ -101,7 +101,7 @@ export function AIContent() {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">IA Comercial</h2>
-          <p className="text-sm text-slate-500">Preferencia guardada en Supabase. Desplegá la Edge Function crm-ai y OPENAI_API_KEY en el proyecto.</p>
+          <p className="text-sm text-slate-500">Preferencia guardada en Supabase. Configurá GEMINI_API_KEY en Edge Functions → Secrets (gratis en Google AI Studio).</p>
         </div>
       </div>
 
