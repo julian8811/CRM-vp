@@ -1,12 +1,14 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import {
   DndContext,
   DragOverlay,
   closestCorners,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
+  useDroppable,
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -24,6 +26,8 @@ import { formatCurrency } from '@/lib/crmMetrics';
 import { confirmDelete } from '@/lib/confirmDelete';
 import { STAGE_COLORS } from '@/config/crm';
 import { PageContainer } from '@/components/stitch/PageContainer';
+
+const STAGES = ['lead', 'contact', 'qualification', 'proposal', 'negotiation', 'closed_won'];
 
 function probabilityStyle(p) {
   if (p >= 70) return 'text-stitch-success bg-stitch-success/10 border-stitch-success/20';
@@ -49,7 +53,7 @@ function OpportunityCard({ opp, stage, onDelete }) {
       style={style}
       {...attributes}
       {...listeners}
-      className="stitch-kanban-card group relative"
+      className="stitch-kanban-card group relative touch-none"
     >
       <button
         type="button"
@@ -65,7 +69,7 @@ function OpportunityCard({ opp, stage, onDelete }) {
       </button>
 
       <div className="flex items-start gap-2 pr-6">
-        <GripVertical className="w-4 h-4 text-stitch-muted opacity-0 group-hover:opacity-100 transition-opacity mt-0.5" />
+        <GripVertical className="w-4 h-4 text-stitch-muted opacity-0 group-hover:opacity-100 transition-opacity mt-0.5 shrink-0" />
         <div className="flex-1 min-w-0">
           <h4 className="font-semibold text-sm text-stitch-text mb-1 truncate">{opp.name}</h4>
           {opp.customer && (
@@ -98,7 +102,7 @@ function OpportunityCard({ opp, stage, onDelete }) {
 }
 
 function PipelineColumn({ stage, opps, onDeleteOpp }) {
-  const { setNodeRef, isOver } = useSortable({
+  const { setNodeRef, isOver } = useDroppable({
     id: stage,
     data: { type: 'column', stage },
   });
@@ -108,7 +112,7 @@ function PipelineColumn({ stage, opps, onDeleteOpp }) {
 
   return (
     <div className="stitch-kanban-col">
-      <div className={`flex justify-between items-center mb-4 px-1 transition-colors ${isOver ? 'opacity-90' : ''}`}>
+      <div className="flex justify-between items-center mb-4 px-1">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full" style={{ backgroundColor: STAGE_COLORS[stage] || '#5f8bff' }} />
           <h3 className="text-xs font-mono font-semibold text-stitch-text uppercase tracking-wider">{stageLabel}</h3>
@@ -118,24 +122,62 @@ function PipelineColumn({ stage, opps, onDeleteOpp }) {
         </div>
         <span className="text-xs font-mono text-stitch-muted">{formatCurrency(total)}</span>
       </div>
-      <div
-        ref={setNodeRef}
-        className={`flex-1 min-h-[280px] sm:min-h-[360px] md:min-h-[420px] rounded-lg p-2 space-y-3 transition-colors custom-scrollbar overflow-y-auto ${
-          isOver ? 'bg-stitch-primary-bright/5 ring-1 ring-stitch-primary-bright/30' : 'bg-stitch-surface-elevated/50'
-        }`}
-      >
-        <SortableContext items={opps.map((o) => o.id)} strategy={verticalListSortingStrategy}>
+      <SortableContext items={opps.map((o) => o.id)} strategy={verticalListSortingStrategy}>
+        <div
+          ref={setNodeRef}
+          className={`flex-1 min-h-[280px] sm:min-h-[360px] md:min-h-[420px] rounded-lg p-2 space-y-3 transition-colors custom-scrollbar overflow-y-auto ${
+            isOver ? 'bg-stitch-primary-bright/5 ring-1 ring-stitch-primary-bright/30' : 'bg-stitch-surface-elevated/50'
+          }`}
+        >
           {opps.length === 0 ? (
-            <div className="text-center py-12 text-sm text-stitch-muted font-mono">Sin oportunidades</div>
+            <div className="text-center py-12 text-sm text-stitch-muted font-mono pointer-events-none">Sin oportunidades</div>
           ) : (
             opps.map((opp) => (
               <OpportunityCard key={opp.id} opp={opp} stage={stage} onDelete={onDeleteOpp} />
             ))
           )}
-        </SortableContext>
-      </div>
+        </div>
+      </SortableContext>
     </div>
   );
+}
+
+function resolveTargetStage(over, pipeline, stages) {
+  if (!over) return null;
+
+  const overData = over.data.current;
+  if (overData?.type === 'column' && overData.stage) return overData.stage;
+  if (overData?.type === 'opportunity' && overData.stage) return overData.stage;
+  if (stages.includes(String(over.id))) return String(over.id);
+
+  for (const stage of stages) {
+    if ((pipeline[stage] || []).some((o) => o.id === over.id)) {
+      return stage;
+    }
+  }
+
+  return null;
+}
+
+function findActiveOpportunity(pipeline, activeId) {
+  if (!activeId) return null;
+  for (const stage of STAGES) {
+    const found = (pipeline[stage] || []).find((o) => o.id === activeId);
+    if (found) return { ...found, stage };
+  }
+  return null;
+}
+
+function computePipelineTotals(pipeline) {
+  let count = 0;
+  let value = 0;
+  STAGES.forEach((s) => {
+    (pipeline[s] || []).forEach((o) => {
+      count += 1;
+      value += o.value || 0;
+    });
+  });
+  return { count, value };
 }
 
 export function PipelineContent() {
@@ -152,65 +194,31 @@ export function PipelineContent() {
     [deleteOpportunity]
   );
 
-  const stages = useMemo(
-    () => ['lead', 'contact', 'qualification', 'proposal', 'negotiation', 'closed_won'],
-    []
-  );
-
   const [activeId, setActiveId] = useState(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 120, tolerance: 6 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
-  const activeOppData = (() => {
-    if (!activeId) return null;
-    for (const stage of stages) {
-      const found = (pipeline[stage] || []).find((o) => o.id === activeId);
-      if (found) return { ...found, stage };
-    }
-    return null;
-  })();
+  const activeOppData = findActiveOpportunity(pipeline, activeId);
+  const totalPipeline = computePipelineTotals(pipeline);
 
-  const totalPipeline = (() => {
-    let count = 0;
-    let value = 0;
-    stages.forEach((s) => {
-      (pipeline[s] || []).forEach((o) => {
-        count += 1;
-        value += o.value || 0;
-      });
-    });
-    return { count, value };
-  })();
-
-  const handleDragEnd = (event) => {
+  const handleDragEnd = async (event) => {
     const { active, over } = event;
-    if (!over) {
-      setActiveId(null);
-      return;
-    }
-
-    const activeData = active.data.current;
-    const overData = over.data.current;
-    let fromStage = activeData?.stage;
-    let toStage = overData?.stage;
-
-    if (!toStage && overData?.type === 'opportunity') {
-      for (const stage of stages) {
-        if ((pipeline[stage] || []).some((o) => o.id === over.id)) {
-          toStage = stage;
-          break;
-        }
-      }
-    }
-    if (overData?.type === 'column') toStage = overData.stage;
-
-    if (fromStage && toStage && fromStage !== toStage) {
-      movePipelineOpportunity(active.id, fromStage, toStage);
-    }
     setActiveId(null);
+    if (!over) return;
+
+    const fromStage = active.data.current?.stage;
+    const toStage = resolveTargetStage(over, pipeline, STAGES);
+
+    if (!fromStage || !toStage || fromStage === toStage) return;
+
+    const result = await movePipelineOpportunity(active.id, fromStage, toStage);
+    if (result?.ok === false && result.error && typeof window !== 'undefined') {
+      window.alert(result.error);
+    }
   };
 
   return (
@@ -233,9 +241,10 @@ export function PipelineContent() {
         collisionDetection={closestCorners}
         onDragStart={(e) => setActiveId(e.active.id)}
         onDragEnd={handleDragEnd}
+        onDragCancel={() => setActiveId(null)}
       >
         <div className="kanban-scroll custom-scrollbar gap-4 sm:gap-6">
-          {stages.map((stage) => (
+          {STAGES.map((stage) => (
             <PipelineColumn
               key={stage}
               stage={stage}
@@ -246,7 +255,7 @@ export function PipelineContent() {
         </div>
         <DragOverlay dropAnimation={null}>
           {activeOppData ? (
-            <div className="stitch-kanban-card w-72 shadow-glow opacity-95">
+            <div className="stitch-kanban-card w-72 shadow-glow opacity-95 cursor-grabbing">
               <div className="font-semibold text-sm text-stitch-text mb-1">{activeOppData.name}</div>
               <div className="flex justify-between text-xs font-mono text-stitch-muted">
                 <span>{formatCurrency(activeOppData.value)}</span>
