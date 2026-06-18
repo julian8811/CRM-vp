@@ -32,6 +32,9 @@ export const useStore = create((set, get) => ({
   crmConversations: [],
   crmMessagesByConversation: {},
 
+  teamProfiles: [],
+  teamProfilesLoading: false,
+
   // ============================================
   // LOADING STATES
   // ============================================
@@ -985,5 +988,35 @@ export const useStore = create((set, get) => ({
     if (!isApiReady()) return [];
     const result = await api.search.crm(q);
     return result.success ? result.data : [];
-  }
+  },
+
+  fetchTeamProfiles: async () => {
+    const { isApiReady } = get();
+    if (!isApiReady()) return;
+
+    set({ teamProfilesLoading: true });
+    try {
+      const result = await api.profiles.getTeam();
+      if (result.success) {
+        set({ teamProfiles: result.data });
+      }
+    } catch (err) {
+      console.error('Error fetching team profiles:', err);
+    } finally {
+      set({ teamProfilesLoading: false });
+    }
+  },
+
+  updateTeamMemberRole: async (userId, role) => {
+    const { isApiReady, teamProfiles } = get();
+    if (!isApiReady()) return { success: false };
+
+    const result = await api.profiles.updateRole(userId, role);
+    if (result.success) {
+      set({
+        teamProfiles: teamProfiles.map((p) => (p.id === userId ? { ...p, role: result.data.role } : p)),
+      });
+    }
+    return result;
+  },
 }));

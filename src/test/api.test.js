@@ -43,19 +43,6 @@ const mockProduct = {
   price: 100,
 };
 
-// Helper to build mock query chain
-const buildMockQuery = (data, error = null) => ({
-  select: vi.fn().mockReturnThis(),
-  order: vi.fn().mockReturnThis(),
-  eq: vi.fn().mockReturnThis(),
-  single: vi.fn().mockResolvedValue({ data, error }),
-  maybeSingle: vi.fn().mockResolvedValue({ data, error }),
-  update: vi.fn().mockReturnThis(),
-  insert: vi.fn().mockReturnThis(),
-  delete: vi.fn().mockReturnThis(),
-  then: vi.fn((res) => Promise.resolve(res({ data, error }))),
-});
-
 describe('api.js - Customers', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -516,6 +503,26 @@ describe('api.js - Search', () => {
 
     expect(result.success).toBe(true);
     expect(result.data).toEqual([]);
+  });
+});
+
+describe('api.js - Profiles', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockRpc.mockReset();
+  });
+
+  it('profiles.getTeam calls get_team_profiles rpc', async () => {
+    const mockTeam = [
+      { id: 'u-1', first_name: 'Ana', last_name: 'López', role: 'admin', email: 'ana@test.com' },
+    ];
+    mockRpc.mockResolvedValue({ data: mockTeam, error: null });
+
+    const result = await api.profiles.getTeam();
+
+    expect(mockRpc).toHaveBeenCalledWith('get_team_profiles');
+    expect(result.success).toBe(true);
+    expect(result.data).toEqual(mockTeam);
   });
 });
 
