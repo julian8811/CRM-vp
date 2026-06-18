@@ -102,7 +102,7 @@ export function LeadsContent() {
   return (
     <PageContainer>
       <StitchPageHeader
-        title="Dirige"
+        title="Leads"
         subtitle={`Gestión de prospectos · ${leads.length} registros`}
         actions={
           <Button type="button" onClick={() => openModal('lead')} className="w-full justify-center sm:w-auto">

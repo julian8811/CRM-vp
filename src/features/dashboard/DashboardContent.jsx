@@ -74,7 +74,7 @@ function KpiCard({ icon: Icon, label, value, trend, sparkData, sparkColor }) {
 function ChartTooltip({ active, payload, label, formatter }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-stitch-border bg-[#111827] px-3 py-2 shadow-xl">
+    <div className="rounded-lg border border-stitch-border bg-stitch-surface px-3 py-2 shadow-xl">
       <p className="text-[11px] font-mono text-stitch-muted mb-1">{label}</p>
       {payload.map((p) => (
         <p key={p.dataKey} className="text-sm font-semibold text-stitch-text">
@@ -435,14 +435,14 @@ export function DashboardContent() {
       </div>
 
       <div className="stitch-panel overflow-hidden">
-        <div className="p-4 border-b border-stitch-border flex justify-between items-center bg-[#0a0e14]/50">
+        <div className="p-4 border-b border-stitch-border flex justify-between items-center bg-stitch-surface-elevated/60">
           <h3 className="font-semibold text-stitch-text">Actividad reciente</h3>
           <span className="text-[11px] font-mono text-stitch-muted uppercase">Últimos movimientos</span>
         </div>
         <div className="overflow-x-auto overscroll-x-contain">
           <table className="w-full min-w-[520px] text-left">
             <thead>
-              <tr className="bg-[#05070a]">
+              <tr className="bg-stitch-surface-elevated">
                 <th className="p-3 text-[11px] font-mono text-stitch-muted uppercase tracking-wider border-b border-stitch-border">Cuenta</th>
                 <th className="p-3 text-[11px] font-mono text-stitch-muted uppercase tracking-wider border-b border-stitch-border">Tipo</th>
                 <th className="p-3 text-[11px] font-mono text-stitch-muted uppercase tracking-wider border-b border-stitch-border">Valor</th>

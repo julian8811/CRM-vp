@@ -168,7 +168,7 @@ export function MetaContent() {
             <p className="mt-1 text-sm text-stitch-muted">
               Usá esta URL como callback en Meta Developers y el secreto <code className="text-xs font-mono">META_VERIFY_TOKEN</code> como verify token.
             </p>
-            <code className="mt-2 block break-all rounded-lg bg-[#05070a] border border-stitch-border/40 px-3 py-2 text-xs text-stitch-text font-mono">
+            <code className="mt-2 block break-all rounded-lg bg-stitch-surface-elevated border border-stitch-border/40 px-3 py-2 text-xs text-stitch-text font-mono">
               {webhookUrl}
             </code>
           </div>

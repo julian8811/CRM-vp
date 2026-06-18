@@ -1,6 +1,23 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const ThemeContext = createContext();
+
+const THEME_COLORS = {
+  dark: '#031427',
+  light: '#f1f5f9',
+};
+
+function applyTheme(theme) {
+  const root = window.document.documentElement;
+  const isDark = theme === 'dark';
+  root.classList.toggle('dark', isDark);
+  localStorage.setItem('theme', theme);
+
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) {
+    meta.setAttribute('content', THEME_COLORS[theme] || THEME_COLORS.dark);
+  }
+}
 
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
@@ -11,19 +28,15 @@ export function ThemeProvider({ children }) {
   });
 
   useEffect(() => {
-    const root = window.document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-    localStorage.setItem('theme', theme);
+    applyTheme(theme);
   }, [theme]);
 
-  const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  const toggleTheme = useCallback(() => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  }, []);
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   );

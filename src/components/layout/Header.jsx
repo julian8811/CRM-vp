@@ -82,7 +82,7 @@ function Header({ user, title, subtitle, onNavigate, onCommandPalette, onOpenMob
     'p-2 rounded-lg text-stitch-muted hover:bg-stitch-surface-elevated hover:text-stitch-text transition-colors shrink-0';
 
   return (
-    <header className="sticky top-0 z-30 shrink-0 bg-white/90 dark:bg-stitch-bg/90 backdrop-blur-xl border-b border-slate-100 dark:border-stitch-border/20 safe-top">
+    <header className="sticky top-0 z-30 shrink-0 bg-stitch-surface/90 backdrop-blur-xl border-b border-stitch-border/30 safe-top">
       <div className="flex flex-col gap-2 px-3 py-2 sm:px-4 sm:py-2 md:px-6 md:min-h-16 md:flex-row md:items-center md:justify-between md:gap-4">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           {onOpenMobileNav && (
@@ -96,11 +96,11 @@ function Header({ user, title, subtitle, onNavigate, onCommandPalette, onOpenMob
             </button>
           )}
           <div className="min-w-0 flex-1">
-            <h1 className="text-base sm:text-lg md:text-xl font-bold text-slate-900 dark:text-stitch-text truncate">
+            <h1 className="text-base sm:text-lg md:text-xl font-bold text-stitch-text truncate">
               {title}
             </h1>
             {subtitle && (
-              <p className="text-[11px] sm:text-xs md:text-sm text-slate-500 dark:text-stitch-muted line-clamp-1 sm:line-clamp-2 md:line-clamp-1 truncate">
+              <p className="text-[11px] sm:text-xs md:text-sm text-stitch-muted line-clamp-1 sm:line-clamp-2 md:line-clamp-1 truncate">
                 {subtitle}
               </p>
             )}
@@ -216,7 +216,7 @@ function Header({ user, title, subtitle, onNavigate, onCommandPalette, onOpenMob
             )}
           </div>
 
-          <button type="button" onClick={toggleTheme} className={iconBtn} aria-label="Cambiar tema">
+          <button type="button" onClick={toggleTheme} className={iconBtn} aria-label={theme === 'dark' ? 'Activar tema claro' : 'Activar tema oscuro'} title={theme === 'dark' ? 'Tema claro' : 'Tema oscuro'}>
             {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
 

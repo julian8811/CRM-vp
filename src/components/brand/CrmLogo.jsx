@@ -17,7 +17,7 @@ function CrmLogo({ size = 'md', showText = true, className }) {
       />
       {showText && (
         <div className="min-w-0">
-          <div className={cn(s.title, 'font-bold text-white tracking-tight leading-tight')}>
+          <div className={cn(s.title, 'font-bold text-stitch-text tracking-tight leading-tight')}>
             CRM-VP
           </div>
           <div className={cn(s.subtitle, 'font-mono uppercase tracking-wider text-stitch-muted')}>

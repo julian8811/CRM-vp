@@ -4,7 +4,7 @@ import { BarChart, Bar, ResponsiveContainer } from 'recharts';
 export function StitchChartTooltip({ active, payload, label, formatter }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-stitch-border bg-[#111827] px-3 py-2 shadow-xl">
+    <div className="rounded-lg border border-stitch-border bg-stitch-surface px-3 py-2 shadow-xl">
       {label && <p className="text-[11px] font-mono text-stitch-muted mb-1">{label}</p>}
       {payload.map((p) => (
         <p key={p.dataKey} className="text-sm font-semibold text-stitch-text">
@@ -71,7 +71,7 @@ export function StitchKpiCard({ icon, label, value, trend, sparkData, sparkColor
 
 export function StitchPeriodPills({ value, onChange, options }) {
   return (
-    <div className="flex items-center bg-[#05070a] border border-stitch-border/30 rounded p-1 w-max max-w-full shrink-0">
+    <div className="flex items-center bg-stitch-surface-elevated border border-stitch-border/30 rounded p-1 w-max max-w-full shrink-0">
       {options.map((opt) => (
         <button
           key={opt.id}

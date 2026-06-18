@@ -121,7 +121,7 @@ function PipelineColumn({ stage, opps, onDeleteOpp }) {
       <div
         ref={setNodeRef}
         className={`flex-1 min-h-[280px] sm:min-h-[360px] md:min-h-[420px] rounded-lg p-2 space-y-3 transition-colors custom-scrollbar overflow-y-auto ${
-          isOver ? 'bg-stitch-primary-bright/5 ring-1 ring-stitch-primary-bright/30' : 'bg-[#05070a]/50'
+          isOver ? 'bg-stitch-primary-bright/5 ring-1 ring-stitch-primary-bright/30' : 'bg-stitch-surface-elevated/50'
         }`}
       >
         <SortableContext items={opps.map((o) => o.id)} strategy={verticalListSortingStrategy}>

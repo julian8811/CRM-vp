@@ -1,30 +1,32 @@
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-primary: #1B3A5C;
   --color-primary-light: #2E75B6;
   --color-primary-dark: #0f2035;
   --color-accent: #3b82f6;
 
-  --color-stitch-bg: #031427;
-  --color-stitch-surface: #111827;
-  --color-stitch-surface-elevated: #1b2b3f;
-  --color-stitch-border: #1e293b;
-  --color-stitch-primary: #b3c5ff;
-  --color-stitch-primary-bright: #5f8bff;
-  --color-stitch-action: #3B82F6;
-  --color-stitch-text: #d3e4fe;
-  --color-stitch-muted: #8c90a1;
-  --color-stitch-success: #4ade80;
-  --color-stitch-warning: #fbbf24;
-  --color-stitch-danger: #f87171;
+  --color-stitch-bg: #f1f5f9;
+  --color-stitch-surface: #ffffff;
+  --color-stitch-surface-elevated: #f8fafc;
+  --color-stitch-border: #e2e8f0;
+  --color-stitch-primary: #1B3A5C;
+  --color-stitch-primary-bright: #2E75B6;
+  --color-stitch-action: #2563eb;
+  --color-stitch-text: #0f172a;
+  --color-stitch-muted: #64748b;
+  --color-stitch-success: #16a34a;
+  --color-stitch-warning: #d97706;
+  --color-stitch-danger: #dc2626;
 
   --font-sans: Geist, Inter, system-ui, sans-serif;
   --font-mono: JetBrains Mono, ui-monospace, monospace;
 
-  --shadow-glow: 0 0 20px rgba(95, 139, 255, 0.25);
-  --background-image-stitch-gradient: linear-gradient(135deg, #031427 0%, #0f2035 50%, #1B3A5C 100%);
+  --shadow-glow: 0 0 20px rgba(46, 117, 182, 0.12);
+  --background-image-stitch-gradient: linear-gradient(135deg, #1B3A5C 0%, #2E75B6 50%, #3b82f6 100%);
 }
 
 @layer base {
@@ -34,12 +36,30 @@
   }
 
   body {
-    @apply bg-slate-50 text-slate-900 font-sans antialiased overflow-x-hidden;
+    @apply bg-stitch-bg text-stitch-text font-sans antialiased overflow-x-hidden;
     min-height: 100dvh;
   }
-  
-  .dark body {
-    @apply bg-stitch-bg text-stitch-text;
+
+  .dark {
+    color-scheme: dark;
+    --color-stitch-bg: #031427;
+    --color-stitch-surface: #111827;
+    --color-stitch-surface-elevated: #1b2b3f;
+    --color-stitch-border: #1e293b;
+    --color-stitch-primary: #b3c5ff;
+    --color-stitch-primary-bright: #5f8bff;
+    --color-stitch-action: #3B82F6;
+    --color-stitch-text: #d3e4fe;
+    --color-stitch-muted: #8c90a1;
+    --color-stitch-success: #4ade80;
+    --color-stitch-warning: #fbbf24;
+    --color-stitch-danger: #f87171;
+    --shadow-glow: 0 0 20px rgba(95, 139, 255, 0.25);
+    --background-image-stitch-gradient: linear-gradient(135deg, #031427 0%, #0f2035 50%, #1B3A5C 100%);
+  }
+
+  :root:not(.dark) {
+    color-scheme: light;
   }
 
   #root {
@@ -66,21 +86,24 @@
 
   .stitch-kpi {
     @apply relative overflow-hidden rounded-lg border border-stitch-border bg-stitch-surface/80 backdrop-blur-md p-4
-           dark:bg-[#111827]/80 dark:border-[#1e293b]
            transition-all duration-300 hover:border-stitch-primary-bright/30;
     box-shadow: var(--shadow-glow);
   }
 
   .stitch-kpi:hover {
-    box-shadow: 0 0 20px rgba(95, 139, 255, 0.25);
+    box-shadow: var(--shadow-glow);
   }
 
   .stitch-panel {
-    @apply rounded-lg border border-stitch-border bg-stitch-surface dark:bg-[#111827] dark:border-[#1e293b];
+    @apply rounded-lg border border-stitch-border bg-stitch-surface;
   }
 
   .stitch-nav-active {
-    @apply bg-[#3f465c] text-stitch-primary rounded-lg;
+    @apply bg-stitch-surface-elevated text-stitch-primary-bright rounded-lg;
+  }
+
+  .dark .stitch-nav-active {
+    @apply bg-[#3f465c] text-stitch-primary;
   }
 
   .stitch-kanban-col {
@@ -147,7 +170,8 @@
     background: transparent;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #424655;
+    background: var(--color-stitch-muted);
     border-radius: 3px;
+    opacity: 0.5;
   }
 }

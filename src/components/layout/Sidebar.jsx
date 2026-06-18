@@ -11,7 +11,7 @@ import { CrmLogo } from '@/components/brand/CrmLogo';
 const NAV_ITEMS = [
   { key: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { key: 'customers', icon: Users, label: 'Clientes' },
-  { key: 'leads', icon: UserPlus, label: 'Dirige' },
+  { key: 'leads', icon: UserPlus, label: 'Leads' },
   { key: 'pipeline', icon: GitBranch, label: 'Embudo' },
   { key: 'products', icon: Package, label: 'Productos' },
   { key: 'quotations', icon: FileText, label: 'Cotizaciones' },

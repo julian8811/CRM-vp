@@ -57,7 +57,7 @@ function DataTable({
 
   return (
     <div className="stitch-panel overflow-hidden">
-      <div className="p-3 sm:p-4 border-b border-stitch-border flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between bg-[#0a0e14]/30">
+      <div className="p-3 sm:p-4 border-b border-stitch-border flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between bg-stitch-surface-elevated/50">
         <div className="relative w-full sm:max-w-xs sm:flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stitch-muted" />
           <Input
@@ -79,7 +79,7 @@ function DataTable({
       <div className="overflow-x-auto -mx-px overscroll-x-contain">
         <table className="w-full min-w-[520px] sm:min-w-[640px]">
           <thead>
-            <tr className="bg-[#05070a] border-b border-stitch-border">
+            <tr className="bg-stitch-surface-elevated border-b border-stitch-border">
               {columns.map((col) => (
                 <th
                   key={col.key}

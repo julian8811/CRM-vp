@@ -1,7 +1,7 @@
 const PAGE_TITLES = {
   dashboard: { title: 'Dashboard', subtitle: 'Resumen de tu gestión comercial' },
   customers: { title: 'Clientes', subtitle: 'Gestión de clientes' },
-  leads: { title: 'Dirige', subtitle: 'Gestión de prospectos' },
+  leads: { title: 'Leads', subtitle: 'Gestión de prospectos' },
   pipeline: { title: 'Embudo de Ventas', subtitle: 'Pipeline de oportunidades' },
   products: { title: 'Productos', subtitle: 'Catálogo de productos' },
   quotations: { title: 'Cotizaciones', subtitle: 'Gestión de cotizaciones' },

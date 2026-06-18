@@ -238,7 +238,7 @@ export function AIContent() {
                 value={aiInput}
                 onChange={(e) => setAiInput(e.target.value)}
                 placeholder="Escribí una pregunta o comando…"
-                className="flex-1 bg-[#05070a] border-stitch-border/40 text-stitch-text pr-12"
+                className="flex-1 bg-stitch-surface-elevated border-stitch-border/40 text-stitch-text pr-12"
                 disabled={!assistantOn || aiLoading}
               />
               <Button

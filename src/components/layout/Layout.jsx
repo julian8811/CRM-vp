@@ -27,7 +27,7 @@ function Layout({ children, currentPage, onNavigate, user, onLogout, title, subt
   }, [mobileNavOpen]);
 
   return (
-    <div className="flex h-dvh min-h-dvh max-h-dvh bg-slate-50 dark:bg-stitch-bg overflow-hidden">
+    <div className="flex h-dvh min-h-dvh max-h-dvh bg-stitch-bg overflow-hidden">
       {mobileNavOpen && (
         <button
           type="button"
@@ -53,7 +53,7 @@ function Layout({ children, currentPage, onNavigate, user, onLogout, title, subt
           onCommandPalette={() => setCommandPaletteOpen(true)}
           onOpenMobileNav={() => setMobileNavOpen(true)}
         />
-        <main className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-4 md:p-6 custom-scrollbar dark:bg-stitch-bg safe-bottom">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-4 md:p-6 custom-scrollbar bg-stitch-bg safe-bottom">
           {children}
         </main>
       </div>
