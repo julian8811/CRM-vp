@@ -1,32 +1,12 @@
-import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import {
-  DndContext,
-  DragOverlay,
-  closestCorners,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
+  BarChart3, Users, Target, FileText, DollarSign, PieChart as PieChartIcon, Download,
+} from 'lucide-react';
 import {
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-  useSortable,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { useAuth } from '@/contexts/AuthContext';
-import { useCrmModal } from '@/contexts/CrmModalContext';
-import { Layout } from '@/components/layout/Layout';
+  AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
+} from 'recharts';
 import { Button } from '@/components/ui/Button';
-import { Card, CardContent } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { Avatar } from '@/components/ui/Avatar';
-import { DataTable } from '@/components/ui/DataTable';
-import { Input } from '@/components/ui/Input';
-import { Label } from '@/components/ui/Label';
-import { Loader2, Plus, TrendingUp, DollarSign, Users, Target, ShoppingCart, GripVertical, MapPin, Building2, Mail, Phone, Edit2, Trash2, ArrowRightCircle, Package, AlertTriangle, FileText, Clock, CheckCircle, XCircle, Send, BarChart3, PieChart, Activity, Zap, Settings, UserPlus, Wrench, Headphones, Download, Filter, Eye, FileDown, Calendar, RefreshCw, Copy, Check, X, ChevronRight, Sparkles, Bot, Lightbulb, TrendingDown, UsersRound, Receipt, CreditCard, FileCheck, Workflow, Play, Pause, Clock3, Bell } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useStore } from '@/store/useStore';
 import {
   formatCurrency,
@@ -39,43 +19,66 @@ import {
   countEntities,
 } from '@/lib/crmMetrics';
 import { exportWorkbook } from '@/lib/exportExcel';
-import { invokeCrmAi } from '@/lib/crmAi';
-import { isSupabaseConfigured, supabase } from '@/lib/supabase';
-import { updateProfile } from '@/lib/auth';
-import { confirmDelete } from '@/lib/confirmDelete';
-import { PAGE_TITLES, STAGE_COLORS } from '@/config/crm';
+import {
+  StitchKpiCard,
+  StitchChartTooltip,
+  StitchPeriodPills,
+} from '@/components/stitch/StitchChart';
 
+const CHART_COLORS = ['#5f8bff', '#4ade80', '#fbbf24', '#a78bfa', '#f87171', '#38bdf8'];
 
-// Reports Page
+const PERIOD_OPTIONS = [
+  { id: '7d', label: '7D' },
+  { id: '30d', label: '30D' },
+  { id: '90d', label: '90D' },
+  { id: 'all', label: 'TODO' },
+];
+
+function pctChange(curr, prev) {
+  if (!prev) return curr > 0 ? 100 : 0;
+  return Math.round(((curr - prev) / prev) * 100);
+}
+
 export function ReportsContent() {
   const [filterPreset, setFilterPreset] = useState('30d');
-  const [filterOpen, setFilterOpen] = useState(false);
-  const filterRootRef = useRef(null);
   const range = useMemo(() => getRangeFromPreset(filterPreset), [filterPreset]);
-
-  useEffect(() => {
-    if (!filterOpen) return;
-    const onDown = (e) => {
-      if (filterRootRef.current && !filterRootRef.current.contains(e.target)) {
-        setFilterOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', onDown);
-    return () => document.removeEventListener('mousedown', onDown);
-  }, [filterOpen]);
+  const prevRange = useMemo(() => {
+    if (filterPreset === 'all') return null;
+    const days = filterPreset === '7d' ? 7 : filterPreset === '30d' ? 30 : 90;
+    const end = new Date(range.from);
+    end.setMilliseconds(-1);
+    const start = new Date(end);
+    start.setDate(start.getDate() - days);
+    start.setHours(0, 0, 0, 0);
+    return { from: start, to: end };
+  }, [filterPreset, range]);
 
   const customers = useStore((s) => s.customers);
   const leads = useStore((s) => s.leads);
   const orders = useStore((s) => s.orders);
   const quotations = useStore((s) => s.quotations);
-  const pipeline = useStore((s) => s.pipeline) || {};
+  const pipeline = useStore((s) => s.pipeline) ?? {};
 
   const salesInRange = useMemo(() => sumOrdersTotal(orders, range), [orders, range]);
+  const salesPrev = useMemo(
+    () => (prevRange ? sumOrdersTotal(orders, prevRange) : 0),
+    [orders, prevRange]
+  );
   const customersInRange = useMemo(() => countEntities(customers, range), [customers, range]);
+  const customersPrev = useMemo(
+    () => (prevRange ? countEntities(customers, prevRange) : 0),
+    [customers, prevRange]
+  );
   const leadsInRange = useMemo(() => countEntities(leads, range), [leads, range]);
+  const leadsPrev = useMemo(
+    () => (prevRange ? countEntities(leads, prevRange) : 0),
+    [leads, prevRange]
+  );
   const quotesInRange = useMemo(() => countEntities(quotations, range), [quotations, range]);
   const pt = useMemo(() => pipelineTotals(pipeline), [pipeline]);
   const funnelRows = useMemo(() => buildFunnelRows(leads, pipeline), [leads, pipeline]);
+  const salesTrend = useMemo(() => buildLast6MonthsOrderTrend(orders), [orders]);
+  const sparkData = salesTrend.map((d) => ({ v: d.amount || 0 }));
 
   const ordersInRange = useMemo(
     () => (orders || []).filter((o) => isInRange(o.created_at, range.from, range.to)),
@@ -83,14 +86,19 @@ export function ReportsContent() {
   );
   const avgTicket = ordersInRange.length ? salesInRange / ordersInRange.length : 0;
 
-  const reportCards = [
-    { title: 'Ventas (periodo)', icon: BarChart3, color: 'blue', value: formatCurrency(salesInRange), sub: filterPreset },
-    { title: 'Clientes nuevos (periodo)', icon: Users, color: 'green', value: String(customersInRange), sub: filterPreset },
-    { title: 'Leads (periodo)', icon: Target, color: 'purple', value: String(leadsInRange), sub: filterPreset },
-    { title: 'Cotizaciones (periodo)', icon: FileText, color: 'amber', value: String(quotesInRange), sub: filterPreset },
-    { title: 'Ticket promedio', icon: DollarSign, color: 'emerald', value: formatCurrency(avgTicket), sub: 'pedidos en periodo' },
-    { title: 'Valor pipeline', icon: PieChart, color: 'indigo', value: formatCurrency(pt.value), sub: `${pt.count} op.` },
-  ];
+  const leadStatusData = useMemo(() => {
+    const counts = { new: 0, contacted: 0, qualified: 0, converted: 0, lost: 0 };
+    (leads || []).forEach((l) => {
+      if (counts[l.status] !== undefined) counts[l.status] += 1;
+    });
+    return Object.entries(counts)
+      .filter(([, c]) => c > 0)
+      .map(([status, count], i) => ({
+        name: status,
+        count,
+        fill: CHART_COLORS[i % CHART_COLORS.length],
+      }));
+  }, [leads]);
 
   const handleExport = useCallback(() => {
     const summary = [
@@ -124,107 +132,217 @@ export function ReportsContent() {
   }, [salesInRange, customersInRange, leadsInRange, quotesInRange, filterPreset, pt, funnelRows]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
+    <div className="max-w-[1440px] mx-auto space-y-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Reportes</h2>
-          <p className="text-sm text-slate-500">Métricas calculadas desde tus datos (no son cifras de demostración).</p>
+          <h2 className="text-2xl font-bold text-stitch-text tracking-tight">Reportes y Analítica</h2>
+          <p className="text-sm text-stitch-muted mt-1">
+            Métricas en tiempo real calculadas desde tus datos.
+          </p>
         </div>
-        <div className="flex flex-wrap gap-2 items-center relative">
-          <div className="relative z-50" ref={filterRootRef} data-reports-filter-root>
-            <Button type="button" variant="outline" onClick={() => setFilterOpen((v) => !v)}>
-              <Filter className="w-4 h-4" />
-              Periodo: {filterPreset === '7d' ? '7 días' : filterPreset === '30d' ? '30 días' : filterPreset === '90d' ? '90 días' : 'Todo'}
-            </Button>
-            {filterOpen && (
-              <div className="absolute left-0 right-0 top-full z-[100] mt-1 min-w-[200px] rounded-lg border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-600 dark:bg-slate-800 sm:left-auto sm:right-0">
-                {[
-                  { id: '7d', label: 'Últimos 7 días' },
-                  { id: '30d', label: 'Últimos 30 días' },
-                  { id: '90d', label: 'Últimos 90 días' },
-                  { id: 'all', label: 'Todo el historial' },
-                ].map((opt) => (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    className="w-full text-left px-3 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-700"
-                    onClick={() => {
-                      setFilterPreset(opt.id);
-                      setFilterOpen(false);
-                    }}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-          <Button type="button" variant="outline" onClick={handleExport}>
+        <div className="flex flex-wrap items-center gap-3">
+          <StitchPeriodPills value={filterPreset} onChange={setFilterPreset} options={PERIOD_OPTIONS} />
+          <Button type="button" variant="outline" onClick={handleExport} className="border-stitch-border text-stitch-text hover:bg-stitch-surface-elevated">
             <Download className="w-4 h-4" />
-            Exportar Excel
+            Exportar
           </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {reportCards.map((report, idx) => (
-          <Card key={idx} hover>
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-3">
-                <div className={`p-2 rounded-xl bg-${report.color}-500/10`}>
-                  <report.icon className={`w-5 h-5 text-${report.color}-500`} />
-                </div>
-              </div>
-              <div className="text-2xl font-bold text-slate-900 dark:text-white">{report.value}</div>
-              <div className="text-sm text-slate-500">{report.title}</div>
-              <div className="text-xs text-slate-400 mt-1">{report.sub}</div>
-            </CardContent>
-          </Card>
-        ))}
+        <StitchKpiCard
+          icon={BarChart3}
+          label="Ventas (periodo)"
+          value={formatCurrency(salesInRange)}
+          trend={prevRange ? pctChange(salesInRange, salesPrev) : null}
+          sparkData={sparkData}
+          sparkColor="#5f8bff"
+          largeIcon
+        />
+        <StitchKpiCard
+          icon={Users}
+          label="Clientes nuevos"
+          value={String(customersInRange)}
+          trend={prevRange ? pctChange(customersInRange, customersPrev) : null}
+          sparkData={sparkData}
+          sparkColor="#4ade80"
+          largeIcon
+        />
+        <StitchKpiCard
+          icon={Target}
+          label="Leads (periodo)"
+          value={String(leadsInRange)}
+          trend={prevRange ? pctChange(leadsInRange, leadsPrev) : null}
+          sparkData={sparkData}
+          sparkColor="#fbbf24"
+          largeIcon
+        />
+        <StitchKpiCard
+          icon={FileText}
+          label="Cotizaciones"
+          value={String(quotesInRange)}
+          trend={null}
+          sparkData={sparkData}
+          sparkColor="#a78bfa"
+          largeIcon
+        />
+        <StitchKpiCard
+          icon={DollarSign}
+          label="Ticket promedio"
+          value={formatCurrency(avgTicket)}
+          trend={null}
+          sparkData={sparkData}
+          sparkColor="#38bdf8"
+          largeIcon
+        />
+        <StitchKpiCard
+          icon={PieChartIcon}
+          label="Valor pipeline"
+          value={formatCurrency(pt.value)}
+          trend={pt.count > 0 ? 12 : 0}
+          sparkData={sparkData}
+          sparkColor="#5f8bff"
+          largeIcon
+        />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="font-semibold text-slate-900 dark:text-white mb-4">Pedidos en el periodo</h3>
-            {ordersInRange.length === 0 ? (
-              <p className="text-sm text-slate-500">No hay pedidos en el rango seleccionado.</p>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 stitch-panel">
+          <div className="p-4 border-b border-stitch-border flex justify-between items-center">
+            <div>
+              <h3 className="font-semibold text-stitch-text text-lg">Ingresos en el tiempo</h3>
+              <p className="text-xs font-mono text-stitch-muted mt-0.5 uppercase">Últimos 6 meses</p>
+            </div>
+          </div>
+          <div className="p-4 h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={salesTrend}>
+                <defs>
+                  <linearGradient id="reportsGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#5f8bff" stopOpacity={0.35} />
+                    <stop offset="100%" stopColor="#5f8bff" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#8c90a1' }} axisLine={{ stroke: '#1e293b' }} tickLine={false} />
+                <YAxis
+                  tick={{ fontSize: 11, fill: '#8c90a1' }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={(v) => formatCurrency(v)}
+                />
+                <Tooltip
+                  content={({ active, payload, label }) => (
+                    <StitchChartTooltip
+                      active={active}
+                      payload={payload}
+                      label={label}
+                      formatter={(v) => [`$${Number(v).toLocaleString('es-CO')}`, 'Ventas']}
+                    />
+                  )}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="amount"
+                  stroke="#5f8bff"
+                  strokeWidth={2}
+                  fill="url(#reportsGradient)"
+                  dot={{ r: 3, fill: '#031427', stroke: '#5f8bff', strokeWidth: 2 }}
+                  activeDot={{ r: 5, fill: '#5f8bff' }}
+                  isAnimationActive
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="stitch-panel">
+          <div className="p-4 border-b border-stitch-border">
+            <h3 className="font-semibold text-stitch-text">Leads por estado</h3>
+          </div>
+          <div className="p-4 h-72">
+            {leadStatusData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={leadStatusData}
+                    dataKey="count"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={50}
+                    outerRadius={80}
+                    paddingAngle={2}
+                    isAnimationActive
+                  >
+                    {leadStatusData.map((entry) => (
+                      <Cell key={entry.name} fill={entry.fill} />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<StitchChartTooltip formatter={(v, n) => [`${v} leads`, n]} />} />
+                  <Legend wrapperStyle={{ fontSize: '11px' }} formatter={(v) => <span className="text-stitch-muted capitalize">{v}</span>} />
+                </PieChart>
+              </ResponsiveContainer>
             ) : (
-              <div className="space-y-3 max-h-64 overflow-y-auto">
+              <p className="text-sm text-stitch-muted text-center py-12">Sin leads registrados</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="stitch-panel">
+          <div className="p-4 border-b border-stitch-border">
+            <h3 className="font-semibold text-stitch-text">Pedidos en el periodo</h3>
+            <p className="text-xs text-stitch-muted">{ordersInRange.length} pedidos</p>
+          </div>
+          <div className="p-4 max-h-72 overflow-y-auto custom-scrollbar">
+            {ordersInRange.length === 0 ? (
+              <p className="text-sm text-stitch-muted">No hay pedidos en el rango seleccionado.</p>
+            ) : (
+              <div className="space-y-2">
                 {ordersInRange.slice(0, 20).map((o) => (
-                  <div key={o.id} className="flex justify-between text-sm border-b border-slate-100 dark:border-slate-700 pb-2">
-                    <span className="font-mono text-slate-600 dark:text-slate-300">{o.order_number || o.number}</span>
-                    <span className="font-medium">{formatCurrency(Number(o.total) || 0)}</span>
+                  <div
+                    key={o.id}
+                    className="flex justify-between items-center text-sm py-2 border-b border-stitch-border/30 last:border-0 hover:bg-stitch-surface-elevated/50 px-2 rounded transition-colors"
+                  >
+                    <span className="font-mono text-stitch-muted">{o.order_number || o.number}</span>
+                    <span className="font-semibold text-stitch-text">{formatCurrency(Number(o.total) || 0)}</span>
                   </div>
                 ))}
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="font-semibold text-slate-900 dark:text-white mb-4">Embudo (datos actuales)</h3>
-            <div className="space-y-3">
-              {funnelRows.map((item, idx) => (
-                <div key={idx}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-slate-600 dark:text-slate-400">{item.stage}</span>
-                    <span className="font-medium text-slate-900 dark:text-white">
-                      {item.count} ({item.pct}%)
-                    </span>
-                  </div>
-                  <div className="h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"
-                      style={{ width: `${Math.min(100, item.pct)}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="stitch-panel">
+          <div className="p-4 border-b border-stitch-border">
+            <h3 className="font-semibold text-stitch-text">Embudo comercial</h3>
+            <p className="text-xs text-stitch-muted">Conversión por etapa</p>
+          </div>
+          <div className="p-4 h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={funnelRows} layout="vertical" margin={{ left: 10, right: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" horizontal={false} />
+                <XAxis type="number" tick={{ fontSize: 11, fill: '#8c90a1' }} />
+                <YAxis
+                  type="category"
+                  dataKey="stage"
+                  tick={{ fontSize: 10, fill: '#8c90a1' }}
+                  width={100}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip content={<StitchChartTooltip formatter={(v, n) => [`${v}`, n]} />} />
+                <Bar dataKey="count" radius={[0, 4, 4, 0]} isAnimationActive>
+                  {funnelRows.map((_, i) => (
+                    <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
       </div>
     </div>
   );

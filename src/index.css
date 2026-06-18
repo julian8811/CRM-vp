@@ -73,6 +73,36 @@
     @apply bg-[#3f465c] text-stitch-primary rounded-lg;
   }
 
+  .stitch-kanban-col {
+    @apply w-72 flex-shrink-0 flex flex-col;
+  }
+
+  .stitch-kanban-card {
+    @apply rounded-lg border border-stitch-border/50 bg-stitch-surface p-4
+           hover:border-stitch-primary-bright/30 hover:shadow-glow transition-all duration-200
+           cursor-grab active:cursor-grabbing;
+  }
+
+  .stitch-glass {
+    @apply border border-stitch-border/30 bg-stitch-surface/60 backdrop-blur-md;
+  }
+
+  .stitch-ai-gradient {
+    background: linear-gradient(135deg, #b3c5ff 0%, #5f8bff 50%, #70a1ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .stitch-pulse-ring {
+    animation: stitch-pulse 2s ease-out infinite;
+  }
+
+  @keyframes stitch-pulse {
+    0% { transform: scale(0.9); opacity: 0.6; }
+    100% { transform: scale(1.3); opacity: 0; }
+  }
+
   .bg-stitch-gradient {
     background-image: var(--background-image-stitch-gradient);
   }

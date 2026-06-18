@@ -1,18 +1,9 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
-import { Card, CardContent } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
 import {
-  Loader2,
-  Sparkles,
-  Bot,
-  TrendingUp,
-  Target,
-  Mail,
-  Lightbulb,
-  AlertTriangle,
-  MessageSquare,
+  Loader2, Sparkles, Bot, TrendingUp, Target, Mail,
+  Lightbulb, AlertTriangle, MessageSquare, Send, Zap,
 } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import { invokeCrmAi } from '@/lib/crmAi';
@@ -105,29 +96,25 @@ export function AIContent() {
   const aiFeatures = [
     {
       name: 'Predicción de cierre',
-      desc: 'Resumen de oportunidades por etapa.',
+      desc: 'Priorizá oportunidades por etapa del pipeline.',
       icon: TrendingUp,
-      active: assistantOn,
+      color: 'text-stitch-primary-bright',
       onClick: () =>
-        appendExchange(
-          `Tengo ${pipelineCount} oportunidades en el pipeline. ¿Cómo priorizo el cierre este mes?`,
-        ),
+        appendExchange(`Tengo ${pipelineCount} oportunidades en el pipeline. ¿Cómo priorizo el cierre este mes?`),
     },
     {
       name: 'Scoring automático',
       desc: 'Priorizá leads según señales del CRM.',
       icon: Target,
-      active: assistantOn,
+      color: 'text-stitch-success',
       onClick: () =>
-        appendExchange(
-          `Tengo ${leads?.length || 0} leads. ¿Qué criterios uso para priorizar los más calientes?`,
-        ),
+        appendExchange(`Tengo ${leads?.length || 0} leads. ¿Qué criterios uso para priorizar los más calientes?`),
     },
     {
       name: 'Asistente de email',
       desc: 'Borradores y tono con Gemini.',
       icon: Mail,
-      active: assistantOn,
+      color: 'text-stitch-warning',
       onClick: () =>
         appendExchange('Redactá un email breve de seguimiento comercial B2B, tono profesional y cercano.'),
     },
@@ -135,14 +122,14 @@ export function AIContent() {
       name: 'Análisis de conversaciones',
       desc: 'Resume tickets y mensajes del CRM.',
       icon: MessageSquare,
-      active: assistantOn,
+      color: 'text-stitch-primary',
       onClick: runConversationAnalysis,
     },
     {
       name: 'Recomendaciones de productos',
       desc: 'Sugerencias según contexto comercial.',
       icon: Lightbulb,
-      active: assistantOn,
+      color: 'text-violet-400',
       onClick: () =>
         appendExchange('¿Cómo recomiendo productos del catálogo según etapa del embudo y tipo de cliente?'),
     },
@@ -150,122 +137,149 @@ export function AIContent() {
       name: 'Alertas de churn',
       desc: 'Señales de riesgo con datos del CRM.',
       icon: AlertTriangle,
-      active: assistantOn,
+      color: 'text-stitch-danger',
       onClick: () =>
         appendExchange('¿Qué señales de churn debería monitorear en clientes y pedidos de este CRM?'),
     },
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">IA Comercial</h2>
-          <p className="text-sm text-slate-500">
-            Asistente con Google Gemini. Activá el assistant y usá el chat o las tarjetas rápidas.
-          </p>
-        </div>
+    <div className="max-w-[1440px] mx-auto space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold text-stitch-text tracking-tight">IA Comercial</h2>
+        <p className="text-sm text-stitch-muted mt-1">
+          Asistente con Google Gemini. Activá el assistant y usá el chat o las tarjetas rápidas.
+        </p>
       </div>
 
-      <Card className="border-0 bg-gradient-to-br from-blue-600 to-indigo-700">
-        <CardContent className="p-8 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20">
-            <Sparkles className="h-8 w-8 text-white" />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[480px]">
+        <div className="lg:col-span-5 stitch-glass rounded-xl p-8 flex flex-col items-center justify-center text-center relative overflow-hidden group">
+          <div className="absolute inset-0 bg-stitch-primary-bright/5 rounded-xl blur-3xl -z-10 group-hover:bg-stitch-primary-bright/10 transition-colors duration-700" />
+          <div className="relative w-32 h-32 mb-8 flex items-center justify-center">
+            <div className="absolute inset-0 rounded-full border border-stitch-primary/30 stitch-pulse-ring" />
+            <div className="absolute inset-0 rounded-full border border-stitch-primary/20 stitch-pulse-ring" style={{ animationDelay: '0.5s' }} />
+            <div className="w-20 h-20 bg-stitch-surface-elevated rounded-full border border-stitch-border flex items-center justify-center shadow-glow z-10">
+              <Bot className="w-10 h-10 text-stitch-primary-bright" />
+            </div>
           </div>
-          <h3 className="mb-2 text-2xl font-bold text-white">CRM AI Assistant</h3>
-          <p className="mx-auto mb-6 max-w-md text-blue-100">
+          <h3 className="text-4xl font-bold stitch-ai-gradient mb-2">CRM AI</h3>
+          <p className="text-sm text-stitch-muted max-w-xs mb-8">
             {assistantOn
-              ? 'Asistente activado. Chat y acciones rápidas disponibles.'
-              : 'Activá el asistente para habilitar el chat y las tarjetas inferiores.'}
+              ? 'Motor de inteligencia comercial activo. Analizá pipelines, redactá comunicaciones y predice cierres.'
+              : 'Activá el asistente para habilitar el chat y las acciones rápidas.'}
           </p>
           <Button
             type="button"
-            variant="secondary"
             onClick={toggleAssistant}
-            className={`relative z-10 cursor-pointer ${assistantOn ? '!bg-white/20 !text-white border border-white/40 hover:!bg-white/30' : '!bg-white !text-blue-600 hover:!bg-blue-50'}`}
+            className={assistantOn
+              ? 'bg-stitch-surface-elevated border border-stitch-border text-stitch-text hover:bg-stitch-surface'
+              : 'bg-stitch-primary-bright text-[#031427] hover:bg-stitch-primary'}
           >
-            <Bot className="h-4 w-4" />
+            <Zap className="h-4 w-4" />
             {assistantOn ? 'Desactivar assistant' : 'Activar Assistant'}
           </Button>
-        </CardContent>
-      </Card>
+        </div>
 
-      {assistantOn && (
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="mb-3 font-semibold text-slate-900 dark:text-white">Chat</h3>
-            {aiErr && <p className="mb-2 text-sm text-red-600 dark:text-red-400">{aiErr}</p>}
-            <div className="mb-3 max-h-64 space-y-2 overflow-y-auto text-sm">
-              {aiMessages.length === 0 ? (
-                <p className="text-slate-500">Escribí una pregunta o tocá una tarjeta de abajo.</p>
-              ) : (
-                aiMessages.map((m, i) => (
-                  <div
-                    key={i}
-                    className={
-                      m.role === 'user'
-                        ? 'text-right text-slate-800 dark:text-slate-100'
-                        : 'text-left text-slate-600 dark:text-slate-300'
-                    }
-                  >
-                    <span className="inline-block rounded-lg bg-slate-100 px-3 py-2 dark:bg-slate-800">
-                      {m.text}
-                    </span>
-                  </div>
-                ))
-              )}
-              {aiLoading && (
-                <div className="flex items-center gap-2 text-slate-500">
-                  <Loader2 className="h-4 w-4 animate-spin" /> Pensando…
-                </div>
-              )}
+        <div className={`lg:col-span-7 stitch-panel flex flex-col overflow-hidden ${!assistantOn ? 'opacity-50 pointer-events-none' : ''}`}>
+          <div className="px-6 py-4 border-b border-stitch-border flex justify-between items-center bg-stitch-surface/50">
+            <div className="flex items-center gap-3">
+              <span className="w-2 h-2 rounded-full bg-stitch-primary-bright animate-pulse" />
+              <span className="text-xs font-mono text-stitch-text uppercase tracking-widest">Sesión activa</span>
             </div>
-            <form onSubmit={sendAi} className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
+            <Sparkles className="w-4 h-4 text-stitch-primary-bright" />
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-6 space-y-4 min-h-[280px] max-h-[360px] custom-scrollbar">
+            {aiMessages.length === 0 ? (
+              <div className="flex gap-4 max-w-[90%]">
+                <div className="w-8 h-8 rounded-full bg-stitch-surface border border-stitch-primary/30 flex items-center justify-center shrink-0">
+                  <Bot className="w-4 h-4 text-stitch-primary-bright" />
+                </div>
+                <div className="stitch-glass p-4 rounded-xl rounded-tl-none">
+                  <p className="text-sm text-stitch-text">
+                    Hola. Soy tu asistente comercial. Preguntame sobre el pipeline, leads o pedí un borrador de email.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              aiMessages.map((m, i) =>
+                m.role === 'user' ? (
+                  <div key={i} className="flex gap-4 max-w-[85%] ml-auto justify-end">
+                    <div className="bg-stitch-surface-elevated border border-stitch-border/30 p-4 rounded-xl rounded-tr-none">
+                      <p className="text-sm text-stitch-text">{m.text}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div key={i} className="flex gap-4 max-w-[90%]">
+                    <div className="w-8 h-8 rounded-full bg-stitch-surface border border-stitch-primary/30 flex items-center justify-center shrink-0">
+                      <Bot className="w-4 h-4 text-stitch-primary-bright" />
+                    </div>
+                    <div className="stitch-glass p-4 rounded-xl rounded-tl-none">
+                      <p className="text-sm text-stitch-text whitespace-pre-wrap">{m.text}</p>
+                    </div>
+                  </div>
+                )
+              )
+            )}
+            {aiLoading && (
+              <div className="flex items-center gap-2 text-stitch-muted text-sm pl-12">
+                <Loader2 className="h-4 w-4 animate-spin" /> Pensando…
+              </div>
+            )}
+            {aiErr && (
+              <p className="text-sm text-stitch-danger pl-12">{aiErr}</p>
+            )}
+          </div>
+
+          <form onSubmit={sendAi} className="p-4 bg-stitch-surface-elevated border-t border-stitch-border">
+            <div className="relative flex items-center gap-2">
               <Input
                 value={aiInput}
                 onChange={(e) => setAiInput(e.target.value)}
-                placeholder="Ej. ¿Cómo priorizo leads esta semana?"
-                className="min-w-0 flex-1"
+                placeholder="Escribí una pregunta o comando…"
+                className="flex-1 bg-[#05070a] border-stitch-border/40 text-stitch-text pr-12"
+                disabled={!assistantOn || aiLoading}
               />
-              <Button type="submit" disabled={aiLoading} className="w-full shrink-0 sm:w-auto">
-                Enviar
+              <Button
+                type="submit"
+                disabled={!assistantOn || aiLoading || !aiInput.trim()}
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 bg-stitch-primary-bright/10 text-stitch-primary-bright hover:bg-stitch-primary-bright hover:text-[#031427]"
+              >
+                <Send className="w-4 h-4" />
               </Button>
-            </form>
-          </CardContent>
-        </Card>
-      )}
+            </div>
+          </form>
+        </div>
+      </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {aiFeatures.map((feature) => (
-          <Card
+          <button
             key={feature.name}
-            hover={assistantOn}
-            className={!assistantOn ? 'opacity-60' : 'cursor-pointer'}
-            onClick={() => assistantOn && !aiLoading && feature.onClick?.()}
+            type="button"
+            disabled={!assistantOn || aiLoading}
+            onClick={() => feature.onClick?.()}
+            className={`stitch-panel p-5 text-left transition-all hover:border-stitch-primary-bright/30 hover:shadow-glow group ${
+              !assistantOn ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+            }`}
           >
-            <CardContent className="p-5">
-              <div className="flex items-center gap-4">
-                <div
-                  className={`rounded-xl p-3 ${feature.active ? 'bg-emerald-500/15' : 'bg-slate-500/10'}`}
-                >
-                  <feature.icon
-                    className={`h-6 w-6 ${feature.active ? 'text-emerald-600' : 'text-slate-400'}`}
-                  />
-                </div>
-                <div>
-                  <h3 className="flex items-center gap-2 font-semibold text-slate-900 dark:text-white">
-                    {feature.name}
-                    {feature.active && (
-                      <Badge variant="green" className="text-[10px]">
-                        On
-                      </Badge>
-                    )}
-                  </h3>
-                  <p className="text-sm text-slate-500">{feature.desc}</p>
-                </div>
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-lg bg-stitch-surface-elevated border border-stitch-border/30 flex items-center justify-center group-hover:border-stitch-primary-bright/50 transition-colors shrink-0">
+                <feature.icon className={`h-5 w-5 ${feature.color}`} />
               </div>
-            </CardContent>
-          </Card>
+              <div>
+                <h3 className="font-semibold text-stitch-text flex items-center gap-2">
+                  {feature.name}
+                  {assistantOn && (
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-stitch-success/10 text-stitch-success border border-stitch-success/20">
+                      ON
+                    </span>
+                  )}
+                </h3>
+                <p className="text-sm text-stitch-muted mt-1">{feature.desc}</p>
+              </div>
+            </div>
+          </button>
         ))}
       </div>
     </div>
