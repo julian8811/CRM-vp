@@ -135,8 +135,8 @@ describe('auth.js - signInWithGoogle', () => {
   });
 
   it('calls supabase.auth.signInWithOAuth with google provider', async () => {
-    const originalWindow = global.window;
-    global.window = {
+    const originalWindow = globalThis.window;
+    globalThis.window = {
       location: { origin: 'https://crm-vp.vercel.app', pathname: '/dashboard' },
     };
 
@@ -156,12 +156,12 @@ describe('auth.js - signInWithGoogle', () => {
     expect(result.data.url).toContain('supabase.com');
     expect(result.error).toBeNull();
 
-    global.window = originalWindow;
+    globalThis.window = originalWindow;
   });
 
   it('handles OAuth error gracefully', async () => {
-    const originalWindow = global.window;
-    global.window = {
+    const originalWindow = globalThis.window;
+    globalThis.window = {
       location: { origin: 'http://localhost:5173', pathname: '/' },
     };
 
@@ -175,7 +175,7 @@ describe('auth.js - signInWithGoogle', () => {
     expect(result.error).toBeDefined();
     expect(result.error.message).toBe('OAuth provider error');
 
-    global.window = originalWindow;
+    globalThis.window = originalWindow;
   });
 });
 

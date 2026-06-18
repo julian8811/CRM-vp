@@ -1,0 +1,41 @@
+# Supabase local / CLI config for CRM-VP
+# Link: supabase link --project-ref tgosnmvlvzaykiuolrot
+
+project_id = "tgosnmvlvzaykiuolrot"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+site_url = "https://crm-vp.vercel.app"
+additional_redirect_urls = ["http://localhost:5173", "https://crm-vp.vercel.app"]
+
+[functions.crm-ai]
+verify_jwt = true
+
+[functions.invite-user]
+verify_jwt = true
+
+[functions.meta-sync-leads]
+verify_jwt = true
+
+[functions.meta-send-whatsapp]
+verify_jwt = true
+
+[functions.meta-webhook]
+verify_jwt = false
+
+[functions.run-automations]
+verify_jwt = false

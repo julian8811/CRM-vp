@@ -268,7 +268,7 @@ describe('useStore - Leads CRUD', () => {
   it('addLead adds new lead to state', async () => {
     mockLeadsCreate.mockResolvedValue({ success: true, data: mockLead });
 
-    const result = await useStore.getState().addLead({
+    await useStore.getState().addLead({
       first_name: 'John',
       last_name: 'Doe',
       email: 'john@example.com',

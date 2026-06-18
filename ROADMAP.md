@@ -1,69 +1,33 @@
 # CRM-VP - Hoja de Ruta
 
-## ✅ Estado Actual: PRODUCCIÓN
+## Estado actual: producción en Vercel
 
-El CRM-VP está **100% funcional** y listo para desplegar.
+**URL:** https://crm-vp.vercel.app/
 
-### Páginas Implementadas (13)
-- ✅ Dashboard con métricas y gráficos
-- ✅ Pipeline Kanban con drag & drop (@dnd-kit)
-- ✅ Customers - DataTable + CRUD
-- ✅ Leads - Scoring + conversión
-- ✅ Products - Catálogo con stock
-- ✅ Quotations - Estados y acciones
-- ✅ Orders - Seguimiento
-- ✅ Automations - Workflows
-- ✅ Reports - Analytics
-- ✅ AI - Dashboard IA
-- ✅ Postventa - Tickets
-- ✅ Settings - Perfil, notificaciones
-- ✅ Users - Gestión equipo
+El frontend está desplegado y conectado a Supabase. Para operación completa revisá [docs/PRODUCTION_CHECKLIST.md](docs/PRODUCTION_CHECKLIST.md).
 
-### Features Completados
-- ✅ Theme Toggle (dark/light)
-- ✅ Command Palette (Ctrl+K)
-- ✅ Export to Excel
-- ✅ Supabase Auth
-- ✅ Supabase API
-- ✅ Testing (Vitest)
-- ✅ Build producción
+### Páginas (14 módulos)
+- Dashboard, Clientes, Leads, Pipeline, Productos, Cotizaciones, Pedidos
+- Automatizaciones, Meta, Reportes, IA, Postventa, Configuración, Usuarios
 
-### Tech Stack Actual
-- React 19 + Vite
-- Tailwind CSS v4
-- Zustand
-- @dnd-kit
-- Supabase (Auth + DB)
-- Recharts
-- Lucide React
-- xlsx
-- Vitest
+### Completado en código
+- Theme toggle, Command Palette (Ctrl+K), export Excel
+- Supabase Auth (email + Google OAuth en UI)
+- Listado de equipo (`get_team_profiles`)
+- Notificaciones in-app + trigger por nuevo lead
+- Edge Functions (IA, Meta, automatizaciones, invitaciones)
+- Tests Vitest + CI con lint
 
----
+### Pendiente de configuración (infra)
+- [ ] Aplicar migración `20260618000000_production_hardening.sql` en Supabase
+- [ ] Desplegar Edge Functions actualizadas (`npm run deploy:functions`)
+- [ ] Configurar secretos (`OPENAI_API_KEY`, `CRON_SECRET`, `META_*`, opcional `RESEND_API_KEY`)
+- [ ] Programar cron de `run-automations`
+- [ ] Habilitar Google provider en Supabase Auth (si se usa OAuth)
+- [ ] Configurar webhook Meta en Developers
+- [ ] Asignar rol `admin` al primer usuario
 
-## 📋 Roadmap Original (Referencia)
-
-### Fase 1: ✅ COMPLETO
-- Supabase schema
-- Auth real
-- API layer
-
-### Fase 2: ✅ COMPLETO
-- Dashboard real
-- Pipeline Kanban real
-
-### Fase 3: ✅ COMPLETO
-- Todas las páginas
-- Tests
-
-### Fase 4: ✅ COMPLETO
-- Deploy config (vercel.json)
-- GitHub push
-
----
-
-## 🚀 Próximos Pasos (Opcional)
-- [ ] Configurar datos de Supabase
-- [ ] Desplegar a Vercel
-- [ ] Agregar más tests
-- [ ] Integrar OpenAI para features IA
+### Tech stack
+- React 19 + Vite + Tailwind CSS v4
+- Zustand, @dnd-kit, Recharts, Supabase
+- Vitest, Vercel, Supabase Edge Functions

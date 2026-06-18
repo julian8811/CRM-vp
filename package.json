@@ -13,7 +13,9 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "bootstrap:supabase": "bash scripts/bootstrap-supabase.sh",
+    "deploy:functions": "bash scripts/deploy-edge-functions.sh"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

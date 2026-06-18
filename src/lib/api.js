@@ -647,6 +647,25 @@ export const api = {
       if (error) return handleError(error)
       return handleSuccess(data || [])
     }
+  },
+
+  profiles: {
+    getTeam: async () => {
+      const { data, error } = await supabase.rpc('get_team_profiles')
+      if (error) return handleError(error)
+      return handleSuccess(data || [])
+    },
+
+    updateRole: async (userId, role) => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({ role, updated_at: new Date().toISOString() })
+        .eq('id', userId)
+        .select()
+        .single()
+      if (error) return handleError(error)
+      return handleSuccess(data)
+    }
   }
 }
 

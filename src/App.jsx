@@ -286,7 +286,7 @@ function DashboardContent() {
 
 // Login Page Component
 function LoginPage() {
-  const { login, register, error, loading, isConfigured } = useAuth();
+  const { login, register, loginWithGoogle, error, loading, isConfigured } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
@@ -294,6 +294,15 @@ function LoginPage() {
   const [lastName, setLastName] = useState('');
   const [registerSuccess, setRegisterSuccess] = useState(false);
   const [registerError, setRegisterError] = useState('');
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  const handleGoogle = async () => {
+    setRegisterError('');
+    setGoogleLoading(true);
+    const { error: googleError } = await loginWithGoogle();
+    setGoogleLoading(false);
+    if (googleError) setRegisterError(googleError.message || 'No se pudo iniciar con Google');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -469,6 +478,26 @@ function LoginPage() {
             </Button>
           </form>
 
+          {!isRegistering && (
+            <>
+              <div className="my-4 flex items-center gap-3">
+                <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+                <span className="text-xs text-slate-400">o</span>
+                <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                disabled={googleLoading || loading}
+                onClick={handleGoogle}
+              >
+                {googleLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                Continuar con Google
+              </Button>
+            </>
+          )}
+
           <div className="mt-6 text-center">
             <button
               onClick={() => setIsRegistering(!isRegistering)}
@@ -512,6 +541,7 @@ export default function App() {
   const fetchPreferences = useStore(state => state.fetchPreferences);
   const fetchAppNotifications = useStore(state => state.fetchAppNotifications);
   const fetchMetaIntegrations = useStore(state => state.fetchMetaIntegrations);
+  const fetchTeamProfiles = useStore(state => state.fetchTeamProfiles);
   
   useEffect(() => {
     if (user) {
@@ -526,8 +556,9 @@ export default function App() {
       fetchPreferences();
       fetchAppNotifications();
       fetchMetaIntegrations();
+      fetchTeamProfiles();
     }
-  }, [user, fetchCustomers, fetchLeads, fetchProducts, fetchOpportunities, fetchQuotations, fetchOrders, fetchTickets, fetchAutomations, fetchPreferences, fetchAppNotifications, fetchMetaIntegrations]);
+  }, [user, fetchCustomers, fetchLeads, fetchProducts, fetchOpportunities, fetchQuotations, fetchOrders, fetchTickets, fetchAutomations, fetchPreferences, fetchAppNotifications, fetchMetaIntegrations, fetchTeamProfiles]);
 
   if (authLoading) {
     return <LoadingScreen />;
@@ -2202,9 +2233,36 @@ function SettingsContent() {
   const savePreferences = useStore((s) => s.savePreferences);
   const avatarInputRef = useRef(null);
   const [avatarErr, setAvatarErr] = useState('');
+  const [profileForm, setProfileForm] = useState(null);
+  const [profileStatus, setProfileStatus] = useState('');
+  const resolvedProfileForm = profileForm ?? {
+    first_name: profile?.first_name || meta.first_name || '',
+    last_name: profile?.last_name || meta.last_name || '',
+  };
 
   const defaultFlags = { leadEmail: true, reminders: true, quoteAlerts: false, weekly: true };
   const flags = { ...defaultFlags, ...(userPreferences?.notification_flags || {}) };
+
+  const saveProfile = async () => {
+    if (!user?.id) return;
+    setProfileStatus('');
+    const { error: profileError } = await updateProfile(user.id, {
+      first_name: resolvedProfileForm.first_name.trim(),
+      last_name: resolvedProfileForm.last_name.trim(),
+    });
+    if (profileError) {
+      setProfileStatus(profileError.message);
+      return;
+    }
+    const { error: authError } = await supabase.auth.updateUser({
+      data: {
+        first_name: resolvedProfileForm.first_name.trim(),
+        last_name: resolvedProfileForm.last_name.trim(),
+      },
+    });
+    if (authError) setProfileStatus(authError.message);
+    else setProfileStatus('Perfil actualizado.');
+  };
 
   const toggle = async (key) => {
     const nextFlags = { ...flags, [key]: !flags[key] };
@@ -2255,13 +2313,25 @@ function SettingsContent() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <Label>Nombre</Label>
-                  <Input readOnly value={meta.first_name || ''} placeholder="—" />
+                  <Input
+                    value={resolvedProfileForm.first_name}
+                    onChange={(e) => setProfileForm({ ...resolvedProfileForm, first_name: e.target.value })}
+                    placeholder="Juan"
+                  />
                 </div>
                 <div>
                   <Label>Apellido</Label>
-                  <Input readOnly value={meta.last_name || ''} placeholder="—" />
+                  <Input
+                    value={resolvedProfileForm.last_name}
+                    onChange={(e) => setProfileForm({ ...resolvedProfileForm, last_name: e.target.value })}
+                    placeholder="Pérez"
+                  />
                 </div>
               </div>
+              <div className="flex justify-end">
+                <Button type="button" size="sm" onClick={saveProfile}>Guardar perfil</Button>
+              </div>
+              {profileStatus && <p className="text-xs text-slate-500">{profileStatus}</p>}
               <div>
                 <Label>Email</Label>
                 <Input readOnly type="email" value={user?.email || ''} />
@@ -2306,9 +2376,9 @@ function SettingsContent() {
             <h3 className="font-semibold text-slate-900 dark:text-white mb-4">Integraciones</h3>
             <div className="space-y-3">
               {[
-                { name: 'Supabase', status: 'connected', icon: '🗄️' },
-                { name: 'Google Calendar', status: 'disconnected', icon: '📅' },
-                { name: 'Slack', status: 'disconnected', icon: '💬' },
+                { name: 'Supabase', status: isSupabaseConfigured() ? 'connected' : 'disconnected', icon: '🗄️' },
+                { name: 'Google OAuth', status: 'connected', icon: '🔐' },
+                { name: 'Meta (Lead Ads / WhatsApp)', status: 'disconnected', icon: '📣' },
               ].map((item, idx) => (
                 <div key={idx} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
                   <div className="flex items-center gap-3">
@@ -2331,8 +2401,12 @@ function SettingsContent() {
 // Users Page
 function UsersContent() {
   const { user, profile } = useAuth();
+  const teamProfiles = useStore((s) => s.teamProfiles);
+  const teamProfilesLoading = useStore((s) => s.teamProfilesLoading);
+  const updateTeamMemberRole = useStore((s) => s.updateTeamMemberRole);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteStatus, setInviteStatus] = useState('');
+  const [roleStatus, setRoleStatus] = useState('');
 
   const sendInvite = async () => {
     setInviteStatus('');
@@ -2341,23 +2415,33 @@ function UsersContent() {
       return;
     }
     const { error } = await supabase.functions.invoke('invite-user', {
-      body: { email: inviteEmail.trim() },
+      body: { email: inviteEmail.trim(), redirectTo: `${window.location.origin}/` },
     });
     if (error) setInviteStatus(error.message || 'Error al invitar');
     else setInviteStatus(`Invitación enviada a ${inviteEmail.trim()}.`);
   };
 
-  const users = profile
-    ? [
-        {
-          name: `${user?.user_metadata?.first_name || user?.email?.split('@')[0] || 'Usuario'} ${user?.user_metadata?.last_name || ''}`.trim(),
-          email: user?.email || '—',
-          role: profile.role || 'sales',
-          team: profile.team || '—',
-          status: 'active',
-        },
-      ]
-    : [];
+  const users = (teamProfiles.length ? teamProfiles : profile
+    ? [{
+        id: user?.id,
+        name: `${user?.user_metadata?.first_name || user?.email?.split('@')[0] || 'Usuario'} ${user?.user_metadata?.last_name || ''}`.trim(),
+        email: user?.email || '—',
+        role: profile.role || 'sales',
+        team: profile.team || '—',
+        status: 'active',
+      }]
+    : []).map((row) => ({
+      ...row,
+      name: row.name || `${row.first_name || ''} ${row.last_name || ''}`.trim(),
+      status: 'active',
+    }));
+
+  const handleRoleChange = async (userId, nextRole) => {
+    setRoleStatus('');
+    const result = await updateTeamMemberRole(userId, nextRole);
+    if (result.success) setRoleStatus('Rol actualizado.');
+    else setRoleStatus(result.error || 'No se pudo actualizar el rol.');
+  };
   
   const columns = [
     { key: 'name', header: 'Usuario', render: (val, row) => (
@@ -2369,7 +2453,20 @@ function UsersContent() {
         </div>
       </div>
     )},
-    { key: 'role', header: 'Rol', render: (val) => {
+    { key: 'role', header: 'Rol', render: (val, row) => {
+      if (profile?.role === 'admin' && row.id !== user?.id) {
+        return (
+          <select
+            className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-sm dark:border-slate-600 dark:bg-slate-800"
+            value={val}
+            onChange={(e) => handleRoleChange(row.id, e.target.value)}
+          >
+            <option value="sales">Vendedor</option>
+            <option value="manager">Gerente</option>
+            <option value="admin">Admin</option>
+          </select>
+        );
+      }
       const variants = { admin: 'purple', manager: 'blue', sales: 'gray' };
       const labels = { admin: 'Admin', manager: 'Gerente', sales: 'Vendedor' };
       return <Badge variant={variants[val] || 'gray'}>{labels[val] || val}</Badge>;
@@ -2380,13 +2477,6 @@ function UsersContent() {
         {val === 'active' ? 'Activo' : 'Inactivo'}
       </Badge>
     )},
-    { key: 'actions', header: '', render: () => (
-      <div className="flex items-center gap-2 justify-end">
-        <button className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-blue-500 transition-colors">
-          <Edit2 className="w-4 h-4" />
-        </button>
-      </div>
-    )},
   ];
 
   return (
@@ -2395,7 +2485,7 @@ function UsersContent() {
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Usuarios</h2>
           <p className="text-sm text-slate-500">
-            {users.length ? `${users.length} usuario en sesión` : 'Sin listado de equipo'} · El alta de usuarios se gestiona en Supabase Auth.
+            {users.length} {users.length === 1 ? 'usuario' : 'usuarios'} · Equipo desde Supabase Auth + profiles
           </p>
         </div>
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
@@ -2418,15 +2508,21 @@ function UsersContent() {
             type="button"
             variant="outline"
             className="w-full justify-center sm:w-auto"
-            onClick={() => window.open('https://supabase.com/dashboard/project/_/auth/users', '_blank', 'noopener')}
+            onClick={() => window.open('https://supabase.com/dashboard/project/tgosnmvlvzaykiuolrot/auth/users', '_blank', 'noopener')}
           >
             Gestionar en Supabase
           </Button>
         </div>
       </div>
-      {inviteStatus && <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">{inviteStatus}</p>}
-      {!users.length ? (
-        <p className="text-sm text-slate-500">No hay perfil extendido cargado. Iniciá sesión con un usuario que tenga fila en <code className="text-xs">profiles</code>.</p>
+      {(inviteStatus || roleStatus) && (
+        <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">{inviteStatus || roleStatus}</p>
+      )}
+      {teamProfilesLoading ? (
+        <div className="flex items-center gap-2 text-sm text-slate-500">
+          <Loader2 className="w-4 h-4 animate-spin" /> Cargando equipo…
+        </div>
+      ) : !users.length ? (
+        <p className="text-sm text-slate-500">No hay perfiles cargados. Verificá la tabla <code className="text-xs">profiles</code> y la migración <code className="text-xs">get_team_profiles</code>.</p>
       ) : (
         <DataTable columns={columns} data={users} searchPlaceholder="Buscar usuarios..." pageName="users" />
       )}
