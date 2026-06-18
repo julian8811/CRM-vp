@@ -2,16 +2,16 @@ import { cn } from '@/lib/utils';
 
 const Badge = ({ variant = 'gray', children, className }) => {
   const variants = {
-    gray: 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300',
-    blue: 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-    green: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
-    red: 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-    amber: 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-    purple: 'bg-violet-50 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400',
+    gray: 'bg-stitch-surface-elevated text-stitch-muted border-stitch-border/30',
+    blue: 'bg-stitch-primary-bright/10 text-stitch-primary border-stitch-primary-bright/20',
+    green: 'bg-stitch-success/10 text-stitch-success border-stitch-success/20',
+    red: 'bg-stitch-danger/10 text-stitch-danger border-stitch-danger/20',
+    amber: 'bg-stitch-warning/10 text-stitch-warning border-stitch-warning/20',
+    purple: 'bg-violet-500/10 text-violet-400 border-violet-500/20',
   };
 
   return (
-    <span className={cn('inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold', variants[variant], className)}>
+    <span className={cn('inline-flex items-center px-2.5 py-0.5 rounded text-xs font-mono font-medium border', variants[variant], className)}>
       {children}
     </span>
   );

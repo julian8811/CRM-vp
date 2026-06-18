@@ -43,7 +43,7 @@ import { invokeCrmAi } from '@/lib/crmAi';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { updateProfile } from '@/lib/auth';
 import { confirmDelete } from '@/lib/confirmDelete';
-import { PAGE_TITLES, STAGE_COLORS } from '@/config/crm';
+import { StitchPageHeader } from '@/components/stitch/StitchPageHeader';
 
 
 // Leads Page
@@ -99,17 +99,17 @@ export function LeadsContent() {
   ];
 
   return (
-    <div>
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Dirige</h2>
-          <p className="text-sm text-slate-500">Gestión de prospectos · {leads.length} registros</p>
-        </div>
-        <Button type="button" onClick={() => openModal('lead')} className="w-full justify-center sm:w-auto">
-          <Plus className="w-4 h-4" />
-          Nuevo prospecto
-        </Button>
-      </div>
+    <div className="max-w-[1440px] mx-auto">
+      <StitchPageHeader
+        title="Dirige"
+        subtitle={`Gestión de prospectos · ${leads.length} registros`}
+        actions={
+          <Button type="button" onClick={() => openModal('lead')} className="w-full justify-center sm:w-auto">
+            <Plus className="w-4 h-4" />
+            Nuevo prospecto
+          </Button>
+        }
+      />
       <DataTable columns={columns} data={leads} searchPlaceholder="Buscar prospectos..." pageName="leads" />
     </div>
   );

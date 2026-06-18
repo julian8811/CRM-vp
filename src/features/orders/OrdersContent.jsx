@@ -43,7 +43,7 @@ import { invokeCrmAi } from '@/lib/crmAi';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { updateProfile } from '@/lib/auth';
 import { confirmDelete } from '@/lib/confirmDelete';
-import { PAGE_TITLES, STAGE_COLORS } from '@/config/crm';
+import { StitchPageHeader } from '@/components/stitch/StitchPageHeader';
 
 
 // Orders Page
@@ -92,17 +92,17 @@ export function OrdersContent() {
   ];
 
   return (
-    <div>
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Pedidos</h2>
-          <p className="text-sm text-slate-500">{orders.length} pedidos</p>
-        </div>
-        <Button type="button" onClick={() => openModal('order')} className="w-full justify-center sm:w-auto">
+    <div className="max-w-[1440px] mx-auto">
+      <StitchPageHeader
+        title="Pedidos"
+        subtitle={`${orders.length} pedidos`}
+        actions={
+          <Button type="button" onClick={() => openModal('order')} className="w-full justify-center sm:w-auto">
             <Plus className="w-4 h-4" />
             Nuevo Pedido
           </Button>
-      </div>
+        }
+      />
       <DataTable columns={columns} data={orders} searchPlaceholder="Buscar pedidos..." pageName="orders" />
     </div>
   );

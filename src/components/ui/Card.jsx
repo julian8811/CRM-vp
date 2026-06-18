@@ -4,8 +4,8 @@ function Card({ className, children, hover = false, ...props }) {
   return (
     <div
       className={cn(
-        'bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-card transition-all',
-        hover && 'hover:shadow-card-hover cursor-pointer',
+        'stitch-panel transition-all',
+        hover && 'hover:border-stitch-primary-bright/30 hover:shadow-glow cursor-pointer',
         className
       )}
       {...props}
@@ -17,7 +17,7 @@ function Card({ className, children, hover = false, ...props }) {
 
 function CardHeader({ className, children, ...props }) {
   return (
-    <div className={cn('px-6 py-4 border-b border-slate-100 dark:border-slate-700', className)} {...props}>
+    <div className={cn('px-6 py-4 border-b border-stitch-border', className)} {...props}>
       {children}
     </div>
   );

@@ -18,3 +18,4 @@ Thumbs.db
 .vercel
 supabase/.temp/
 qa-results.json
+tmp/

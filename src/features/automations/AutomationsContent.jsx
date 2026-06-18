@@ -44,6 +44,7 @@ import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { updateProfile } from '@/lib/auth';
 import { confirmDelete } from '@/lib/confirmDelete';
 import { PAGE_TITLES, STAGE_COLORS } from '@/config/crm';
+import { StitchPageHeader } from '@/components/stitch/StitchPageHeader';
 
 function triggerActionLabel(row) {
   const tr = row.trigger_config || {};
@@ -85,23 +86,20 @@ export function AutomationsContent() {
   };
 
   return (
-    <div>
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Automatizaciones</h2>
-          <p className="text-sm text-slate-500">
-            {automations.filter((a) => a.status === 'active').length} activas · Ejecución programada cada 15 min (
-            <code className="text-xs">pg_cron</code>) · Notificaciones in-app.
-          </p>
-        </div>
-        <Button type="button" variant="outline" onClick={() => setModalOpen(true)} className="w-full justify-center sm:w-auto">
-          <Plus className="w-4 h-4" />
-          Nueva Automatización
-        </Button>
-      </div>
+    <div className="max-w-[1440px] mx-auto">
+      <StitchPageHeader
+        title="Automatizaciones"
+        subtitle={`${automations.filter((a) => a.status === 'active').length} activas · Ejecución programada cada 15 min (pg_cron) · Notificaciones in-app.`}
+        actions={
+          <Button type="button" variant="outline" onClick={() => setModalOpen(true)} className="w-full justify-center sm:w-auto">
+            <Plus className="w-4 h-4" />
+            Nueva Automatización
+          </Button>
+        }
+      />
 
       {info && (
-        <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 dark:bg-blue-950/30 px-3 py-2 text-sm text-blue-900 dark:text-blue-100">
+        <div className="mb-4 rounded-lg border border-stitch-primary-bright/30 bg-stitch-primary-bright/10 px-3 py-2 text-sm text-stitch-text">
           {info}{' '}
           <button type="button" className="underline" onClick={() => setInfo('')}>
             Cerrar

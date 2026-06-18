@@ -43,7 +43,7 @@ import { invokeCrmAi } from '@/lib/crmAi';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { updateProfile } from '@/lib/auth';
 import { confirmDelete } from '@/lib/confirmDelete';
-import { PAGE_TITLES, STAGE_COLORS } from '@/config/crm';
+import { StitchPageHeader } from '@/components/stitch/StitchPageHeader';
 
 
 // Products Page
@@ -53,23 +53,23 @@ export function ProductsContent() {
   const deleteProduct = useStore(state => state.deleteProduct);
 
   return (
-    <div>
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Productos</h2>
-          <p className="text-sm text-slate-500">{products.length} productos en catálogo</p>
-        </div>
-        <Button type="button" onClick={() => openModal('product')} className="w-full justify-center sm:w-auto">
-          <Plus className="w-4 h-4" />
-          Nuevo Producto
-        </Button>
-      </div>
-      
+    <div className="max-w-[1440px] mx-auto">
+      <StitchPageHeader
+        title="Productos"
+        subtitle={`${products.length} productos en catálogo`}
+        actions={
+          <Button type="button" onClick={() => openModal('product')} className="w-full justify-center sm:w-auto">
+            <Plus className="w-4 h-4" />
+            Nuevo Producto
+          </Button>
+        }
+      />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {products.map(product => (
           <Card key={product.id} hover className="overflow-hidden">
-            <div className="h-24 bg-gradient-to-br from-slate-50 to-indigo-50 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center relative">
-              <Package className="w-10 h-10 text-slate-300" />
+            <div className="h-24 bg-gradient-to-br from-stitch-surface-elevated to-stitch-bg flex items-center justify-center relative border-b border-stitch-border/30">
+              <Package className="w-10 h-10 text-stitch-muted" />
               {product.stock <= 5 && (
                 <div className="absolute top-2 right-2 flex items-center gap-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs px-2 py-1 rounded-full font-medium">
                   <AlertTriangle className="w-3 h-3" /> Existencia baja
@@ -80,28 +80,28 @@ export function ProductsContent() {
               </div>
             </div>
             <CardContent className="p-4">
-              <div className="text-xs text-slate-500 font-mono mb-1">{product.sku}</div>
+              <div className="text-xs text-stitch-muted font-mono mb-1">{product.sku}</div>
               {product.category && (
-                <div className="text-[11px] text-slate-500 mb-1 line-clamp-1" title={product.category}>
+                <div className="text-[11px] text-stitch-muted mb-1 line-clamp-1" title={product.category}>
                   {product.category}
                 </div>
               )}
-              <div className="font-semibold text-slate-900 dark:text-white mb-2 line-clamp-2">{product.name}</div>
+              <div className="font-semibold text-stitch-text mb-2 line-clamp-2">{product.name}</div>
               <div className="flex items-baseline gap-2 mb-3">
                 {product.discount_price ? (
                   <>
-                    <span className="text-lg font-bold text-slate-900 dark:text-white">${Math.round(product.discount_price).toLocaleString()}</span>
-                    <span className="text-sm text-slate-400 line-through">${Math.round(product.price).toLocaleString()}</span>
+                    <span className="text-lg font-bold text-stitch-text">${Math.round(product.discount_price).toLocaleString()}</span>
+                    <span className="text-sm text-stitch-muted line-through">${Math.round(product.price).toLocaleString()}</span>
                   </>
                 ) : (
-                  <span className="text-lg font-bold text-slate-900 dark:text-white">${Math.round(product.price).toLocaleString()}</span>
+                  <span className="text-lg font-bold text-stitch-text">${Math.round(product.price).toLocaleString()}</span>
                 )}
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-slate-500">Existencia: <span className={`font-medium ${product.stock <= 5 ? 'text-red-500' : 'text-slate-700 dark:text-slate-300'}`}>{product.stock}</span></span>
-                <span className="text-slate-500">Margen: <span className="font-medium text-slate-700 dark:text-slate-300">{product.margin}%</span></span>
+                <span className="text-stitch-muted">Existencia: <span className={`font-medium ${product.stock <= 5 ? 'text-stitch-danger' : 'text-stitch-text'}`}>{product.stock}</span></span>
+                <span className="text-stitch-muted">Margen: <span className="font-medium text-stitch-text">{product.margin}%</span></span>
               </div>
-              <div className="mt-3 flex justify-end border-t border-slate-100 dark:border-slate-700 pt-3">
+              <div className="mt-3 flex justify-end border-t border-stitch-border/30 pt-3">
                 <Button
                   type="button"
                   variant="outline"

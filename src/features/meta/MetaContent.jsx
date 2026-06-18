@@ -44,6 +44,7 @@ import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { updateProfile } from '@/lib/auth';
 import { confirmDelete } from '@/lib/confirmDelete';
 import { statusVariant } from '@/lib/statusVariant';
+import { StitchPageHeader } from '@/components/stitch/StitchPageHeader';
 import { PAGE_TITLES, STAGE_COLORS } from '@/config/crm';
 
 
@@ -157,15 +158,16 @@ export function MetaContent() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-xl border border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/30 p-4">
+    <div className="max-w-[1440px] mx-auto space-y-6">
+      <StitchPageHeader title="Meta Ads" subtitle="Lead Ads, WhatsApp y webhooks de integración." />
+      <div className="stitch-panel border-stitch-primary-bright/20 bg-stitch-primary-bright/5 p-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h2 className="font-semibold text-slate-900 dark:text-white">Webhook Meta</h2>
-            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-              Usá esta URL como callback en Meta Developers y el secreto <code className="text-xs">META_VERIFY_TOKEN</code> como verify token.
+            <h2 className="font-semibold text-stitch-text text-lg">Webhook Meta</h2>
+            <p className="mt-1 text-sm text-stitch-muted">
+              Usá esta URL como callback en Meta Developers y el secreto <code className="text-xs font-mono">META_VERIFY_TOKEN</code> como verify token.
             </p>
-            <code className="mt-2 block break-all rounded-lg bg-white/70 dark:bg-slate-900/60 px-3 py-2 text-xs text-slate-700 dark:text-slate-200">
+            <code className="mt-2 block break-all rounded-lg bg-[#05070a] border border-stitch-border/40 px-3 py-2 text-xs text-stitch-text font-mono">
               {webhookUrl}
             </code>
           </div>
@@ -177,9 +179,9 @@ export function MetaContent() {
       </div>
 
       {info && (
-        <div className="rounded-lg border border-slate-200 bg-white dark:bg-slate-800 dark:border-slate-700 px-3 py-2 text-sm text-slate-700 dark:text-slate-200">
+        <div className="rounded-lg border border-stitch-border stitch-panel px-3 py-2 text-sm text-stitch-text">
           {info}{' '}
-          <button type="button" className="text-blue-600 dark:text-blue-400 underline" onClick={() => setInfo('')}>
+          <button type="button" className="text-stitch-primary-bright underline" onClick={() => setInfo('')}>
             Cerrar
           </button>
         </div>

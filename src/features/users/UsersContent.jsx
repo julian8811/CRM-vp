@@ -44,6 +44,7 @@ import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { updateProfile } from '@/lib/auth';
 import { confirmDelete } from '@/lib/confirmDelete';
 import { PAGE_TITLES, STAGE_COLORS } from '@/config/crm';
+import { StitchPageHeader } from '@/components/stitch/StitchPageHeader';
 
 
 // Users Page
@@ -135,14 +136,11 @@ export function UsersContent() {
   ];
 
   return (
-    <div>
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Usuarios</h2>
-          <p className="text-sm text-slate-500">
-            {users.length} {users.length === 1 ? 'usuario' : 'usuarios'} · Equipo desde Supabase Auth + profiles
-          </p>
-        </div>
+    <div className="max-w-[1440px] mx-auto">
+      <StitchPageHeader
+        title="Usuarios"
+        subtitle={`${users.length} ${users.length === 1 ? 'usuario' : 'usuarios'} · Equipo desde Supabase Auth + profiles`}
+        actions={
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
           {profile?.role === 'admin' && (
             <>
@@ -168,7 +166,8 @@ export function UsersContent() {
             Gestionar en Supabase
           </Button>
         </div>
-      </div>
+        }
+      />
       {(inviteStatus || roleStatus) && (
         <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">{inviteStatus || roleStatus}</p>
       )}

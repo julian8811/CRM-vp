@@ -43,7 +43,7 @@ import { invokeCrmAi } from '@/lib/crmAi';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { updateProfile } from '@/lib/auth';
 import { confirmDelete } from '@/lib/confirmDelete';
-import { PAGE_TITLES, STAGE_COLORS } from '@/config/crm';
+import { StitchPageHeader } from '@/components/stitch/StitchPageHeader';
 
 
 function ticketDisplay(t) {
@@ -87,22 +87,22 @@ export function PostsaleContent() {
   };
 
   return (
-    <div>
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Postventa</h2>
-          <p className="text-sm text-slate-500">Tickets en la tabla support_tickets (Supabase).</p>
-        </div>
-        <Button type="button" onClick={() => setModalOpen(true)} className="w-full justify-center sm:w-auto">
-          <Plus className="w-4 h-4" />
-          Nuevo Ticket
-        </Button>
-      </div>
+    <div className="max-w-[1440px] mx-auto">
+      <StitchPageHeader
+        title="Postventa"
+        subtitle="Tickets en la tabla support_tickets (Supabase)."
+        actions={
+          <Button type="button" onClick={() => setModalOpen(true)} className="w-full justify-center sm:w-auto">
+            <Plus className="w-4 h-4" />
+            Nuevo Ticket
+          </Button>
+        }
+      />
 
       {modalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4" onClick={() => setModalOpen(false)}>
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 max-w-md w-full shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <h3 className="font-semibold text-lg mb-4 text-slate-900 dark:text-white">Nuevo ticket</h3>
+          <div className="stitch-panel p-6 max-w-md w-full shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-semibold text-lg mb-4 text-stitch-text">Nuevo ticket</h3>
             <form onSubmit={submitTicket} className="space-y-3">
               <div>
                 <Label>Cliente / empresa</Label>

@@ -44,6 +44,7 @@ import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { updateProfile } from '@/lib/auth';
 import { confirmDelete } from '@/lib/confirmDelete';
 import { PAGE_TITLES, STAGE_COLORS } from '@/config/crm';
+import { StitchPageHeader } from '@/components/stitch/StitchPageHeader';
 
 
 // Settings Page
@@ -110,16 +111,16 @@ export function SettingsContent() {
   };
 
   return (
-    <div className="max-w-3xl">
-      <div className="mb-6">
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white">Configuración</h2>
-        <p className="text-sm text-slate-500">Perfil y preferencias en Supabase (tabla user_preferences).</p>
-      </div>
+    <div className="max-w-3xl mx-auto">
+      <StitchPageHeader
+        title="Configuración"
+        subtitle="Perfil y preferencias en Supabase (tabla user_preferences)."
+      />
       
       <div className="space-y-6">
         <Card>
           <CardContent className="p-6">
-            <h3 className="font-semibold text-slate-900 dark:text-white mb-4">Perfil (sesión actual)</h3>
+            <h3 className="font-semibold text-stitch-text mb-4">Perfil (sesión actual)</h3>
             <div className="space-y-4">
               <div className="flex items-center gap-4">
                 <Avatar src={profile?.avatar_url} name={`${meta.first_name || user?.email || '?'} ${meta.last_name || ''}`} size="lg" />

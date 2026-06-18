@@ -1,22 +1,21 @@
 import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
-const Button = forwardRef(({ 
-  className, 
-  variant = 'primary', 
-  size = 'md', 
+const Button = forwardRef(({
+  className,
+  variant = 'primary',
+  size = 'md',
   children,
-  ...props 
+  ...props
 }, ref) => {
   const variants = {
-    primary: 'bg-primary text-white hover:bg-primary-light active:scale-[0.98]',
-    secondary: 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300',
-    outline:
-      'border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700',
-    ghost: 'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800',
-    danger: 'bg-red-500 text-white hover:bg-red-600',
+    primary: 'bg-stitch-primary-bright text-[#031427] hover:bg-stitch-primary font-semibold',
+    secondary: 'bg-stitch-surface-elevated text-stitch-text hover:bg-stitch-surface border border-stitch-border',
+    outline: 'border border-stitch-border bg-transparent text-stitch-text hover:bg-stitch-surface-elevated hover:border-stitch-primary-bright/40',
+    ghost: 'bg-transparent text-stitch-muted hover:bg-stitch-surface-elevated hover:text-stitch-text',
+    danger: 'bg-stitch-danger/90 text-white hover:bg-stitch-danger',
   };
-  
+
   const sizes = {
     sm: 'px-3 py-1.5 text-sm',
     md: 'px-4 py-2 text-sm',
@@ -27,7 +26,7 @@ const Button = forwardRef(({
     <button
       ref={ref}
       className={cn(
-        'inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-all duration-150 ease-out disabled:opacity-50 disabled:cursor-not-allowed',
+        'inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-all duration-150 ease-out disabled:opacity-50 disabled:cursor-not-allowed',
         variants[variant],
         sizes[size],
         className
