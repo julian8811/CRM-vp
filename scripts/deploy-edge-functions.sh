@@ -4,18 +4,15 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-if ! command -v supabase >/dev/null 2>&1; then
-  echo "Instalá Supabase CLI: https://supabase.com/docs/guides/cli"
-  exit 1
-fi
+CLI="${SUPABASE_CLI:-npx supabase}"
 
 echo "Desplegando Edge Functions a Supabase..."
-supabase functions deploy crm-ai
-supabase functions deploy invite-user
-supabase functions deploy run-automations --no-verify-jwt
-supabase functions deploy meta-webhook --no-verify-jwt
-supabase functions deploy meta-sync-leads
-supabase functions deploy meta-send-whatsapp
+$CLI functions deploy crm-ai
+$CLI functions deploy invite-user
+$CLI functions deploy run-automations --no-verify-jwt
+$CLI functions deploy meta-webhook --no-verify-jwt
+$CLI functions deploy meta-sync-leads
+$CLI functions deploy meta-send-whatsapp
 
 cat <<'EOF'
 

@@ -22,7 +22,7 @@ if [[ -z "${SUPABASE_ACCESS_TOKEN:-}" ]]; then
 fi
 
 export SUPABASE_ACCESS_TOKEN
-CLI="npx supabase"
+CLI="${SUPABASE_CLI:-npx supabase}"
 
 green "1/4 — Link proyecto $PROJECT_REF"
 $CLI link --project-ref "$PROJECT_REF"
@@ -31,7 +31,7 @@ green "2/4 — Aplicar migraciones"
 if [[ "${SKIP_INITIAL_MIGRATION:-}" == "1" ]]; then
   $CLI migration repair --status applied 20260401000000 2>/dev/null || true
 fi
-$CLI db push
+$CLI db push --yes
 
 green "3/4 — Desplegar Edge Functions"
 bash "$ROOT/scripts/deploy-edge-functions.sh"

@@ -4,10 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-if ! command -v supabase >/dev/null 2>&1; then
-  echo "Instalá Supabase CLI: https://supabase.com/docs/guides/cli"
-  exit 1
-fi
+CLI="${SUPABASE_CLI:-npx supabase}"
 
 echo "== CRM-VP bootstrap Supabase =="
 echo "Proyecto remoto: tgosnmvlvzaykiuolrot"
@@ -21,7 +18,7 @@ echo "1/3 — Si es un proyecto NUEVO, aplicá el schema base en SQL Editor:"
 echo "     supabase-schema.sql"
 echo
 echo "2/3 — Aplicando migraciones incrementales..."
-supabase db push
+$CLI db push --yes
 echo
 echo "3/3 — Desplegando Edge Functions..."
 bash "$ROOT/scripts/deploy-edge-functions.sh"

@@ -4,20 +4,20 @@
 **Repositorio:** https://github.com/julian8811/CRM-vp  
 **Supabase:** `tgosnmvlvzaykiuolrot`
 
-## Estado del checklist
+## Estado del checklist (actualizado 2026-06-18)
 
 | # | Tarea | Estado | Notas |
 |---|--------|--------|-------|
-| 1 | Variables `VITE_SUPABASE_*` en Vercel | ✅ Hecho | La app en producción muestra login (Supabase configurado) |
-| 2 | Schema base + migraciones | ⚠️ Manual | Proyectos nuevos: `supabase-schema.sql` → `supabase db push` |
-| 3 | Edge Functions desplegadas | ⚠️ Manual | `npm run deploy:functions` |
-| 4 | Secretos Supabase | ⚠️ Manual | Ver tabla abajo |
-| 5 | Frontend en Vercel | ✅ Hecho | https://crm-vp.vercel.app/ |
-| 6 | Cron `run-automations` | ⚠️ Manual | Programar cada 15–60 min |
-| 7 | Webhook Meta | ⚠️ Manual | Callback → `.../functions/v1/meta-webhook` |
+| 1 | Variables `VITE_SUPABASE_*` en Vercel | ✅ Hecho | Login en producción OK |
+| 2 | Schema base + migraciones | ✅ Hecho | 7 migraciones aplicadas en `tgosnmvlvzaykiuolrot` |
+| 3 | Edge Functions desplegadas | ✅ Hecho | 6 functions desplegadas |
+| 4 | Secretos Supabase | ⚠️ Parcial | `OPENAI_API_KEY`, `SERVICE_ROLE` OK · `CRON_SECRET` configurado · faltan `META_*` y `RESEND_*` si los usás |
+| 5 | Frontend en Vercel | ✅ Hecho | Merge PR #2 para Google OAuth + features nuevas |
+| 6 | Cron `run-automations` | ⚠️ Manual | Secret listo; programar invocación periódica (ver abajo) |
+| 7 | Webhook Meta | ⚠️ Manual | Requiere secretos Meta + callback en Developers |
 | 8 | Google OAuth | ⚠️ Manual | Habilitar provider en Supabase Auth |
-| 9 | Usuario admin | ⚠️ Manual | `UPDATE profiles SET role = 'admin' WHERE id = '...'` |
-| 10 | Emails (Resend) | Opcional | `RESEND_API_KEY` + `NOTIFICATION_FROM_EMAIL` |
+| 9 | Usuario admin | ✅ Hecho | `Julián Esteban Pineda Montoya` → `admin` |
+| 10 | Emails (Resend) | Opcional | `RESEND_API_KEY` no configurado aún |
 
 ## Credenciales que el agente / operador necesita
 
