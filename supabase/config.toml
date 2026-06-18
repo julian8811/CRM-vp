@@ -20,7 +20,16 @@ port = 54323
 
 [auth]
 site_url = "https://crm-vp.vercel.app"
-additional_redirect_urls = ["http://localhost:5173", "https://crm-vp.vercel.app"]
+additional_redirect_urls = [
+  "https://crm-vp.vercel.app/**",
+  "http://localhost:5173/**",
+  "http://localhost:3000/**",
+]
+
+[auth.external.google]
+enabled = true
+client_id = "env(GOOGLE_CLIENT_ID)"
+secret = "env(GOOGLE_CLIENT_SECRET)"
 
 [functions.crm-ai]
 verify_jwt = true

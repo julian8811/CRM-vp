@@ -9,15 +9,18 @@
 | # | Tarea | Estado | Notas |
 |---|--------|--------|-------|
 | 1 | Variables `VITE_SUPABASE_*` en Vercel | ✅ Hecho | Login en producción OK |
-| 2 | Schema base + migraciones | ✅ Hecho | 7 migraciones aplicadas en `tgosnmvlvzaykiuolrot` |
+| 2 | Schema base + migraciones | ✅ Hecho | 10 migraciones en `tgosnmvlvzaykiuolrot` (incl. fix RLS) |
 | 3 | Edge Functions desplegadas | ✅ Hecho | 6 functions desplegadas |
-| 4 | Secretos Supabase | ⚠️ Parcial | `OPENAI_API_KEY`, `SERVICE_ROLE` OK · `CRON_SECRET` configurado · faltan `META_*` y `RESEND_*` si los usás |
-| 5 | Frontend en Vercel | ✅ Hecho | Merge PR #2 para Google OAuth + features nuevas |
+| 4 | Secretos Supabase | ⚠️ Parcial | `OPENAI_API_KEY` configurada pero **cuota agotada** · `CRON_SECRET` OK · faltan `META_*` y `RESEND_*` |
+| 5 | Frontend en Vercel | ✅ Hecho | Bundle con Google OAuth |
 | 6 | Cron `run-automations` | ✅ Hecho | `pg_cron` job `crm-vp-run-automations` cada 15 min |
 | 7 | Webhook Meta | ⚠️ Manual | Requiere secretos Meta + callback en Developers |
-| 8 | Google OAuth | ⚠️ Manual | `site_url` configurado · faltan Client ID/Secret de Google Cloud |
+| 8 | Google OAuth | ✅ Hecho | Provider habilitado; redirect a Google verificado |
 | 9 | Usuario admin | ✅ Hecho | `Julián Esteban Pineda Montoya` → `admin` |
 | 10 | Emails (Resend) | Opcional | `RESEND_API_KEY` no configurado aún |
+| 11 | Verificación E2E | ✅ Hecho | Ver [PRODUCTION_VERIFICATION.md](./PRODUCTION_VERIFICATION.md) |
+
+> **Fix crítico (2026-06-18):** se corrigió recursión RLS en `profiles` y se restauraron políticas faltantes en `opportunities`, `orders`, `quotations` y `activity_log`.
 
 ## Credenciales que el agente / operador necesita
 
@@ -113,9 +116,17 @@ Backup opcional: workflow `.github/workflows/cron-automations.yml` (requiere `CR
 
 ## 5. Google OAuth
 
-`site_url` y redirects ya apuntan a `https://crm-vp.vercel.app`.
+**Configurado en Supabase** (provider Google habilitado).
 
-Falta crear credenciales en [Google Cloud Console](https://console.cloud.google.com/apis/credentials) y ejecutar:
+Para recrear o actualizar credenciales:
+
+```bash
+export GOOGLE_CLIENT_ID=....apps.googleusercontent.com
+export GOOGLE_CLIENT_SECRET=GOCSPX-...
+npx supabase config push --yes
+```
+
+O vía Management API:
 
 ```bash
 export SUPABASE_ACCESS_TOKEN=sbp_...
@@ -147,7 +158,23 @@ WHERE id = '<tu-user-uuid>';
 3. Registrar formularios Lead Ads en la app
 4. Configurar secretos `META_*` en Supabase
 
-## 8. Verificación rápida
+## 8. Verificación en producción
+
+Informe completo: [PRODUCTION_VERIFICATION.md](./PRODUCTION_VERIFICATION.md)
+
+| Prueba | Estado |
+|--------|--------|
+| Login email/password | ✅ |
+| Login Google | ✅ (redirect verificado) |
+| CRUD cliente / lead / producto | ✅ |
+| Pipeline drag & drop (API) | ✅ |
+| Notificación al crear lead | ✅ (in-app) |
+| Chat IA | ❌ OpenAI quota exceeded |
+| Invitar usuario (admin) | ⏸️ No probado en UI |
+| Emails vía Resend | ⏸️ Sin `RESEND_API_KEY` |
+| Meta / WhatsApp | ⏸️ Sin secretos |
+
+### Verificación rápida (CI local)
 
 ```bash
 npm ci
@@ -155,15 +182,6 @@ npm run lint
 npm run test:run
 npm run build
 ```
-
-En producción:
-- [ ] Login email/password
-- [ ] Login Google (si provider habilitado)
-- [ ] CRUD cliente / lead / producto
-- [ ] Pipeline drag & drop
-- [ ] Notificación al crear lead
-- [ ] Chat IA (con `OPENAI_API_KEY`)
-- [ ] Invitar usuario (admin + `invite-user` desplegada)
 
 ## Cambios incluidos en este checklist (código)
 
